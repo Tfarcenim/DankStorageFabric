@@ -2,7 +2,6 @@
   "required": true,
   "package": "tfar.dankstorage.mixin",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "dankstorage.refmap.json",
   "mixins": [
     "HopperBlockEntityMixin",
     "ItemStackMixin",
