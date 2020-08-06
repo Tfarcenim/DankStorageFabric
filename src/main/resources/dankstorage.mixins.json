@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "package": "tfar.dankstorage.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "dankstorage.refmap.json",
+  "mixins": [
+    "ItemStackMixin",
+    "ItemUsageContextAccessor",
+    "MinecraftClientAccessor",
+    "MinecraftClientMixin",
+    "MixinBlock",
+    "MixinBowItem",
+    "MixinPlayerEntity",
+    "PlayerInventoryMixin",
+    "SimpleInventoryAccessor"
+  ],
+  "client": [
+    "MouseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}

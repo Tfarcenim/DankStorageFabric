@@ -1,0 +1,6 @@
+{
+  "parent": "dankstorage:block/core",
+  "textures": {
+    "1": "dankstorage:block/dank_5"
+  }
+}

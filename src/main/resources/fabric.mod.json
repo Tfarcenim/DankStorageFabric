@@ -1,10 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "dankstorage",
   "version": "${version}",
+  "accessWidener" : "dankstorage.accesswidener",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Dank Storage",
+  "description": "It's a backpack, no it's a chest, no it's dank storage",
   "authors": [
     "Me!"
   ],
@@ -19,11 +20,14 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "tfar.dankstorage.DankStorage"
+    ],
+    "client": [
+      "tfar.dankstorage.DankStorage"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "dankstorage.mixins.json"
   ],
 
   "depends": {
