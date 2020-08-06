@@ -1,6 +1,7 @@
 package tfar.dankstorage.utils;
 
 import net.fabricmc.fabric.api.tag.TagRegistry;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
@@ -216,6 +217,18 @@ public class Utils {
 		if (stack.getItem() instanceof DankItem)return true;
 		stack = player.getOffHandStack();
 		return stack.getItem() instanceof DankItem;
+	}
+
+	public static boolean canMerge(ItemStack first, ItemStack second, Inventory inventory) {
+		if (first.getItem() != second.getItem()) {
+			return false;
+		} else if (first.getDamage() != second.getDamage()) {
+			return false;
+		} else if (first.getCount() > inventory.getMaxCountPerStack()) {
+			return false;
+		} else {
+			return ItemStack.areTagsEqual(first, second);
+		}
 	}
 
 	public static boolean DEV;

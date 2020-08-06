@@ -236,9 +236,9 @@ public abstract class AbstractDankContainer extends ScreenHandler {
               } else {
                 int toMove;
                 if (slot6 instanceof DankSlot) {
-                  if (slotStack.getMaxCount() <= slotStack.getCount()) {
+                  if (slotStack.getCount() >= slotStack.getMaxCount()) {
                     if (dragType == 0) {
-                      if (locked) {
+                      if (locked && slotStack.getCount() == slotStack.getMaxCount()) {
                         toMove = slotStack.getMaxCount() - 1;
                       } else {
                         toMove = slotStack.getMaxCount();

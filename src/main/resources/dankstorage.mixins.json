@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "dankstorage.refmap.json",
   "mixins": [
+    "HopperBlockEntityMixin",
     "ItemStackMixin",
     "ItemUsageContextAccessor",
     "MinecraftClientAccessor",

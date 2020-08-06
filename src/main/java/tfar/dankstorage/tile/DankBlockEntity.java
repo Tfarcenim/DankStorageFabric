@@ -6,6 +6,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
@@ -25,7 +26,7 @@ import tfar.dankstorage.utils.Utils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class DankBlockEntity extends BlockEntity implements Nameable, NamedScreenHandlerFactory {
+public class DankBlockEntity extends BlockEntity implements Nameable, NamedScreenHandlerFactory , Inventory {
 
   protected final PropertyDelegate propertyDelegate;
   public int numPlayersUsing = 0;
@@ -137,6 +138,43 @@ public class DankBlockEntity extends BlockEntity implements Nameable, NamedScree
     return new BlockEntityUpdateS2CPacket(getPos(), 1, toInitialChunkDataTag());
   }
 
+  //Inventory nonsense
+
+  @Override
+  public int size() {
+    return handler.size();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return handler.isEmpty();
+  }
+
+  @Override
+  public ItemStack getStack(int slot) {
+    return handler.getStack(slot);
+  }
+
+  @Override
+  public ItemStack removeStack(int slot, int amount) {
+    return handler.removeStack(slot,amount);
+  }
+
+  @Override
+  public ItemStack removeStack(int slot) {
+    return handler.removeStack(slot);
+  }
+
+  @Override
+  public void setStack(int slot, ItemStack stack) {
+    handler.setStack(slot,stack);
+  }
+
+  @Override
+  public int getMaxCountPerStack() {
+    return handler.getMaxCountPerStack();
+  }
+
   @Override
   public void markDirty() {
     super.markDirty();
@@ -144,6 +182,11 @@ public class DankBlockEntity extends BlockEntity implements Nameable, NamedScree
       getWorld().updateListeners(pos, getWorld().getBlockState(pos), getWorld().getBlockState(pos), 3);
       this.world.updateNeighborsAlways(this.pos, this.getCachedState().getBlock());
     }
+  }
+
+  @Override
+  public boolean canPlayerUse(PlayerEntity player) {
+    return true;
   }
 
   public void setCustomName(Text text) {
@@ -155,7 +198,7 @@ public class DankBlockEntity extends BlockEntity implements Nameable, NamedScree
     return customName != null ? customName : getDefaultName();
   }
 
-  Text getDefaultName() {
+  public Text getDefaultName() {
     return new TranslatableText("container.dankstorage.dank_"+getCachedState().get(DockBlock.TIER));
   }
 
@@ -207,5 +250,10 @@ public class DankBlockEntity extends BlockEntity implements Nameable, NamedScree
       handler.addTank(tank.getOrCreateTag().getCompound(Utils.INV),tank);
       tank.decrement(1);
     }
+  }
+
+  @Override
+  public void clear() {
+
   }
 }
