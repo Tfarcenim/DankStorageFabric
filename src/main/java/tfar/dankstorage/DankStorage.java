@@ -59,8 +59,8 @@ public class DankStorage implements ModInitializer, ClientModInitializer {
     Registry.register(Registry.BLOCK_ENTITY_TYPE,new Identifier(MODID,"dank_tile"),dank_tile = BlockEntityType.Builder.create(DankBlockEntity::new, dock).build(null));
 
     IntStream.range(1,8).forEach(i -> Registry.register(Registry.ITEM,new Identifier(MODID,"dank_"+i),new DankItem(properties.maxCount(1), DankStats.values()[i])));
-    IntStream.range(1,8).forEach(i -> Registry.register(Registry.ITEM,new Identifier(MODID,i+"_to_"+(i+1)),new UpgradeItem(properties,new UpgradeInfo(i,i+1))));
-    Registry.register(Registry.RECIPE_SERIALIZER,new Identifier(MODID,"upgrade"),new Serializer2());
+    IntStream.range(1,7).forEach(i -> Registry.register(Registry.ITEM,new Identifier(MODID,i+"_to_"+(i+1)),new UpgradeItem(properties,new UpgradeInfo(i,i+1))));
+    Registry.register(Registry.RECIPE_SERIALIZER,new Identifier(MODID,"upgrade"),upgrade = new Serializer2());
 
     Registry.register(Registry.SCREEN_HANDLER,new Identifier(MODID,"dank_1"),dank_1_container = new ScreenHandlerType<>(DockContainer::t1));
     Registry.register(Registry.SCREEN_HANDLER,new Identifier(MODID,"portable_dank_1"),portable_dank_1_container = new ScreenHandlerType<>(DankContainer::t1));

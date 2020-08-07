@@ -12,9 +12,9 @@ public class Serializer2 extends ShapedRecipe.Serializer {
       return new UpgradeRecipe(super.read(location,json));
    }
 
+
+
   @Override
-  @Nonnull
-  @SuppressWarnings("ConstantConditions")
   public UpgradeRecipe read(@Nonnull Identifier p_199426_1_, PacketByteBuf p_199426_2_) {
     return new UpgradeRecipe(super.read(p_199426_1_, p_199426_2_));
   }
