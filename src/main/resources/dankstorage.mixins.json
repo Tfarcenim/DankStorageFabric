@@ -10,7 +10,7 @@
     "MinecraftClientMixin",
     "MixinBlock",
     "MixinBowItem",
-    "MixinPlayerEntity",
+    "PlayerEntityMixin",
     "PlayerInventoryMixin",
     "SimpleInventoryAccessor"
   ],

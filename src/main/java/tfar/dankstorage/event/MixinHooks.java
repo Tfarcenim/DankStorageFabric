@@ -4,11 +4,15 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tfar.dankstorage.DankItem;
 import tfar.dankstorage.container.DankContainer;
+import tfar.dankstorage.ducks.UseDankStorage;
+import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.PortableDankInventory;
 import tfar.dankstorage.utils.ItemHandlerHelper;
 import tfar.dankstorage.utils.Mode;
@@ -17,6 +21,8 @@ import tfar.dankstorage.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 public class MixinHooks {
 	public static <T extends LivingEntity> void actuallyBreakItem(int p_222118_1_, T livingEntity, Consumer<T> p_222118_3_, CallbackInfo ci) {
@@ -43,6 +49,40 @@ public class MixinHooks {
 			}
 		}
 		return false;
+	}
+
+	public static ItemStack myFindAmmo(PlayerEntity player, ItemStack bow) {
+		Predicate<ItemStack> predicate = ((RangedWeaponItem) bow.getItem()).getProjectiles();
+
+		ItemStack dank = getDankStorage(player);
+		if (!dank.isEmpty())
+			return Utils.getHandler(dank).getContents().stream()
+							.filter(predicate).findFirst().orElse(ItemStack.EMPTY);
+		return ItemStack.EMPTY;
+	}
+
+	private static ItemStack getDankStorage(PlayerEntity player){
+		return IntStream.range(0, player.inventory.size()).mapToObj(player.inventory::getStack)
+						.filter(stack -> stack.getItem() instanceof DankItem).findFirst()
+						.orElse(ItemStack.EMPTY);
+	}
+
+	public static void onStoppedUsing(ItemStack bow, World worldIn, LivingEntity entityLiving, int timeLeft) {
+		if (entityLiving instanceof PlayerEntity && !worldIn.isClient){
+			PlayerEntity player = (PlayerEntity) entityLiving;
+			Predicate<ItemStack> predicate = ((RangedWeaponItem) bow.getItem()).getProjectiles();
+			if (((UseDankStorage)player).useDankStorage() && !player.abilities.creativeMode) {
+				ItemStack dank = getDankStorage(player);
+				DankInventory dankInventory = Utils.getHandler(dank);
+				for (int i = 0;i < dankInventory.size();i++){
+					ItemStack stack = dankInventory.getStack(i);
+					if (predicate.test(stack)){
+						dankInventory.removeStack(i,1);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	public static boolean onItemPickup(PlayerEntity player, ItemStack pickup, ItemStack dank) {
