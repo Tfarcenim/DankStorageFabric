@@ -235,7 +235,7 @@ public class Utils {
 
 	static {
 		try {
-			Items.class.getField("field_8036");//empty in ItemStack
+			ItemStack.class.getField("field_8036");//empty in ItemStack
 			DEV = false;
 		} catch (NoSuchFieldException e) {
 			DEV = true;
