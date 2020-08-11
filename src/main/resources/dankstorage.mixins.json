@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "HopperBlockEntityMixin",
+    "ItemEntityMixin",
     "ItemStackMixin",
     "ItemUsageContextAccessor",
     "MinecraftClientAccessor",

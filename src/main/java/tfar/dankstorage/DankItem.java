@@ -2,6 +2,7 @@ package tfar.dankstorage;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.damage.DamageSource;
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.container.PortableDankProvider;
 import tfar.dankstorage.inventory.DankInventory;
@@ -286,6 +287,11 @@ public class DankItem extends Item {
     ActionResult actionResultType = toPlace.getItem().useOnBlock(ctx2);//ctx2.getItem().onItemUse(ctx);
     handler.setStack(selectedSlot, ctx2.getStack());
     return actionResultType;
+  }
+
+  @Override
+  public boolean damage(DamageSource source) {
+    return source == DamageSource.OUT_OF_WORLD;
   }
 
   public static class ItemUseContextExt extends ItemUsageContext {
