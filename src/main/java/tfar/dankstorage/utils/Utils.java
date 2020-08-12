@@ -1,13 +1,14 @@
 package tfar.dankstorage.utils;
 
+import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagGroup;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -198,8 +199,8 @@ public class Utils {
 
 	public static boolean areItemStacksConvertible(final ItemStack stack1, final ItemStack stack2) {
 		if (stack1.hasTag() || stack2.hasTag()) return false;
-		Set<Identifier> taglistofstack1 = getTags(stack1.getItem());
-		Set<Identifier> taglistofstack2 = getTags(stack2.getItem());
+		Collection<Identifier> taglistofstack1 = getTags(stack1.getItem());
+		Collection<Identifier> taglistofstack2 = getTags(stack2.getItem());
 
 		Set<Identifier> commontags = new HashSet<>(taglistofstack1);
 		commontags.retainAll(taglistofstack2);
@@ -207,9 +208,17 @@ public class Utils {
 		return !commontags.isEmpty();
 	}
 
-	public static Set<Identifier> getTags(Item item) {
-		return ItemTags.getContainer().getEntries().entrySet().stream().filter(identifierTagEntry -> identifierTagEntry.getValue().contains(item))
-						.map(Map.Entry::getKey).collect(Collectors.toSet());
+	public static Collection<Identifier> getTags(Item item) {
+		return getTagsFor(ItemTags.getTagGroup(),item);
+	}
+
+	/**
+	 * can't use TagGroup#getTagsFor because it's client only
+	 */
+	public static Collection<Identifier> getTagsFor(TagGroup<Item> tagGroup, Item item) {
+		return tagGroup.getTags().entrySet().stream()
+						.filter(identifierTagEntry -> identifierTagEntry.getValue().contains(item))
+						.map(Map.Entry::getKey).collect(Collectors.toList());
 	}
 
 	public static boolean isHoldingDank(PlayerEntity player) {

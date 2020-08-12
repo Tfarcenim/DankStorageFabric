@@ -138,7 +138,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 			if (!this.touchDragStack.isEmpty() && this.touchIsRightClickDrag) {
 				itemstack = itemstack.copy();
 				itemstack.setCount(MathHelper.ceil((float) itemstack.getCount() / 2.0F));
-			} else if (this.isCursorDragging && this.cursorDragSlots.size() > 1) {
+			} else if (this.cursorDragging && this.cursorDragSlots.size() > 1) {
 				itemstack = itemstack.copy();
 				itemstack.setCount(this.draggedStackRemainder);
 
@@ -226,7 +226,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 		if (slotIn == this.touchDragSlotStart && !this.touchDragStack.isEmpty() && this.touchIsRightClickDrag && !itemstack.isEmpty()) {
 			itemstack = itemstack.copy();
 			itemstack.setCount(itemstack.getCount() / 2);
-		} else if (this.isCursorDragging && this.cursorDragSlots.contains(slotIn) && !itemstack1.isEmpty()) {
+		} else if (this.cursorDragging && this.cursorDragSlots.contains(slotIn) && !itemstack1.isEmpty()) {
 			if (this.cursorDragSlots.size() == 1) {
 				return;
 			}
@@ -235,7 +235,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 				itemstack = itemstack1.copy();
 				flag = true;
 				ScreenHandler.calculateStackSize(this.cursorDragSlots, this.heldButtonType, itemstack, slotIn.getStack().isEmpty() ? 0 : slotIn.getStack().getCount());
-				int k = slotIn.getMaxStackAmount(itemstack);
+				int k = slotIn.getMaxItemCount(itemstack);
 
 				if (itemstack.getCount() > k) {
 					s = Formatting.YELLOW.toString() + k;
@@ -284,7 +284,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 	private void calculateOffset() {
 		ItemStack itemstack = this.client.player.inventory.getCursorStack();
 
-		if (!itemstack.isEmpty() && this.isCursorDragging) {
+		if (!itemstack.isEmpty() && this.cursorDragging) {
 			if (this.heldButtonType == 2) {
 				this.draggedStackRemainder = itemstack.getMaxCount();
 			} else {
@@ -296,7 +296,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 					int i = itemstack2.isEmpty() ? 0 : itemstack2.getCount();
 					ScreenHandler.calculateStackSize(this.cursorDragSlots, this.heldButtonType, itemstack1, i);
 					//int j = Math.min(itemstack1.getMaxStackSize(), slot.getItemStackLimit(itemstack1));
-					int j = slot.getMaxStackAmount(itemstack1);
+					int j = slot.getMaxItemCount(itemstack1);
 
 					if (itemstack1.getCount() > j) {
 						itemstack1.setCount(j);
@@ -360,7 +360,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 		boolean isPickBlock = false;//this.client.options.keyPickItem.isActiveAndMatches(mouseKey);
 		Slot slot = this.getSlotAtPosition(mouseX, mouseY);
 		long i = System.currentTimeMillis();
-		this.isDoubleClicking = this.lastClickedSlot == slot && i - this.lastButtonClickTime < 250L && this.lastClickedButton == mouseButton;
+		this.doubleClicking = this.lastClickedSlot == slot && i - this.lastButtonClickTime < 250L && this.lastClickedButton == mouseButton;
 		this.cancelNextRelease = false;
 
 		if (mouseButton == 0 || mouseButton == 1 || isPickBlock) {
@@ -393,7 +393,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 					} else {
 						this.touchDragSlotStart = null;
 					}
-				} else if (!this.isCursorDragging) {
+				} else if (!this.cursorDragging) {
 					if (this.client.player.inventory.getCursorStack().isEmpty()) {
 						if (/*this.client.options.keyPickItem.isActiveAndMatches(mouseKey)*/false) {
 							this.onMouseClick(slot, l, mouseButton, SlotActionType.CLONE);
@@ -413,7 +413,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 
 						this.cancelNextRelease = true;
 					} else {
-						this.isCursorDragging = true;
+						this.cursorDragging = true;
 						this.heldButtonCode = mouseButton;
 						this.cursorDragSlots.clear();
 
@@ -464,7 +464,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 					}
 				}
 			}
-		} else if (this.isCursorDragging && slot != null && !itemstack.isEmpty() && (itemstack.getCount() > this.cursorDragSlots.size() || this.heldButtonType == 2) && DockContainer.canInsertItemIntoSlot(slot, itemstack, true) && slot.canInsert(itemstack) && this.handler.canInsertIntoSlot(slot)) {
+		} else if (this.cursorDragging && slot != null && !itemstack.isEmpty() && (itemstack.getCount() > this.cursorDragSlots.size() || this.heldButtonType == 2) && DockContainer.canInsertItemIntoSlot(slot, itemstack, true) && slot.canInsert(itemstack) && this.handler.canInsertIntoSlot(slot)) {
 			this.cursorDragSlots.add(slot);
 			this.calculateOffset();
 		}
@@ -496,7 +496,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 			k = -999;
 		}
 
-		if (this.isDoubleClicking && slot1 != null && state == 0 && this.handler.canInsertIntoSlot(ItemStack.EMPTY, slot1)) {
+		if (this.doubleClicking && slot1 != null && state == 0 && this.handler.canInsertIntoSlot(ItemStack.EMPTY, slot1)) {
 			if (Screen.hasShiftDown()) {
 				if (!this.quickMovingStack.isEmpty()) {
 					for (Slot slot2 : this.handler.slots) {
@@ -509,11 +509,11 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 				this.onMouseClick(slot1, k, state, SlotActionType.PICKUP_ALL);
 			}
 
-			this.isDoubleClicking = false;
+			this.doubleClicking = false;
 			this.lastButtonClickTime = 0L;
 		} else {
-			if (this.isCursorDragging && this.heldButtonCode != state) {
-				this.isCursorDragging = false;
+			if (this.cursorDragging && this.heldButtonCode != state) {
+				this.cursorDragging = false;
 				this.cursorDragSlots.clear();
 				this.cancelNextRelease = true;
 				return true;
@@ -557,7 +557,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 					this.touchDragStack = ItemStack.EMPTY;
 					this.touchDragSlotStart = null;
 				}
-			} else if (this.isCursorDragging && !this.cursorDragSlots.isEmpty()) {
+			} else if (this.cursorDragging && !this.cursorDragSlots.isEmpty()) {
 				this.onMouseClick(null, -999, ScreenHandler.packQuickCraftData(0, this.heldButtonType), SlotActionType.QUICK_CRAFT);
 
 				for (Slot slot2 : this.cursorDragSlots) {
@@ -584,7 +584,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 			this.lastButtonClickTime = 0L;
 		}
 
-		this.isCursorDragging = false;
+		this.cursorDragging = false;
 		return true;
 	}
 

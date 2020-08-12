@@ -123,12 +123,12 @@ public class Constants
         public static final int DISPENSER_SMOKE                 = 2000;
 
         /**
-         * {@code data} is the {@link net.minecraft.block.Block#getStateId state id} of the block broken
+         * {@code data} is the {@link Block#getStateId state id} of the block broken
          */
         public static final int BREAK_BLOCK_EFFECTS             = 2001;
         /**
          * {@code data} is the rgb color int that should be used for the potion particles<br>
-         * This is the same as {@link Constants.WorldEvents#POTION_IMPACT} but uses the particle type {@link ParticleTypes#EFFECT}
+         * This is the same as {@link WorldEvents#POTION_IMPACT} but uses the particle type {@link ParticleTypes#EFFECT}
          */
         public static final int POTION_IMPACT_INSTANT           = 2002;
         public static final int ENDER_EYE_SHATTER               = 2003;
@@ -140,7 +140,7 @@ public class Constants
         public static final int DRAGON_FIREBALL_HIT             = 2006;
         /**
          * {@code data} is the rgb color int that should be used for the potion particles<br>
-         * This is the same as {@link Constants.WorldEvents#POTION_IMPACT_INSTANT} but uses the particle type {@link ParticleTypes#INSTANT_EFFECT}
+         * This is the same as {@link WorldEvents#POTION_IMPACT_INSTANT} but uses the particle type {@link ParticleTypes#INSTANT_EFFECT}
          */
         public static final int POTION_IMPACT                   = 2007;
         public static final int SPAWN_EXPLOSION_PARTICLE        = 2008;

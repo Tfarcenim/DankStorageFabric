@@ -85,3 +85,4 @@ accessible field net/minecraft/screen/ScreenHandler listeners Ljava/util/List;
 mutable field net/minecraft/screen/ScreenHandler listeners Ljava/util/List;
 accessible field net/minecraft/screen/ScreenHandler restrictedPlayers Ljava/util/Set;
 mutable field net/minecraft/screen/ScreenHandler restrictedPlayers Ljava/util/Set;
+accessible field net/minecraft/client/gui/screen/ingame/HandledScreen doubleClicking Z

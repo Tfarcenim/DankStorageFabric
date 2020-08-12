@@ -33,7 +33,7 @@ public class MixinBlock {
                                      BlockPos pos, BlockEntity tileEntityIn,
                                      Entity entityIn, ItemStack dank){
     ItemStack tool = Utils.getItemStackInSelectedSlot(dank);
-    LootContext.Builder lootcontext$builder = (new LootContext.Builder(worldIn)).random(worldIn.random).parameter(LootContextParameters.POSITION, pos).parameter(LootContextParameters.TOOL, tool).optionalParameter(LootContextParameters.THIS_ENTITY, entityIn).optionalParameter(LootContextParameters.BLOCK_ENTITY, tileEntityIn);
+    LootContext.Builder lootcontext$builder = (new LootContext.Builder(worldIn)).random(worldIn.random).parameter(LootContextParameters.TOOL, tool).optionalParameter(LootContextParameters.THIS_ENTITY, entityIn).optionalParameter(LootContextParameters.BLOCK_ENTITY, tileEntityIn);
     return state.getDroppedStacks(lootcontext$builder);
   }
 

@@ -18,7 +18,7 @@ public class DankSlot extends Slot {
   }
 
   @Override
-  public int getMaxStackAmount(@Nonnull ItemStack stack) {
+  public int getMaxItemCount(@Nonnull ItemStack stack) {
     return this.inventory.getMaxCountPerStack();
   }
 }

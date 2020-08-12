@@ -64,8 +64,8 @@ public class DankContainer extends AbstractDankContainer {
         int y = row * 18 + yStart;
         this.addSlot(new Slot(playerinventory, col + row * 9 + 9, x, y) {
           @Override
-          public int getMaxStackAmount(ItemStack stack) {
-            return Math.min(this.getMaxStackAmount(), stack.getMaxCount());
+          public int getMaxItemCount(ItemStack stack) {
+            return Math.min(this.getMaxItemCount(), stack.getMaxCount());
           }
         });
       }

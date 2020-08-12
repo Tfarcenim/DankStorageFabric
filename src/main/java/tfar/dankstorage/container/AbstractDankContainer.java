@@ -58,8 +58,8 @@ public abstract class AbstractDankContainer extends ScreenHandler {
         int y = row * 18 + yStart;
         this.addSlot(new Slot(playerinventory, col + row * 9 + 9, x, y) {
           @Override
-          public int getMaxStackAmount(ItemStack stack) {
-            return Math.min(this.getMaxStackAmount(), stack.getMaxCount());
+          public int getMaxItemCount(ItemStack stack) {
+            return Math.min(this.getMaxItemCount(), stack.getMaxCount());
           }
         });
       }
@@ -70,8 +70,8 @@ public abstract class AbstractDankContainer extends ScreenHandler {
       int y = yStart + 58;
       this.addSlot(new Slot(playerinventory, row, x, y) {
         @Override
-        public int getMaxStackAmount(ItemStack stack) {
-          return Math.min(this.getMaxStackAmount(), stack.getMaxCount());
+        public int getMaxItemCount(ItemStack stack) {
+          return Math.min(this.getMaxItemCount(), stack.getMaxCount());
         }
       });
     }
@@ -149,7 +149,7 @@ public abstract class AbstractDankContainer extends ScreenHandler {
               ItemStack itemstack14 = mouseStackCopy.copy();
               int j3 = dragSlot.hasStack() ? dragSlot.getStack().getCount() : 0;
               calculateStackSize(this.quickCraftSlots, this.quickCraftStage, itemstack14, j3);
-              int k3 = dragSlot.getMaxStackAmount(itemstack14);
+              int k3 = dragSlot.getMaxItemCount(itemstack14);
 
               if (itemstack14.getCount() > k3) {
                 itemstack14.setCount(k3);
@@ -222,8 +222,8 @@ public abstract class AbstractDankContainer extends ScreenHandler {
             if (!mouseStack.isEmpty() && slot6.canInsert(mouseStack)) {
               int i3 = dragType == 0 ? mouseStack.getCount() : 1;
 
-              if (i3 > slot6.getMaxStackAmount(mouseStack)) {
-                i3 = slot6.getMaxStackAmount(mouseStack);
+              if (i3 > slot6.getMaxItemCount(mouseStack)) {
+                i3 = slot6.getMaxItemCount(mouseStack);
               }
 
               slot6.setStack(mouseStack.split(i3));
@@ -277,13 +277,13 @@ public abstract class AbstractDankContainer extends ScreenHandler {
               if (slotStack.getItem() == mouseStack.getItem() && ItemStack.areTagsEqual(slotStack, mouseStack)) {
                 int k2 = dragType == 0 ? mouseStack.getCount() : 1;
 
-                if (k2 > slot6.getMaxStackAmount(mouseStack) - slotStack.getCount()) {
-                  k2 = slot6.getMaxStackAmount(mouseStack) - slotStack.getCount();
+                if (k2 > slot6.getMaxItemCount(mouseStack) - slotStack.getCount()) {
+                  k2 = slot6.getMaxItemCount(mouseStack) - slotStack.getCount();
                 }
 
                 mouseStack.decrement(k2);
                 slotStack.increment(k2);
-              } else if (mouseStack.getCount() <= slot6.getMaxStackAmount(mouseStack) && slotStack.getCount() <= slotStack.getMaxCount()) {
+              } else if (mouseStack.getCount() <= slot6.getMaxItemCount(mouseStack) && slotStack.getCount() <= slotStack.getMaxCount()) {
                 slot6.setStack(mouseStack);
                 PlayerInventory.setCursorStack(slotStack);
               }
@@ -398,7 +398,7 @@ public abstract class AbstractDankContainer extends ScreenHandler {
             if (slot1.hasStack() && DockContainer.canInsertItemIntoSlot(slot1, mouseStack, true) && slot1.canTakeItems(player) && this.canInsertIntoSlot(mouseStack, slot1)) {
               ItemStack itemstack2 = slot1.getStack();
 
-              if (k != 0 || itemstack2.getCount() < slot1.getMaxStackAmount(itemstack2)) {
+              if (k != 0 || itemstack2.getCount() < slot1.getMaxItemCount(itemstack2)) {
                 int i1 = Math.min(mouseStack.getMaxCount() - mouseStack.getCount(), itemstack2.getCount());
                 ItemStack itemstack3 = slot1.takeStack(i1);
                 mouseStack.increment(i1);
@@ -451,7 +451,7 @@ public abstract class AbstractDankContainer extends ScreenHandler {
 
       if (!itemstack.isEmpty() && itemstack.getItem() == stack.getItem() && ItemStack.areTagsEqual(stack, itemstack)) {
         int j = itemstack.getCount() + stack.getCount();
-        int maxSize = slot.getMaxStackAmount(itemstack);
+        int maxSize = slot.getMaxItemCount(itemstack);
 
         if (j <= maxSize) {
           stack.setCount(0);
@@ -484,8 +484,8 @@ public abstract class AbstractDankContainer extends ScreenHandler {
         ItemStack itemstack1 = slot1.getStack();
 
         if (itemstack1.isEmpty() && slot1.canInsert(stack)) {
-          if (stack.getCount() > slot1.getMaxStackAmount(stack)) {
-            slot1.setStack(stack.split(slot1.getMaxStackAmount(stack)));
+          if (stack.getCount() > slot1.getMaxItemCount(stack)) {
+            slot1.setStack(stack.split(slot1.getMaxItemCount(stack)));
           } else {
             slot1.setStack(stack.split(stack.getCount()));
           }
@@ -508,7 +508,7 @@ public abstract class AbstractDankContainer extends ScreenHandler {
       ItemStack slotStack = slot.getStack();
 
       if (!flag && stack.isItemEqualIgnoreDamage(slotStack) && ItemStack.areTagsEqual(slotStack, stack)) {
-        return slotStack.getCount() + (stackSizeMatters ? 0 : stack.getCount()) <= slot.getMaxStackAmount(slotStack);
+        return slotStack.getCount() + (stackSizeMatters ? 0 : stack.getCount()) <= slot.getMaxItemCount(slotStack);
       }
     }
     return flag;
