@@ -22,51 +22,26 @@ import org.apache.logging.log4j.Logger;
 
 public class C2SMessagePickBlock implements PacketConsumer {
 
-  public static void send() {
+  public static void send(int slot) {
     PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+    buf.writeInt(slot);
     ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.pick_block, buf);
   }
 
-  private static final Logger LOGGER = LogManager.getLogger();
 
-  public void handle(PacketContext ctx) {
+  public void handle(PacketContext ctx, int slot) {
     PlayerEntity player = ctx.getPlayer();
-
       ItemStack bag = player.getMainHandStack();
       if (bag.getItem() instanceof DankItem) {
-        PortableDankInventory handler = Utils.getHandler(bag);
-        ItemStack pickblock = onPickBlock(player.rayTrace(20.0D,0,false),player,player.world);
-        int slot = -1;
-        if (!pickblock.isEmpty())
-        for (int i = 0; i < handler.size(); i++) {
-          if (pickblock.getItem() == handler.getStack(i).getItem()){
-            slot = i;
-            break;
-          }
-        }
-        if (slot != -1)
         Utils.setSelectedSlot(bag,slot);
       }
     }
 
-  public static ItemStack onPickBlock(HitResult target, PlayerEntity player, World world) {
-    ItemStack result = ItemStack.EMPTY;
 
-    if (target.getType() == HitResult.Type.BLOCK) {
-      BlockPos pos = ((BlockHitResult) target).getBlockPos();
-      BlockState state = world.getBlockState(pos);
-
-      if (state.isAir()) return ItemStack.EMPTY;
-        result = state.getBlock().getPickStack(world, pos, state);
-
-      if (result.isEmpty())
-        LOGGER.warn("Picking on: [{}] {} gave null item", target.getType(), state.getBlock());
-    }
-    return result;
-  }
 
   @Override
   public void accept(PacketContext packetContext, PacketByteBuf packetByteBuf) {
-    packetContext.getTaskQueue().execute(() -> handle(packetContext));
+    int slot = packetByteBuf.readInt();
+    packetContext.getTaskQueue().execute(() -> handle(packetContext,slot));
   }
 }

@@ -3,8 +3,12 @@ package tfar.dankstorage;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.dispenser.DispenserBehavior;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Items;
 import net.minecraft.util.registry.Registry;
+import tfar.dankstorage.block.DankDispenserBehavior;
 import tfar.dankstorage.block.DockBlock;
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.container.DankContainer;
@@ -13,7 +17,7 @@ import tfar.dankstorage.item.UpgradeInfo;
 import tfar.dankstorage.item.UpgradeItem;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.recipe.Serializer2;
-import tfar.dankstorage.tile.DankBlockEntity;
+import tfar.dankstorage.tile.DockBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
@@ -56,9 +60,13 @@ public class DankStorage implements ModInitializer, ClientModInitializer {
     Item.Settings properties = new Item.Settings().group(ItemGroup.DECORATIONS);
     Registry.register(Registry.BLOCK,new Identifier(MODID,"dock"),dock = new DockBlock(AbstractBlock.Settings.of(Material.METAL).strength(1, 30)));
     Registry.register(Registry.ITEM,new Identifier(MODID,"dock"),new BlockItem(dock,properties));
-    Registry.register(Registry.BLOCK_ENTITY_TYPE,new Identifier(MODID,"dank_tile"),dank_tile = BlockEntityType.Builder.create(DankBlockEntity::new, dock).build(null));
+    Registry.register(Registry.BLOCK_ENTITY_TYPE,new Identifier(MODID,"dank_tile"),dank_tile = BlockEntityType.Builder.create(DockBlockEntity::new, dock).build(null));
 
-    IntStream.range(1,8).forEach(i -> Registry.register(Registry.ITEM,new Identifier(MODID,"dank_"+i),new DankItem(properties.maxCount(1), DankStats.values()[i])));
+    IntStream.range(1,8).forEach(i -> {
+      DankItem dankItem = new DankItem(properties.maxCount(1), DankStats.values()[i]);
+      DispenserBlock.registerBehavior(dankItem, new DankDispenserBehavior());
+              Registry.register(Registry.ITEM, new Identifier(MODID, "dank_" + i), dankItem);
+    });
     IntStream.range(1,7).forEach(i -> Registry.register(Registry.ITEM,new Identifier(MODID,i+"_to_"+(i+1)),new UpgradeItem(properties,new UpgradeInfo(i,i+1))));
     Registry.register(Registry.RECIPE_SERIALIZER,new Identifier(MODID,"upgrade"),upgrade = new Serializer2());
 
@@ -82,6 +90,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer {
 
     Registry.register(Registry.SCREEN_HANDLER,new Identifier(MODID,"dank_7"),dank_7_container = new ScreenHandlerType<>(DockContainer::t7));
     Registry.register(Registry.SCREEN_HANDLER,new Identifier(MODID,"portable_dank_7"),portable_dank_7_container = new ScreenHandlerType<>(DankContainer::t7));
+
 
     DankPacketHandler.registerMessages();
   }

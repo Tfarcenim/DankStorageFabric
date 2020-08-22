@@ -1,9 +1,7 @@
 package tfar.dankstorage.item;
 
 import tfar.dankstorage.block.DockBlock;
-import tfar.dankstorage.tile.DankBlockEntity;
-import tfar.dankstorage.utils.Utils;
-import net.minecraft.block.Block;
+import tfar.dankstorage.tile.DockBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,7 +18,6 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class UpgradeItem extends Item {
 
@@ -55,7 +52,7 @@ public class UpgradeItem extends Item {
     BlockEntity oldDank = world.getBlockEntity(pos);
 
     //shortcut
-    final List<ItemStack> oldDankContents = new ArrayList<>(((DankBlockEntity) oldDank).getHandler().getContents());
+    final List<ItemStack> oldDankContents = new ArrayList<>(((DockBlockEntity) oldDank).getHandler().getContents());
 
     oldDank.markRemoved();
 

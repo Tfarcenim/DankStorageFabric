@@ -26,7 +26,7 @@ import tfar.dankstorage.utils.Utils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class DankBlockEntity extends BlockEntity implements Nameable, NamedScreenHandlerFactory , Inventory {
+public class DockBlockEntity extends BlockEntity implements Nameable, NamedScreenHandlerFactory , Inventory {
 
   protected final PropertyDelegate propertyDelegate;
   public int numPlayersUsing = 0;
@@ -38,23 +38,23 @@ public class DankBlockEntity extends BlockEntity implements Nameable, NamedScree
     @Override
     public void markDirty() {
       super.markDirty();
-      DankBlockEntity.this.markDirty();
+      DockBlockEntity.this.markDirty();
     }
   };
 
-  public DankBlockEntity() {
+  public DockBlockEntity() {
     super(DankStorage.dank_tile);
     this.propertyDelegate = new PropertyDelegate() {
       public int get(int index) {
-          return DankBlockEntity.this.handler.lockedSlots[index];
+          return DockBlockEntity.this.handler.lockedSlots[index];
       }
 
       public void set(int index, int value) {
-        DankBlockEntity.this.handler.lockedSlots[index] = value;
+        DockBlockEntity.this.handler.lockedSlots[index] = value;
       }
 
       public int size() {
-        return DankBlockEntity.this.handler.lockedSlots.length;
+        return DockBlockEntity.this.handler.lockedSlots.length;
       }
     };
   }
@@ -232,7 +232,7 @@ public class DankBlockEntity extends BlockEntity implements Nameable, NamedScree
     return null;
   }
 
-  public void removeTank(){
+  public void removeTank() {
     int tier = getCachedState().get(DockBlock.TIER);
     CompoundTag nbt = handler.serializeNBT();
     world.setBlockState(pos,getCachedState().with(DockBlock.TIER,0));
@@ -241,6 +241,16 @@ public class DankBlockEntity extends BlockEntity implements Nameable, NamedScree
     ItemEntity entity = new ItemEntity(world,pos.getX(),pos.getY(),pos.getZ(),stack);
     world.spawnEntity(entity);
     handler.setDankStats(DankStats.zero);
+  }
+
+  public ItemStack removeTank0() {
+    int tier = getCachedState().get(DockBlock.TIER);
+    CompoundTag nbt = handler.serializeNBT();
+    world.setBlockState(pos,getCachedState().with(DockBlock.TIER,0));
+    ItemStack stack = new ItemStack(Utils.getItemFromTier(tier));
+    stack.getOrCreateTag().put(Utils.INV,nbt);
+    handler.setDankStats(DankStats.zero);
+    return stack;
   }
 
   public void addTank(ItemStack tank){

@@ -8,7 +8,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import tfar.dankstorage.inventory.DankInventory;
-import tfar.dankstorage.tile.DankBlockEntity;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
 

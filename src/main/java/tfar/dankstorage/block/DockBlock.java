@@ -18,7 +18,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import tfar.dankstorage.DankItem;
-import tfar.dankstorage.tile.DankBlockEntity;
+import tfar.dankstorage.tile.DockBlockEntity;
 import tfar.dankstorage.utils.Utils;
 
 import javax.annotation.Nonnull;
@@ -74,7 +74,7 @@ public class DockBlock extends Block implements BlockEntityProvider {
   public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult p_225533_6_) {
     if (!world.isClient) {
       final BlockEntity tile = world.getBlockEntity(pos);
-      if (tile instanceof DankBlockEntity) {
+      if (tile instanceof DockBlockEntity) {
         ItemStack held = player.getStackInHand(hand);
         if (player.isInSneakingPose() && held.getItem().isIn(Utils.WRENCHES)) {
           world.breakBlock(pos, true, player);
@@ -84,14 +84,14 @@ public class DockBlock extends Block implements BlockEntityProvider {
         if (held.getItem() instanceof DankItem) {
 
           if (state.get(TIER) > 0) {
-            ((DankBlockEntity) tile).removeTank();
+            ((DockBlockEntity) tile).removeTank();
           }
-          ((DankBlockEntity) tile).addTank(held);
+          ((DockBlockEntity) tile).addTank(held);
           return ActionResult.SUCCESS;
         }
 
         if (held.isEmpty() && player.isSneaking()) {
-          ((DankBlockEntity)tile).removeTank();
+          ((DockBlockEntity)tile).removeTank();
           return ActionResult.SUCCESS;
         }
 
@@ -114,7 +114,7 @@ public class DockBlock extends Block implements BlockEntityProvider {
   @Nullable
   @Override
   public BlockEntity createBlockEntity(BlockView world) {
-    return new DankBlockEntity();
+    return new DockBlockEntity();
   }
 
   @Override

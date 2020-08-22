@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import tfar.dankstorage.event.ClientMixinHooks;
+import tfar.dankstorage.event.ClientMixinEvents;
 
 @Mixin(Mouse.class)
 public class MouseMixin {
@@ -19,6 +19,6 @@ public class MouseMixin {
 	private void onScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
 		double delta = (this.client.options.discreteMouseScroll ? Math.signum(horizontal) : vertical) * this.client.options.mouseWheelSensitivity;
 
-		if (ClientMixinHooks.onScroll((Mouse)(Object)this,window,horizontal,vertical,delta))ci.cancel();
+		if (ClientMixinEvents.onScroll((Mouse)(Object)this,window,horizontal,vertical,delta))ci.cancel();
 	}
 }

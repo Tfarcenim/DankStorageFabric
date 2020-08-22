@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import tfar.dankstorage.tile.DankBlockEntity;
+import tfar.dankstorage.tile.DockBlockEntity;
 import tfar.dankstorage.utils.Utils;
 
 @Mixin(HopperBlockEntity.class)
@@ -22,16 +22,16 @@ public abstract class HopperBlockEntityMixin {
 	 */
 	@Inject(method = "method_17769", at = @At("HEAD"), cancellable = true)
 	private static void patchHopper(Inventory inv, int slot, CallbackInfoReturnable<Boolean> cir) {
-		if (inv instanceof DankBlockEntity) {
+		if (inv instanceof DockBlockEntity) {
 			ItemStack stack = inv.getStack(slot);
 			if (inv.getMaxCountPerStack() > stack.getCount()) cir.setReturnValue(false);
 		}
 	}
 
 	@Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;ILnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;",
-					at = @At(value = "INVOKE", target = "Lnet/minecraft/inventory/Inventory;isEmpty()Z"), cancellable = true)
+					at = @At(value = "INVOKE", target = "Lnet/minecraft/inventory/Inventory;isEmpty()Z"))
 	private static void patchHopper1(Inventory from, Inventory to, ItemStack stack, int slot, Direction direction, CallbackInfoReturnable<ItemStack> cir) {
-		if (to instanceof DankBlockEntity) {
+		if (to instanceof DockBlockEntity) {
 			ItemStack itemStack = to.getStack(slot);
 			if (itemStack.isEmpty()) {
 				//vanilla
