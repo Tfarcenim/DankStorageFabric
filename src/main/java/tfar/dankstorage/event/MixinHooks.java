@@ -88,7 +88,7 @@ public class MixinHooks {
 	public static boolean onItemPickup(PlayerEntity player, ItemStack pickup, ItemStack dank) {
 
 		Mode mode = Utils.getMode(dank);
-		if (mode == Mode.NORMAL) return false;
+		if (mode == Mode.normal) return false;
 		PortableDankInventory inv = Utils.getHandler(dank);
 		int count = pickup.getCount();
 		boolean oredict = Utils.oredict(dank);
@@ -111,7 +111,7 @@ public class MixinHooks {
 		}
 
 		switch (mode) {
-			case PICKUP_ALL: {
+			case pickup_all: {
 				for (int i = 0; i < inv.size(); i++) {
 					allPickup(inv, i, pickup, oredict);
 					if (pickup.isEmpty())break;
@@ -119,7 +119,7 @@ public class MixinHooks {
 			}
 			break;
 
-			case FILTERED_PICKUP: {
+			case filtered_pickup: {
 				for (int i = 0; i < inv.size(); i++) {
 					filteredPickup(inv, i, pickup,  oredict, existing);
 					if (pickup.isEmpty())break;
@@ -127,7 +127,7 @@ public class MixinHooks {
 			}
 			break;
 
-			case VOID_PICKUP: {
+			case void_pickup: {
 				for (int i = 0; i < inv.size(); i++) {
 					voidPickup(inv, i, pickup, oredict, existing);
 					if (pickup.isEmpty())break;
@@ -165,10 +165,10 @@ public class MixinHooks {
 			int remainder = total - stackLimit;
 			//no overflow
 			if (remainder <= 0) {
-				 inv.getContents().set(slot, pickup.copy());
+				 inv.setStack(slot, pickup.copy());
 				pickup.setCount(0);
 			} else {
-				 inv.getContents().set(slot, ItemHandlerHelper.copyStackWithSize(pickup, stackLimit));
+				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(pickup, stackLimit));
 				pickup.setCount(remainder);
 			}
 			return;
@@ -180,10 +180,10 @@ public class MixinHooks {
 			int remainder = total - stackLimit;
 			//no overflow
 			if (remainder <= 0) {
-				 inv.getContents().set(slot, ItemHandlerHelper.copyStackWithSize(existing, total));
+				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(existing, total));
 				pickup.setCount(0);
 			} else {
-				 inv.getContents().set(slot, ItemHandlerHelper.copyStackWithSize(pickup, stackLimit));
+				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(pickup, stackLimit));
 				pickup.setCount(remainder);
 			}
 		}
@@ -198,10 +198,10 @@ public class MixinHooks {
 			int remainder = total - stackLimit;
 			//no overflow
 			if (remainder <= 0) {
-				 inv.getContents().set(slot, toInsert.copy());
+				 inv.setStack(slot, toInsert.copy());
 				toInsert.setCount(0);
 			} else {
-				 inv.getContents().set(slot, ItemHandlerHelper.copyStackWithSize(toInsert, stackLimit));
+				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(toInsert, stackLimit));
 				toInsert.setCount(remainder);
 			}
 			return;
@@ -213,10 +213,10 @@ public class MixinHooks {
 			int remainder = total - stackLimit;
 			//no overflow
 			if (remainder <= 0) {
-				 inv.getContents().set(slot, ItemHandlerHelper.copyStackWithSize(existing, total));
+				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(existing, total));
 				toInsert.setCount(0);
 			} else {
-				 inv.getContents().set(slot, ItemHandlerHelper.copyStackWithSize(toInsert, stackLimit));
+				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(toInsert, stackLimit));
 				toInsert.setCount(remainder);
 			}
 		}

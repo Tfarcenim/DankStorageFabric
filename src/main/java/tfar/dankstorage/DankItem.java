@@ -158,7 +158,7 @@ public class DankItem extends Item {
 
   @Override
   public boolean hasGlint(ItemStack stack) {
-    return stack.hasTag() && Utils.getMode(stack) != Mode.NORMAL;
+    return stack.hasTag() && Utils.getMode(stack) != Mode.normal;
   }
 
   @Override
@@ -259,10 +259,10 @@ public class DankItem extends Item {
   public int getGlintColor(ItemStack stack){
     Mode mode = Utils.getMode(stack);
     switch (mode){
-      case NORMAL:default:return 0xffffffff;
-      case PICKUP_ALL:return 0xff00ff00;
-      case FILTERED_PICKUP:return 0xffffff00;
-      case VOID_PICKUP:return 0xffff0000;
+      case normal:default:return 0xffffffff;
+      case pickup_all:return 0xff00ff00;
+      case filtered_pickup:return 0xffffff00;
+      case void_pickup:return 0xffff0000;
     }
   }
 

@@ -1,6 +1,5 @@
 package tfar.dankstorage.utils;
 
-import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.CompoundTag;
@@ -27,7 +26,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static tfar.dankstorage.network.server.C2SMessageTogglePickup.modes;
 import static tfar.dankstorage.network.server.C2SMessageToggleUseType.useTypes;
 
 public class Utils {
@@ -40,7 +38,7 @@ public class Utils {
 	public static final String INV = "inv";
 
 	public static Mode getMode(ItemStack bag) {
-		return modes[bag.getOrCreateTag().getInt("mode")];
+		return Mode.modes[bag.getOrCreateTag().getInt("mode")];
 	}
 
 	public static boolean isConstruction(ItemStack bag) {
@@ -66,10 +64,10 @@ public class Utils {
 	public static void cycleMode(ItemStack bag, PlayerEntity player) {
 		int ordinal = bag.getOrCreateTag().getInt("mode");
 		ordinal++;
-		if (ordinal > modes.length - 1) ordinal = 0;
+		if (ordinal > Mode.modes.length - 1) ordinal = 0;
 		bag.getOrCreateTag().putInt("mode", ordinal);
 		player.sendMessage(
-						new TranslatableText("dankstorage.mode." + modes[ordinal].name()), true);
+						new TranslatableText("dankstorage.mode." + Mode.modes[ordinal].name()), true);
 	}
 
 	public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag) {

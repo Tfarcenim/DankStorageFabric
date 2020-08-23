@@ -20,9 +20,7 @@ public class C2SMessageTogglePickup implements PacketConsumer {
     ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.toggle_pickup, buf);
   }
 
-  public static final Mode[] modes = Mode.values();
-
-    public void handle(PacketContext ctx) {
+  public void handle(PacketContext ctx) {
       PlayerEntity player = ctx.getPlayer();
         ItemStack bag = player.getMainHandStack();
         if (!(bag.getItem() instanceof DankItem)){
