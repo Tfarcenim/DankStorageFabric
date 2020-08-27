@@ -173,6 +173,8 @@ public class DankItem extends Item {
 
       int length = s.length();
 
+      if (s.length() > 10000)return;
+
       int itr = (int) Math.ceil(length / 40d);
 
       for (int i = 0; i < itr;i++) {

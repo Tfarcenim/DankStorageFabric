@@ -9,26 +9,4 @@ accessible field net/minecraft/world/inventory/AbstractContainerMenu lastSlots L
 accessible field net/minecraft/world/inventory/AbstractContainerMenu containerListeners Ljava/util/List;
 accessible field net/minecraft/world/inventory/AbstractContainerMenu dataSlots Ljava/util/List;
 
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen draggingItem Lnet/minecraft/world/item/ItemStack;
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen isSplittingStack Z
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen quickCraftingRemainder I
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen snapbackItem Lnet/minecraft/world/item/ItemStack;
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen snapbackStartX I
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen snapbackStartY I
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen snapbackTime J
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen snapbackEnd Lnet/minecraft/world/inventory/Slot;
-
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen clickedSlot Lnet/minecraft/world/inventory/Slot;
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen quickCraftingType I
-
 accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen findSlot (DD)Lnet/minecraft/world/inventory/Slot;
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen doubleclick Z
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen lastClickSlot Lnet/minecraft/world/inventory/Slot;
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen lastClickTime J
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen lastClickButton I
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen skipNextRelease Z
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen lastQuickMoved Lnet/minecraft/world/item/ItemStack;
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen quickCraftingButton I
-
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen quickdropSlot Lnet/minecraft/world/inventory/Slot;
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen quickdropTime J

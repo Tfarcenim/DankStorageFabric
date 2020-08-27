@@ -22,7 +22,7 @@ public class PortableDankProvider implements MenuProvider {
 
   @Override
   public Component getDisplayName() {
-    return new TextComponent("Dank "+(tier.ordinal()+1));
+    return new TextComponent("Dank "+ tier.ordinal());
   }
 
   @Nullable
@@ -31,19 +31,7 @@ public class PortableDankProvider implements MenuProvider {
 
     DankInventory dankInventory = Utils.getHandler(player.getMainHandItem());
 
-    ContainerData propertyDelegate = new ContainerData() {
-      public int get(int index) {
-        return dankInventory.lockedSlots[index];
-      }
-
-      public void set(int index, int value) {
-        dankInventory.lockedSlots[index] = value;
-      }
-
-      public int getCount() {
-        return dankInventory.lockedSlots.length;
-      }
-    };
+    ContainerData propertyDelegate = new DankContainerData(dankInventory);
 
     switch (tier) {
       case one:

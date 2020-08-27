@@ -12,23 +12,20 @@ import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.DankSlot;
 import tfar.dankstorage.inventory.LockedSlot;
-import tfar.dankstorage.network.S2CSyncNBTSize;
 import tfar.dankstorage.utils.Utils;
 
 public class DankMenu extends AbstractDankMenu {
 
   protected ItemStack bag;
-  public int nbtSize;
 
   public DankMenu(MenuType<?> type, int id, Inventory inv, int rows) {
-    this(type, id, inv, rows,new DankInventory(Utils.getStatsfromRows(rows)),new SimpleContainerData(9 * rows));
+    this(type, id, inv, rows,new DankInventory(Utils.getStatsfromRows(rows)),new SimpleContainerData(9 * rows + 1));
   }
 
   public DankMenu(MenuType<?> type, int id, Inventory inv, int rows, DankInventory dankInventory, ContainerData propertyDelegate) {
     super(type, id, inv, rows,dankInventory, propertyDelegate);
     Player player = inv.player;
     this.bag = player.getMainHandItem().getItem() instanceof DankItem ? player.getMainHandItem() : player.getOffhandItem();
-    nbtSize = getNBTSize();
     addDankSlots();
     addPlayerSlots(inv, inv.selected);
   }
@@ -40,12 +37,11 @@ public class DankMenu extends AbstractDankMenu {
       for (int col = 0; col < 9; ++col) {
         int x = 8 + col * 18;
         int y = row * 18 + 18;
-        this.addSlot(new DankSlot(dankInventory, slotIndex, x, y){
+        this.addSlot(new DankSlot(dankInventory, slotIndex, x, y) {
           @Override
-          public void onQuickCraft(ItemStack originalItem, ItemStack itemStack) {
-            super.onQuickCraft(originalItem, itemStack);
-            nbtSize = getNBTSize();
-            S2CSyncNBTSize.send(playerInventory.player,nbtSize);
+          public void setChanged() {
+            super.setChanged();
+            DankMenu.this.propertyDelegate.set(dankInventory.dankStats.slots,getNBTSize());
           }
         });
         slotIndex++;

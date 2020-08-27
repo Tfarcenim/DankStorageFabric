@@ -36,6 +36,8 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     }, Utils.getMode(menu.getBag())));
   }
 
+  public static int max_nbt = 1048576;
+
   @Override
   protected void renderLabels(PoseStack stack,int mouseX, int mouseY) {
     super.renderLabels(stack,mouseX, mouseY);
@@ -44,8 +46,9 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     start+= namelength;
     this.font.draw(stack,"Tag", start += 30, 6, 0x404040);
     this.font.draw(stack,"Pickup", start += 30, 6 , 0x404040);
-    int color = menu.nbtSize > 2000000 ? 0x800000 : 0x008000;
-    this.font.draw(stack,"NBT: " + menu.nbtSize,70,this.imageHeight - 94,color);
+    int nbt_size = menu.propertyDelegate.get(menu.rows * 9);
+    int color = nbt_size > max_nbt ? 0x800000 : 0x008000;
+    this.font.draw(stack,"NBT: " + nbt_size,70,this.imageHeight - 94,color);
   }
 
   public static PortableDankStorageScreen t1(DankMenu container, Inventory playerinventory, Component component) {
@@ -75,5 +78,4 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
   public static PortableDankStorageScreen t7(DankMenu container, Inventory playerinventory, Component component) {
     return new PortableDankStorageScreen(container,playerinventory,component,background7);
   }
-
 }

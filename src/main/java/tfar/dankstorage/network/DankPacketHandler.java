@@ -8,7 +8,6 @@ import tfar.dankstorage.network.server.*;
 
 public class DankPacketHandler {
 
-  public static final ResourceLocation sync_nbt = new ResourceLocation(DankStorage.MODID,"sync_nbt");
   public static final ResourceLocation toggle_pickup = new ResourceLocation(DankStorage.MODID,"toggle_pickup");
   public static final ResourceLocation tag_mode = new ResourceLocation(DankStorage.MODID,"tag_mode");
   public static final ResourceLocation sort = new ResourceLocation(DankStorage.MODID,"sort");
@@ -30,7 +29,6 @@ public class DankPacketHandler {
   }
 
   public static void registerClientMessages() {
-    ClientSidePacketRegistry.INSTANCE.register(sync_nbt,new S2CSyncNBTSize());
     ClientSidePacketRegistry.INSTANCE.register(sync_stacks,new S2CSyncExtendedSlotContents());
   }
 }

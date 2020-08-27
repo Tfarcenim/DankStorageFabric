@@ -15,7 +15,7 @@ public class SortingData implements Comparable<SortingData>{
     return stack.getCount() < Integer.MAX_VALUE && stack.getItem() == otherStack.getItem() && ItemStack.tagMatches(stack,otherStack);
   }
 
-  public int add(int add){
+  public int add(int add) {
     //nothing was gained
     if (add == 0)return 0;
     //is full, can't add more

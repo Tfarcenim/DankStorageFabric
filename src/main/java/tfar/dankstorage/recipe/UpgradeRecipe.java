@@ -1,7 +1,6 @@
 package tfar.dankstorage.recipe;
 
 import tfar.dankstorage.DankStorage;
-import tfar.dankstorage.utils.Utils;
 import javax.annotation.Nonnull;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -17,12 +16,11 @@ public class UpgradeRecipe extends ShapedRecipe {
   @Nonnull
   @Override
   public ItemStack assemble(CraftingContainer inv) {
-    ItemStack bag = super.assemble(inv).copy();
-    ItemStack oldBag = inv.getItem(4).copy();
-    if (!oldBag.hasTag())return bag;
-    bag.setTag(oldBag.getTag());
-    bag.getOrCreateTagElement(Utils.INV).putInt("Size",Utils.getSlotCount(bag));
-    return bag;
+    ItemStack newBag = super.assemble(inv).copy();
+    ItemStack oldBag = inv.getItem(4);
+    if (!oldBag.hasTag())return newBag;
+    newBag.setTag(oldBag.getTag());
+    return newBag;
   }
 
   @Override
