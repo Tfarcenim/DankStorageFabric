@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import tfar.dankstorage.DankItem;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.block.DockBlock;
-import tfar.dankstorage.container.DockContainer;
+import tfar.dankstorage.container.DockMenu;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
@@ -219,15 +219,15 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
 
   @Nullable
   @Override
-  public DockContainer createMenu(int syncId, Inventory p_createMenu_2_, Player p_createMenu_3_) {
+  public DockMenu createMenu(int syncId, Inventory p_createMenu_2_, Player p_createMenu_3_) {
     switch (getBlockState().getValue(DockBlock.TIER)) {
-      case 1:return DockContainer.t1s(syncId,p_createMenu_2_,handler,propertyDelegate);
-      case 2:return DockContainer.t2s(syncId,p_createMenu_2_,handler,propertyDelegate);
-      case 3:return DockContainer.t3s(syncId,p_createMenu_2_,handler,propertyDelegate);
-      case 4:return DockContainer.t4s(syncId,p_createMenu_2_,handler,propertyDelegate);
-      case 5:return DockContainer.t5s(syncId,p_createMenu_2_,handler,propertyDelegate);
-      case 6:return DockContainer.t6s(syncId,p_createMenu_2_,handler,propertyDelegate);
-      case 7:return DockContainer.t7s(syncId,p_createMenu_2_,handler,propertyDelegate);
+      case 1:return DockMenu.t1s(syncId,p_createMenu_2_,handler,propertyDelegate);
+      case 2:return DockMenu.t2s(syncId,p_createMenu_2_,handler,propertyDelegate);
+      case 3:return DockMenu.t3s(syncId,p_createMenu_2_,handler,propertyDelegate);
+      case 4:return DockMenu.t4s(syncId,p_createMenu_2_,handler,propertyDelegate);
+      case 5:return DockMenu.t5s(syncId,p_createMenu_2_,handler,propertyDelegate);
+      case 6:return DockMenu.t6s(syncId,p_createMenu_2_,handler,propertyDelegate);
+      case 7:return DockMenu.t7s(syncId,p_createMenu_2_,handler,propertyDelegate);
     }
     return null;
   }

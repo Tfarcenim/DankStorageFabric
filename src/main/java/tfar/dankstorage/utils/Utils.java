@@ -16,7 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.DankItem;
-import tfar.dankstorage.container.AbstractDankContainer;
+import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.PortableDankInventory;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
@@ -95,9 +95,9 @@ public class Utils {
 	public static void sort(Player player) {
 		if (player == null) return;
 		AbstractContainerMenu openContainer = player.containerMenu;
-		if (openContainer instanceof AbstractDankContainer) {
+		if (openContainer instanceof AbstractDankMenu) {
 			List<SortingData> itemlist = new ArrayList<>();
-			DankInventory handler = ((AbstractDankContainer) openContainer).dankInventory;
+			DankInventory handler = ((AbstractDankMenu) openContainer).dankInventory;
 
 			for (int i = 0; i < handler.getContainerSize(); i++) {
 				ItemStack stack = handler.getItem(i);

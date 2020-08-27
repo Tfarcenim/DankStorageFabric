@@ -1,41 +1,26 @@
 package tfar.dankstorage.container;
 
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.screen.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.ContainerListener;
-import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.DankSlot;
 import tfar.dankstorage.network.S2CSyncExtendedSlotContents;
-import tfar.dankstorage.utils.Utils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Iterator;
 
-public abstract class AbstractDankContainer extends AbstractContainerMenu {
+public abstract class AbstractDankMenu extends AbstractContainerMenu {
 
   public final int rows;
   public final Inventory playerInventory;
   public DankInventory dankInventory;
   public final ContainerData propertyDelegate;
 
-  //client
-  public AbstractDankContainer(MenuType<?> type, int p_i50105_2_, Inventory playerInventory, int rows) {
-    this(type, p_i50105_2_,playerInventory,rows,new DankInventory(Utils.getStatsfromRows(rows)), new SimpleContainerData(rows * 9));
-  }
-
-  public AbstractDankContainer(MenuType<?> type, int p_i50105_2_, Inventory playerInventory, int rows, DankInventory dankInventory, ContainerData propertyDelegate) {
+  public AbstractDankMenu(MenuType<?> type, int p_i50105_2_, Inventory playerInventory, int rows, DankInventory dankInventory, ContainerData propertyDelegate) {
     super(type, p_i50105_2_);
     this.rows = rows;
     this.playerInventory = playerInventory;
@@ -140,7 +125,7 @@ public abstract class AbstractDankContainer extends AbstractContainerMenu {
         Slot slot7 = this.slots.get(slotId);
         ItemStack mouseStack = PlayerInventory.getCarried();
 
-        if (slot7 != null && DockContainer.canItemQuickReplace(slot7, mouseStack, true) && slot7.mayPlace(mouseStack) && (this.quickcraftType == 2 || mouseStack.getCount() > this.quickcraftSlots.size()) && this.canDragTo(slot7)) {
+        if (slot7 != null && DockMenu.canItemQuickReplace(slot7, mouseStack, true) && slot7.mayPlace(mouseStack) && (this.quickcraftType == 2 || mouseStack.getCount() > this.quickcraftSlots.size()) && this.canDragTo(slot7)) {
           this.quickcraftSlots.add(slot7);
         }
       } else if (this.quickcraftStatus == 2) {
@@ -151,7 +136,7 @@ public abstract class AbstractDankContainer extends AbstractContainerMenu {
           for (Slot dragSlot : this.quickcraftSlots) {
             ItemStack mouseStack = PlayerInventory.getCarried();
 
-            if (dragSlot != null && DockContainer.canItemQuickReplace(dragSlot, mouseStack, true) && dragSlot.mayPlace(mouseStack) && (this.quickcraftType == 2 || mouseStack.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(dragSlot)) {
+            if (dragSlot != null && DockMenu.canItemQuickReplace(dragSlot, mouseStack, true) && dragSlot.mayPlace(mouseStack) && (this.quickcraftType == 2 || mouseStack.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(dragSlot)) {
               ItemStack itemstack14 = mouseStackCopy.copy();
               int j3 = dragSlot.hasItem() ? dragSlot.getItem().getCount() : 0;
               getQuickCraftSlotCount(this.quickcraftSlots, this.quickcraftType, itemstack14, j3);
@@ -401,7 +386,7 @@ public abstract class AbstractDankContainer extends AbstractContainerMenu {
           for (int l = i; l >= 0 && l < this.slots.size() && mouseStack.getCount() < mouseStack.getMaxStackSize(); l += j) {
             Slot slot1 = this.slots.get(l);
 
-            if (slot1.hasItem() && DockContainer.canItemQuickReplace(slot1, mouseStack, true) && slot1.mayPickup(player) && this.canTakeItemForPickAll(mouseStack, slot1)) {
+            if (slot1.hasItem() && DockMenu.canItemQuickReplace(slot1, mouseStack, true) && slot1.mayPickup(player) && this.canTakeItemForPickAll(mouseStack, slot1)) {
               ItemStack itemstack2 = slot1.getItem();
 
               if (k != 0 || itemstack2.getCount() < slot1.getMaxStackSize(itemstack2)) {
@@ -524,15 +509,14 @@ public abstract class AbstractDankContainer extends AbstractContainerMenu {
   @Override
   public void broadcastChanges() {
     for (int i = 0; i < this.slots.size(); ++i) {
-      ItemStack itemstack = (this.slots.get(i)).getItem();
+      ItemStack itemstack = this.slots.get(i).getItem();
       ItemStack itemstack1 = this.lastSlots.get(i);
 
       if (!ItemStack.matches(itemstack1, itemstack)) {
         itemstack1 = itemstack.isEmpty() ? ItemStack.EMPTY : itemstack.copy();
         this.lastSlots.set(i, itemstack1);
 
-        for (int j = 0; j < this.containerListeners.size(); ++j) {
-          ContainerListener listener = this.containerListeners.get(j);
+        for (ContainerListener listener : this.containerListeners) {
           if (listener instanceof ServerPlayer) {
             ServerPlayer player = (ServerPlayer) listener;
 
@@ -543,13 +527,11 @@ public abstract class AbstractDankContainer extends AbstractContainerMenu {
     }
 
     for(int j = 0; j < this.dataSlots.size(); ++j) {
-      DataSlot property = (DataSlot)this.dataSlots.get(j);
+      DataSlot property = this.dataSlots.get(j);
       if (property.checkAndClearUpdateFlag()) {
-        Iterator var8 = this.containerListeners.iterator();
 
-        while(var8.hasNext()) {
-          ContainerListener screenHandlerListener2 = (ContainerListener)var8.next();
-          screenHandlerListener2.setContainerData(this, j, property.get());
+        for (ContainerListener containerListener : this.containerListeners) {
+          containerListener.setContainerData(this, j, property.get());
         }
       }
     }

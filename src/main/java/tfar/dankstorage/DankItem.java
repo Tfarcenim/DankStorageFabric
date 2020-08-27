@@ -14,7 +14,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.item.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -286,7 +285,7 @@ public class DankItem extends Item {
     if (toPlace.getCount() == 1 && handler.isLocked(selectedSlot))
       return InteractionResult.PASS;
 
-    UseOnContext ctx2 = new ItemUseContextExt(ctx.getLevel(),ctx.getPlayer(),ctx.getHand(),toPlace,((ItemUsageContextAccessor)ctx).getHit());
+    UseOnContext ctx2 = new ItemUseContextExt(ctx.getLevel(),ctx.getPlayer(),ctx.getHand(),toPlace,((ItemUsageContextAccessor)ctx).getHitResult());
     InteractionResult actionResultType = toPlace.getItem().useOn(ctx2);//ctx2.getItem().onItemUse(ctx);
     handler.setItem(selectedSlot, ctx2.getItemInHand());
     return actionResultType;

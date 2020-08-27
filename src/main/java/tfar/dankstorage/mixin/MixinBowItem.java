@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 
 @Mixin(BowItem.class)
 public class MixinBowItem {
-  @Inject(method = "onStoppedUsing",at = @At("TAIL"))
+  @Inject(method = "releaseUsing",at = @At("TAIL"))
   private void onPlayerStoppedUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft, CallbackInfo callbackInfo){
     MixinHooks.onStoppedUsing(stack, worldIn, entityLiving, timeLeft);
   }

@@ -15,16 +15,16 @@ import tfar.dankstorage.inventory.LockedSlot;
 import tfar.dankstorage.network.S2CSyncNBTSize;
 import tfar.dankstorage.utils.Utils;
 
-public class DankContainer extends AbstractDankContainer {
+public class DankMenu extends AbstractDankMenu {
 
   protected ItemStack bag;
   public int nbtSize;
 
-  public DankContainer(MenuType<?> type, int id, Inventory inv, int rows) {
+  public DankMenu(MenuType<?> type, int id, Inventory inv, int rows) {
     this(type, id, inv, rows,new DankInventory(Utils.getStatsfromRows(rows)),new SimpleContainerData(9 * rows));
   }
 
-  public DankContainer(MenuType<?> type, int id, Inventory inv, int rows,DankInventory dankInventory,ContainerData propertyDelegate) {
+  public DankMenu(MenuType<?> type, int id, Inventory inv, int rows, DankInventory dankInventory, ContainerData propertyDelegate) {
     super(type, id, inv, rows,dankInventory, propertyDelegate);
     Player player = inv.player;
     this.bag = player.getMainHandItem().getItem() instanceof DankItem ? player.getMainHandItem() : player.getOffhandItem();
@@ -94,54 +94,54 @@ public class DankContainer extends AbstractDankContainer {
     super.broadcastChanges();
   }
 
-  public static DankContainer t1(int id, Inventory inv) {
-    return new DankContainer(DankStorage.portable_dank_1_container,id,inv,1);
+  public static DankMenu t1(int id, Inventory inv) {
+    return new DankMenu(DankStorage.portable_dank_1_container,id,inv,1);
   }
 
-  public static DankContainer t2(int id, Inventory inv) {
-    return new DankContainer(DankStorage.portable_dank_2_container,id,inv,2);
+  public static DankMenu t2(int id, Inventory inv) {
+    return new DankMenu(DankStorage.portable_dank_2_container,id,inv,2);
   }
-  public static DankContainer t3(int id, Inventory inv) {
-    return new DankContainer(DankStorage.portable_dank_3_container,id,inv,3);
+  public static DankMenu t3(int id, Inventory inv) {
+    return new DankMenu(DankStorage.portable_dank_3_container,id,inv,3);
   }
-  public static DankContainer t4(int id, Inventory inv) {
-    return new DankContainer(DankStorage.portable_dank_4_container,id,inv,4);
+  public static DankMenu t4(int id, Inventory inv) {
+    return new DankMenu(DankStorage.portable_dank_4_container,id,inv,4);
   }
-  public static DankContainer t5(int id, Inventory inv) {
-    return new DankContainer(DankStorage.portable_dank_5_container,id,inv,5);
+  public static DankMenu t5(int id, Inventory inv) {
+    return new DankMenu(DankStorage.portable_dank_5_container,id,inv,5);
   }
-  public static DankContainer t6(int id, Inventory inv) {
-    return new DankContainer(DankStorage.portable_dank_6_container,id,inv,6);
+  public static DankMenu t6(int id, Inventory inv) {
+    return new DankMenu(DankStorage.portable_dank_6_container,id,inv,6);
   }
 
-  public static DankContainer t7(int id, Inventory inv) {
-    return new DankContainer(DankStorage.portable_dank_7_container,id,inv,9);
+  public static DankMenu t7(int id, Inventory inv) {
+    return new DankMenu(DankStorage.portable_dank_7_container,id,inv,9);
   }
 
   ////////////////////
 
-  public static DankContainer t1s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
-    return new DankContainer(DankStorage.portable_dank_1_container,id,inv,1,dankInventory,propertyDelegate);
+  public static DankMenu t1s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
+    return new DankMenu(DankStorage.portable_dank_1_container,id,inv,1,dankInventory,propertyDelegate);
   }
 
-  public static DankContainer t2s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
-    return new DankContainer(DankStorage.portable_dank_2_container,id,inv,2,dankInventory,propertyDelegate);
+  public static DankMenu t2s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
+    return new DankMenu(DankStorage.portable_dank_2_container,id,inv,2,dankInventory,propertyDelegate);
   }
-  public static DankContainer t3s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
-    return new DankContainer(DankStorage.portable_dank_3_container,id,inv,3,dankInventory,propertyDelegate);
+  public static DankMenu t3s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
+    return new DankMenu(DankStorage.portable_dank_3_container,id,inv,3,dankInventory,propertyDelegate);
   }
-  public static DankContainer t4s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
-    return new DankContainer(DankStorage.portable_dank_4_container,id,inv,4,dankInventory,propertyDelegate);
+  public static DankMenu t4s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
+    return new DankMenu(DankStorage.portable_dank_4_container,id,inv,4,dankInventory,propertyDelegate);
   }
-  public static DankContainer t5s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
-    return new DankContainer(DankStorage.portable_dank_5_container,id,inv,5,dankInventory,propertyDelegate);
+  public static DankMenu t5s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
+    return new DankMenu(DankStorage.portable_dank_5_container,id,inv,5,dankInventory,propertyDelegate);
   }
-  public static DankContainer t6s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
-    return new DankContainer(DankStorage.portable_dank_6_container,id,inv,6,dankInventory,propertyDelegate);
+  public static DankMenu t6s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
+    return new DankMenu(DankStorage.portable_dank_6_container,id,inv,6,dankInventory,propertyDelegate);
   }
 
-  public static DankContainer t7s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
-    return new DankContainer(DankStorage.portable_dank_7_container,id,inv,9,dankInventory,propertyDelegate);
+  public static DankMenu t7s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
+    return new DankMenu(DankStorage.portable_dank_7_container,id,inv,9,dankInventory,propertyDelegate);
   }
 
 }

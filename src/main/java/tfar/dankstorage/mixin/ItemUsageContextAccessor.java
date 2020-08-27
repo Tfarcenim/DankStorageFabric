@@ -8,5 +8,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(UseOnContext.class)
 public interface ItemUsageContextAccessor {
 	@Accessor
-	BlockHitResult getHit();
+	BlockHitResult getHitResult();
 }

@@ -18,9 +18,9 @@ public abstract class HopperBlockEntityMixin {
 	 * @param inv
 	 * @param slot
 	 * @param cir
-	 * @see HopperBlockEntity#isInventoryFull(Inventory, Direction)
+	 * @see HopperBlockEntity#isFullContainer(Container, Direction)
 	 */
-	@Inject(method = "method_17769", at = @At("HEAD"), cancellable = true)
+	@Inject(method = {"method_17769","lambda$isFullContainer$1(Lnet/minecraft/world/Container;I)Z"}, at = @At("HEAD"), cancellable = true)
 	private static void patchHopper(Container inv, int slot, CallbackInfoReturnable<Boolean> cir) {
 		if (inv instanceof DockBlockEntity) {
 			ItemStack stack = inv.getItem(slot);
@@ -28,8 +28,8 @@ public abstract class HopperBlockEntityMixin {
 		}
 	}
 
-	@Inject(method = "transfer(Lnet/minecraft/inventory/Inventory;Lnet/minecraft/inventory/Inventory;Lnet/minecraft/item/ItemStack;ILnet/minecraft/util/math/Direction;)Lnet/minecraft/item/ItemStack;",
-					at = @At(value = "INVOKE", target = "Lnet/minecraft/inventory/Inventory;isEmpty()Z"))
+	@Inject(method = "tryMoveInItem",
+					at = @At(value = "INVOKE", target = "Lnet/minecraft/world/Container;isEmpty()Z"))
 	private static void patchHopper1(Container from, Container to, ItemStack stack, int slot, Direction direction, CallbackInfoReturnable<ItemStack> cir) {
 		if (to instanceof DockBlockEntity) {
 			ItemStack itemStack = to.getItem(slot);

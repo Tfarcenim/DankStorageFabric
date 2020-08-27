@@ -2,7 +2,7 @@ package tfar.dankstorage.event;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tfar.dankstorage.DankItem;
-import tfar.dankstorage.container.DankContainer;
+import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.ducks.UseDankStorage;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.PortableDankInventory;
@@ -39,7 +39,7 @@ public class MixinHooks {
 	 */
 	public static boolean interceptItem(Inventory inv, ItemStack incoming) {
 		Player player = inv.player;
-		if (player.containerMenu instanceof DankContainer) {
+		if (player.containerMenu instanceof DankMenu) {
 			return false;
 		}
 		for (int i = 0; i < inv.getContainerSize(); i++) {

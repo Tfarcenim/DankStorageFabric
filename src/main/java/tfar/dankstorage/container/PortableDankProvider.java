@@ -48,19 +48,19 @@ public class PortableDankProvider implements MenuProvider {
     switch (tier) {
       case one:
       default:
-        return DankContainer.t1s(i,playerInventory,dankInventory,propertyDelegate);
+        return DankMenu.t1s(i,playerInventory,dankInventory,propertyDelegate);
       case two:
-        return DankContainer.t2s(i, playerInventory,dankInventory,propertyDelegate);
+        return DankMenu.t2s(i, playerInventory,dankInventory,propertyDelegate);
       case three:
-        return DankContainer.t3s(i, playerInventory,dankInventory,propertyDelegate);
+        return DankMenu.t3s(i, playerInventory,dankInventory,propertyDelegate);
       case four:
-        return DankContainer.t4s(i, playerInventory,dankInventory,propertyDelegate);
+        return DankMenu.t4s(i, playerInventory,dankInventory,propertyDelegate);
       case five:
-        return DankContainer.t5s(i, playerInventory,dankInventory,propertyDelegate);
+        return DankMenu.t5s(i, playerInventory,dankInventory,propertyDelegate);
       case six:
-        return DankContainer.t6s(i, playerInventory,dankInventory,propertyDelegate);
+        return DankMenu.t6s(i, playerInventory,dankInventory,propertyDelegate);
       case seven:
-        return DankContainer.t7s(i, playerInventory,dankInventory,propertyDelegate);
+        return DankMenu.t7s(i, playerInventory,dankInventory,propertyDelegate);
     }
   }
 }

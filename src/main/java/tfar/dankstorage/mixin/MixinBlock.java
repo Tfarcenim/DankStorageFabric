@@ -1,5 +1,8 @@
 package tfar.dankstorage.mixin;
 
+import com.mojang.math.Vector3d;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +22,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 @Mixin(Block.class)
 public class MixinBlock {
-  @Inject(method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/item/ItemStack;)Ljava/util/List;",at = @At("HEAD"),cancellable = true)
+  @Inject(method = "getDrops(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/entity/BlockEntity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/item/ItemStack;)Ljava/util/List;",at = @At("HEAD"),cancellable = true)
   private static void hijacklootcontextbuilder(BlockState state, ServerLevel worldIn,
                                        BlockPos pos, BlockEntity tileEntityIn,
                                        Entity entityIn, ItemStack tool,
@@ -33,7 +36,7 @@ public class MixinBlock {
                                      BlockPos pos, BlockEntity tileEntityIn,
                                      Entity entityIn, ItemStack dank){
     ItemStack tool = Utils.getItemStackInSelectedSlot(dank);
-    LootContext.Builder lootcontext$builder = (new LootContext.Builder(worldIn)).withRandom(worldIn.random).withParameter(LootContextParams.TOOL, tool).withOptionalParameter(LootContextParams.THIS_ENTITY, entityIn).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileEntityIn);
+    LootContext.Builder lootcontext$builder = new LootContext.Builder(worldIn).withRandom(worldIn.random).withParameter(LootContextParams.TOOL, tool).withOptionalParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).withOptionalParameter(LootContextParams.THIS_ENTITY, entityIn).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileEntityIn);
     return state.getDrops(lootcontext$builder);
   }
 

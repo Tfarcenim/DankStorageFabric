@@ -2,7 +2,7 @@ package tfar.dankstorage.client.screens;
 
 import tfar.dankstorage.client.button.RedGreenToggleButton;
 import tfar.dankstorage.client.button.TripleToggleButton;
-import tfar.dankstorage.container.DankContainer;
+import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.network.server.C2SMessageTagMode;
 import tfar.dankstorage.network.server.C2SMessageTogglePickup;
 import tfar.dankstorage.utils.Utils;
@@ -14,9 +14,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankContainer> {
+public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMenu> {
 
-  public PortableDankStorageScreen(DankContainer container, Inventory playerinventory, Component component, ResourceLocation background) {
+  public PortableDankStorageScreen(DankMenu container, Inventory playerinventory, Component component, ResourceLocation background) {
     super(container,playerinventory, component,background);
   }
 
@@ -48,31 +48,31 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankCon
     this.font.draw(stack,"NBT: " + menu.nbtSize,70,this.imageHeight - 94,color);
   }
 
-  public static PortableDankStorageScreen t1(DankContainer container, Inventory playerinventory, Component component) {
+  public static PortableDankStorageScreen t1(DankMenu container, Inventory playerinventory, Component component) {
     return new PortableDankStorageScreen(container,playerinventory,component,background1);
   }
 
-  public static PortableDankStorageScreen t2(DankContainer container, Inventory playerinventory, Component component) {
+  public static PortableDankStorageScreen t2(DankMenu container, Inventory playerinventory, Component component) {
     return new PortableDankStorageScreen(container,playerinventory,component,background2);
   }
 
-  public static PortableDankStorageScreen t3(DankContainer container, Inventory playerinventory, Component component) {
+  public static PortableDankStorageScreen t3(DankMenu container, Inventory playerinventory, Component component) {
     return new PortableDankStorageScreen(container,playerinventory,component,background3);
   }
 
-  public static PortableDankStorageScreen t4(DankContainer container, Inventory playerinventory, Component component) {
+  public static PortableDankStorageScreen t4(DankMenu container, Inventory playerinventory, Component component) {
     return new PortableDankStorageScreen(container,playerinventory,component,background4);
   }
 
-  public static PortableDankStorageScreen t5(DankContainer container, Inventory playerinventory, Component component) {
+  public static PortableDankStorageScreen t5(DankMenu container, Inventory playerinventory, Component component) {
     return new PortableDankStorageScreen(container,playerinventory,component,background5);
   }
 
-  public static PortableDankStorageScreen t6(DankContainer container, Inventory playerinventory, Component component) {
+  public static PortableDankStorageScreen t6(DankMenu container, Inventory playerinventory, Component component) {
     return new PortableDankStorageScreen(container,playerinventory,component,background6);
   }
 
-  public static PortableDankStorageScreen t7(DankContainer container, Inventory playerinventory, Component component) {
+  public static PortableDankStorageScreen t7(DankMenu container, Inventory playerinventory, Component component) {
     return new PortableDankStorageScreen(container,playerinventory,component,background7);
   }
 

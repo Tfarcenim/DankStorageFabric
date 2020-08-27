@@ -7,7 +7,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
-import tfar.dankstorage.mixin.ItemStackMixin;
 import tfar.dankstorage.mixin.SimpleInventoryAccessor;
 import tfar.dankstorage.utils.Constants;
 import tfar.dankstorage.utils.DankStats;
@@ -41,7 +40,7 @@ public class DankInventory extends SimpleContainer {
 			newStacks.set(i,getContents().get(i));
 		}
 
-		((SimpleInventoryAccessor)this).setStacks(newStacks);
+		((SimpleInventoryAccessor)this).setItems(newStacks);
 
 		int[] newLockedSlots = new int[dankStats.slots];
 		if (max >= 0) System.arraycopy(lockedSlots, 0, newLockedSlots, 0, max);
@@ -80,7 +79,7 @@ public class DankInventory extends SimpleContainer {
 	}
 
 	public NonNullList<ItemStack> getContents() {
-		return ((SimpleInventoryAccessor)this).getStacks();
+		return ((SimpleInventoryAccessor)this).getItems();
 	}
 
 	public boolean noValidSlots() {

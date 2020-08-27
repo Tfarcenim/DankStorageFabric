@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import tfar.dankstorage.container.AbstractDankContainer;
+import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.utils.PacketBufferEX;
 
 public class S2CSyncExtendedSlotContents implements PacketConsumer {
@@ -22,7 +22,7 @@ public class S2CSyncExtendedSlotContents implements PacketConsumer {
 
     public void handle(PacketContext ctx, int windowId, int slot, ItemStack stack) {
     Player player = ctx.getPlayer();
-        if (player.containerMenu instanceof AbstractDankContainer && windowId == player.containerMenu.containerId) {
+        if (player.containerMenu instanceof AbstractDankMenu && windowId == player.containerMenu.containerId) {
           player.containerMenu.slots.get(slot).set(stack);
         }
     }

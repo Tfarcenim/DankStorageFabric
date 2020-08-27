@@ -18,7 +18,7 @@ public class MinecraftClientMixin {
 
 	@Shadow @Nullable public LocalPlayer player;
 
-	@Inject(method = "doItemPick",at = @At("HEAD"),cancellable = true)
+	@Inject(method = "pickBlock",at = @At("HEAD"),cancellable = true)
 	private void dankPickBlock(CallbackInfo ci){
 		if (Utils.isHoldingDank(player)) {
 			int slot = ClientMixinEvents.pickItemFromDank(player.getMainHandItem());

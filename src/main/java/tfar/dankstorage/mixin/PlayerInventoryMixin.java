@@ -11,7 +11,7 @@ import tfar.dankstorage.event.MixinHooks;
 @Mixin(Inventory.class)
 public class PlayerInventoryMixin {
 
-	@Inject(method = "insertStack(Lnet/minecraft/item/ItemStack;)Z",at = @At("HEAD"),cancellable = true)
+	@Inject(method = "addResource(Lnet/minecraft/world/item/ItemStack;)I",at = @At("HEAD"),cancellable = true)
 	private void interceptItems(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
 		if (MixinHooks.interceptItem((Inventory)(Object)this,stack))cir.setReturnValue(true);
 	}

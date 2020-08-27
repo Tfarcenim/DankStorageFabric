@@ -8,8 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import tfar.dankstorage.container.DankContainer;
-import tfar.dankstorage.network.DankPacketHandler;
+import tfar.dankstorage.container.DankMenu;
 
 public class S2CSyncNBTSize implements PacketConsumer {
 
@@ -30,8 +29,8 @@ public class S2CSyncNBTSize implements PacketConsumer {
   public void handle(PacketContext ctx, int size) {
     Player player = Minecraft.getInstance().player;
     AbstractContainerMenu container = player.containerMenu;
-    if (container instanceof DankContainer) {
-      ((DankContainer) container).nbtSize = size;
+    if (container instanceof DankMenu) {
+      ((DankMenu) container).nbtSize = size;
     }
   }
 

@@ -7,8 +7,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import tfar.dankstorage.client.BigItemRenderer;
 import tfar.dankstorage.client.button.SmallButton;
-import tfar.dankstorage.container.AbstractDankContainer;
-import tfar.dankstorage.container.DockContainer;
+import tfar.dankstorage.container.AbstractDankMenu;
+import tfar.dankstorage.container.DockMenu;
 import tfar.dankstorage.inventory.DankSlot;
 import tfar.dankstorage.network.server.C2SMessageLockSlot;
 import tfar.dankstorage.network.server.C2SMessageSort;
@@ -34,7 +34,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer> extends AbstractContainerScreen<T> {
+public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> extends AbstractContainerScreen<T> {
 
 	final ResourceLocation background;//= new ResourceLocation("textures/gui/container/shulker_box.png");
 
@@ -44,7 +44,6 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 		super(container, playerinventory, component);
 		this.background = background;
 		this.imageHeight = 114 + this.menu.rows * 18;
-		this.skipNextRelease = true;
 		this.is7 = this.menu.rows > 6;
 		this.inventoryLabelY = this.imageHeight - 94;
 	}
@@ -150,7 +149,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 		}
 
 		if (!this.snapbackItem.isEmpty()) {
-			float f = (float) (System.currentTimeMillis() - this.snapbackTime) / 100.0F;
+			float f =  (System.currentTimeMillis() - this.snapbackTime) / 100.0F;
 
 			if (f >= 1.0F) {
 				f = 1.0F;
@@ -230,7 +229,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 				return;
 			}
 
-			if (DockContainer.canItemQuickReplace(slotIn, itemstack1, true) && this.menu.canDragTo(slotIn)) {
+			if (DockMenu.canItemQuickReplace(slotIn, itemstack1, true) && this.menu.canDragTo(slotIn)) {
 				itemstack = itemstack1.copy();
 				flag = true;
 				AbstractContainerMenu.getQuickCraftSlotCount(this.quickCraftSlots, this.quickCraftingType, itemstack, slotIn.getItem().isEmpty() ? 0 : slotIn.getItem().getCount());
@@ -307,18 +306,6 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 		}
 	}
 
-	private Slot getSlotAtPosition(double x, double y) {
-		for (int i = 0; i < this.menu.slots.size(); ++i) {
-			Slot slot = this.menu.slots.get(i);
-
-			if (this.isMouseOverSlot(slot, (int) x, (int) y) && slot.isActive()) {
-				return slot;
-			}
-		}
-
-		return null;
-	}
-
 	public boolean mouseclicked(double mouseX, double mouseY, int mouseButton) {
 		Iterator<GuiEventListener> var6 = this.children.iterator();
 
@@ -348,16 +335,15 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 		if (mouseclicked(mouseX, mouseY, mouseButton)) return true;
 
 		if (Screen.hasControlDown()) {
-			Slot slot = getSlotAtPosition(mouseX, mouseY);
+			Slot slot = findSlot(mouseX, mouseY);
 			if (slot instanceof DankSlot) {
 				C2SMessageLockSlot.send(slot.index);
 				return true;
 			}
 		}
 
-		InputConstants.Key mouseKey = InputConstants.Type.MOUSE.getOrCreate(mouseButton);
-		boolean isPickBlock = false;//this.client.options.keyPickItem.isActiveAndMatches(mouseKey);
-		Slot slot = this.getSlotAtPosition(mouseX, mouseY);
+		boolean isPickBlock = this.minecraft.options.keyPickItem.matchesMouse(mouseButton);
+		Slot slot = this.findSlot(mouseX, mouseY);
 		long i = System.currentTimeMillis();
 		this.doubleclick = this.lastClickSlot == slot && i - this.lastClickTime < 250L && this.lastClickButton == mouseButton;
 		this.skipNextRelease = false;
@@ -394,7 +380,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 					}
 				} else if (!this.isQuickCrafting) {
 					if (this.minecraft.player.inventory.getCarried().isEmpty()) {
-						if (/*this.client.options.keyPickItem.isActiveAndMatches(mouseKey)*/false) {
+						if (this.minecraft.options.keyPickItem.matchesMouse((int)i)) {
 							this.slotClicked(slot, l, mouseButton, ClickType.CLONE);
 						} else {
 							boolean flag2 = l != -999 && Screen.hasShiftDown();
@@ -420,7 +406,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 							this.quickCraftingType = 0;
 						} else if (mouseButton == 1) {
 							this.quickCraftingType = 1;
-						} else if (/*this.client.options.keyPickItem.isActiveAndMatches(mouseKey)*/false) {
+						} else if (this.minecraft.options.keyPickItem.matchesMouse((int) i)) {
 							this.quickCraftingType = 2;
 						}
 					}
@@ -437,7 +423,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int clickedMouseButton, double timeSinceLastClick, double param1) {
-		Slot slot = this.getSlotAtPosition(mouseX, mouseY);
+		Slot slot = this.findSlot(mouseX,mouseY);
 		ItemStack itemstack = this.minecraft.player.inventory.getCarried();
 
 		if (this.clickedSlot != null && this.minecraft.options.touchscreen) {
@@ -446,7 +432,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 					if (slot != this.clickedSlot && !this.clickedSlot.getItem().isEmpty()) {
 						this.draggingItem = this.clickedSlot.getItem().copy();
 					}
-				} else if (this.draggingItem.getCount() > 1 && slot != null && DockContainer.canItemQuickReplace(slot, this.draggingItem, false)) {
+				} else if (this.draggingItem.getCount() > 1 && slot != null && DockMenu.canItemQuickReplace(slot, this.draggingItem, false)) {
 					long i = System.currentTimeMillis();
 
 					if (this.quickdropSlot == slot) {
@@ -463,7 +449,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 					}
 				}
 			}
-		} else if (this.isQuickCrafting && slot != null && !itemstack.isEmpty() && (itemstack.getCount() > this.quickCraftSlots.size() || this.quickCraftingType == 2) && DockContainer.canItemQuickReplace(slot, itemstack, true) && slot.mayPlace(itemstack) && this.menu.canDragTo(slot)) {
+		} else if (this.isQuickCrafting && slot != null && !itemstack.isEmpty() && (itemstack.getCount() > this.quickCraftSlots.size() || this.quickCraftingType == 2) && DockMenu.canItemQuickReplace(slot, itemstack, true) && slot.mayPlace(itemstack) && this.menu.canDragTo(slot)) {
 			this.quickCraftSlots.add(slot);
 			this.recalculateQuickCraftRemaining();
 		}
@@ -478,9 +464,8 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 			//  this.selectedButton.mouseReleased(mouseX, mouseY);
 			//  this.selectedButton = null;
 		}
-		InputConstants.Key mouseKey = InputConstants.Type.MOUSE.getOrCreate(state);
 
-		Slot slot1 = this.getSlotAtPosition(mouseX, mouseY);
+		Slot slot1 = this.findSlot(mouseX, mouseY);
 		int i = this.leftPos;
 		int j = this.topPos;
 		boolean flag = this.hasClickedOutside(mouseX, mouseY, i, j, state);
@@ -499,7 +484,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 			if (Screen.hasShiftDown()) {
 				if (!this.lastQuickMoved.isEmpty()) {
 					for (Slot slot2 : this.menu.slots) {
-						if (slot2 != null && slot2.mayPickup(this.minecraft.player) && slot2.hasItem() && DockContainer.canItemQuickReplace(slot2, this.lastQuickMoved, true)) {
+						if (slot2 != null && slot2.mayPickup(this.minecraft.player) && slot2.hasItem() && DockMenu.canItemQuickReplace(slot2, this.lastQuickMoved, true)) {
 							this.slotClicked(slot2, slot2.index, state, ClickType.QUICK_MOVE);
 						}
 					}
@@ -529,7 +514,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 						this.draggingItem = this.clickedSlot.getItem();
 					}
 
-					boolean flag2 = DockContainer.canItemQuickReplace(slot1, this.draggingItem, false);
+					boolean flag2 = DockMenu.canItemQuickReplace(slot1, this.draggingItem, false);
 
 					if (k != -1 && !this.draggingItem.isEmpty() && flag2) {
 						this.slotClicked(this.clickedSlot, this.clickedSlot.index, state, ClickType.PICKUP);
@@ -589,15 +574,5 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankContainer>
 
 	private boolean isMouseOverSlot(Slot slotIn, double mouseX, double mouseY) {
 		return this.isHovering(slotIn.x, slotIn.y, 16, 16, mouseX, mouseY);
-	}
-
-	private Slot findSlot(double p_195360_1_, double p_195360_3_) {
-		for (int i = 0; i < this.menu.slots.size(); ++i) {
-			Slot slot = this.menu.slots.get(i);
-			if (this.isMouseOverSlot(slot, p_195360_1_, p_195360_3_) && slot.isActive()) {
-				return slot;
-			}
-		}
-		return null;
 	}
 }

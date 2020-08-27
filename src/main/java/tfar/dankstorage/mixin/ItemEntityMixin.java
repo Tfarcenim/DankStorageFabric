@@ -15,7 +15,7 @@ public class ItemEntityMixin {
 
 	@Shadow private int age;
 
-	@Inject(method = "<init>(Lnet/minecraft/world/World;DDDLnet/minecraft/item/ItemStack;)V",at = @At("RETURN"))
+	@Inject(method = "<init>(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/item/ItemStack;)V",at = @At("RETURN"))
 	private void noDespawn(Level world, double x, double y, double z, ItemStack stack, CallbackInfo ci) {
 		if (stack.getItem() instanceof DankItem) {
 			this.age = -32768;

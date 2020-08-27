@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface SimpleInventoryAccessor {
 
 	@Accessor
-	NonNullList<ItemStack> getStacks();
+	NonNullList<ItemStack> getItems();
 
 	@Accessor
-	void setStacks(NonNullList<ItemStack> stacks);
+	void setItems(NonNullList<ItemStack> stacks);
 
 	@Accessor void setSize(int slots);
 

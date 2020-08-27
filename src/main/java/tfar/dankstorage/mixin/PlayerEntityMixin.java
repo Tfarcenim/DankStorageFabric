@@ -22,18 +22,15 @@ import net.minecraft.world.item.ItemStack;
 @Mixin(Player.class)
 public abstract class PlayerEntityMixin implements UseDankStorage {
   @Shadow @Final public Inventory inventory;
-
-  @Shadow public abstract void increaseStat(Stat<?> stat, int amount);
-
+  
   public boolean useDankStorage = false;
 
-  @Inject(method = "getArrowType", at = @At("HEAD"), cancellable = true)
+  @Inject(method = "getProjectile", at = @At("HEAD"), cancellable = true)
   private void findAmmo(ItemStack shootable, CallbackInfoReturnable<ItemStack> cir) {
     ItemStack ammo = MixinHooks.myFindAmmo((Player)(Object)this,shootable);
     useDankStorage = !ammo.isEmpty();
     if (!ammo.isEmpty()) {
       cir.setReturnValue(ammo);
-      cir.cancel();
     }
   }
 
