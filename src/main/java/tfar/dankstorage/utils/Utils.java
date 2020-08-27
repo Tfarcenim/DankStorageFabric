@@ -1,16 +1,19 @@
 package tfar.dankstorage.utils;
 
 import net.fabricmc.fabric.api.tag.TagRegistry;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.Tag;
-import net.minecraft.tag.TagGroup;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagCollection;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.DankItem;
 import tfar.dankstorage.container.AbstractDankContainer;
@@ -18,10 +21,6 @@ import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.PortableDankInventory;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 import io.netty.buffer.Unpooled;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,10 +29,10 @@ import static tfar.dankstorage.network.server.C2SMessageToggleUseType.useTypes;
 
 public class Utils {
 
-	public static final Tag<Item> BLACKLISTED_STORAGE = TagRegistry.item(new Identifier(DankStorage.MODID, "blacklisted_storage"));
-	public static final Tag<Item> BLACKLISTED_USAGE = TagRegistry.item(new Identifier(DankStorage.MODID, "blacklisted_usage"));
+	public static final Tag<Item> BLACKLISTED_STORAGE = TagRegistry.item(new ResourceLocation(DankStorage.MODID, "blacklisted_storage"));
+	public static final Tag<Item> BLACKLISTED_USAGE = TagRegistry.item(new ResourceLocation(DankStorage.MODID, "blacklisted_usage"));
 
-	public static final Tag<Item> WRENCHES = TagRegistry.item(new Identifier("forge", "wrenches"));
+	public static final Tag<Item> WRENCHES = TagRegistry.item(new ResourceLocation("forge", "wrenches"));
 
 	public static final String INV = "inv";
 
@@ -61,13 +60,13 @@ public class Utils {
 	}
 
 	//0,1,2,3
-	public static void cycleMode(ItemStack bag, PlayerEntity player) {
+	public static void cycleMode(ItemStack bag, Player player) {
 		int ordinal = bag.getOrCreateTag().getInt("mode");
 		ordinal++;
 		if (ordinal > Mode.modes.length - 1) ordinal = 0;
 		bag.getOrCreateTag().putInt("mode", ordinal);
-		player.sendMessage(
-						new TranslatableText("dankstorage.mode." + Mode.modes[ordinal].name()), true);
+		player.displayClientMessage(
+						new TranslatableComponent("dankstorage.mode." + Mode.modes[ordinal].name()), true);
 	}
 
 	public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag) {
@@ -75,13 +74,13 @@ public class Utils {
 	}
 
 	//0,1,2
-	public static void cyclePlacement(ItemStack bag, PlayerEntity player) {
+	public static void cyclePlacement(ItemStack bag, Player player) {
 		int ordinal = bag.getOrCreateTag().getInt("construction");
 		ordinal++;
 		if (ordinal >= useTypes.length) ordinal = 0;
 		bag.getOrCreateTag().putInt("construction", ordinal);
-		player.sendMessage(
-						new TranslatableText("dankstorage.usetype." + useTypes[ordinal].name()), true);
+		player.displayClientMessage(
+						new TranslatableComponent("dankstorage.usetype." + useTypes[ordinal].name()), true);
 	}
 
 	public static int getSelectedSlot(ItemStack bag) {
@@ -93,15 +92,15 @@ public class Utils {
 	}
 
 
-	public static void sort(PlayerEntity player) {
+	public static void sort(Player player) {
 		if (player == null) return;
-		ScreenHandler openContainer = player.currentScreenHandler;
+		AbstractContainerMenu openContainer = player.containerMenu;
 		if (openContainer instanceof AbstractDankContainer) {
 			List<SortingData> itemlist = new ArrayList<>();
 			DankInventory handler = ((AbstractDankContainer) openContainer).dankInventory;
 
-			for (int i = 0; i < handler.size(); i++) {
-				ItemStack stack = handler.getStack(i);
+			for (int i = 0; i < handler.getContainerSize(); i++) {
+				ItemStack stack = handler.getItem(i);
 				if (stack.isEmpty()) continue;
 				boolean exists = SortingData.exists(itemlist, stack.copy());
 				if (exists) {
@@ -123,8 +122,8 @@ public class Utils {
 			for (SortingData data : itemlist) {
 				ItemStack stack = data.stack.copy();
 				ItemStack rem = stack.copy();
-				for (int i = 0; i < handler.size(); i++) {
-					rem = handler.addStack(rem);
+				for (int i = 0; i < handler.getContainerSize(); i++) {
+					rem = handler.addItem(rem);
 					if (rem.isEmpty()) break;
 				}
 			}
@@ -148,7 +147,7 @@ public class Utils {
 			//don't change slot if empty
 		if (handler.noValidSlots()) return;
 			int selectedSlot = getSelectedSlot(bag);
-			int size = handler.size();
+			int size = handler.getContainerSize();
 			//keep iterating until a valid slot is found (not empty and not blacklisted from usage)
 			while (true) {
 				if (right) {
@@ -158,7 +157,7 @@ public class Utils {
 					selectedSlot--;
 					if (selectedSlot < 0) selectedSlot = size - 1;
 				}
-				if (!handler.getStack(selectedSlot).isEmpty() && !handler.getStack(selectedSlot).getItem().isIn(BLACKLISTED_USAGE))
+				if (!handler.getItem(selectedSlot).isEmpty() && !handler.getItem(selectedSlot).getItem().is(BLACKLISTED_USAGE))
 					break;
 			}
 			setSelectedSlot(bag, selectedSlot);
@@ -177,64 +176,64 @@ public class Utils {
 	}
 
 	public static DankItem getItemFromTier(int tier) {
-		return (DankItem) Registry.ITEM.get(new Identifier(DankStorage.MODID, "dank_" + tier));
+		return (DankItem) Registry.ITEM.get(new ResourceLocation(DankStorage.MODID, "dank_" + tier));
 	}
 
 	public static int getNbtSize(@Nullable CompoundTag nbt) {
-		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
-		buffer.writeCompoundTag(nbt);
+		FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
+		buffer.writeNbt(nbt);
 		buffer.release();
 		return buffer.writerIndex();
 	}
 
 	public static ItemStack getItemStackInSelectedSlot(ItemStack bag) {
 		PortableDankInventory inv = getHandler(bag);
-		ItemStack stack = inv.getStack(Utils.getSelectedSlot(bag));
-		return stack.getItem().isIn(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
+		ItemStack stack = inv.getItem(Utils.getSelectedSlot(bag));
+		return stack.getItem().is(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
 	}
 
-	public static final Set<Identifier> taglist = new HashSet<>();
+	public static final Set<ResourceLocation> taglist = new HashSet<>();
 
 	public static boolean areItemStacksConvertible(final ItemStack stack1, final ItemStack stack2) {
 		if (stack1.hasTag() || stack2.hasTag()) return false;
-		Collection<Identifier> taglistofstack1 = getTags(stack1.getItem());
-		Collection<Identifier> taglistofstack2 = getTags(stack2.getItem());
+		Collection<ResourceLocation> taglistofstack1 = getTags(stack1.getItem());
+		Collection<ResourceLocation> taglistofstack2 = getTags(stack2.getItem());
 
-		Set<Identifier> commontags = new HashSet<>(taglistofstack1);
+		Set<ResourceLocation> commontags = new HashSet<>(taglistofstack1);
 		commontags.retainAll(taglistofstack2);
 		commontags.retainAll(taglist);
 		return !commontags.isEmpty();
 	}
 
-	public static Collection<Identifier> getTags(Item item) {
-		return getTagsFor(ItemTags.getTagGroup(),item);
+	public static Collection<ResourceLocation> getTags(Item item) {
+		return getTagsFor(ItemTags.getAllTags(),item);
 	}
 
 	/**
 	 * can't use TagGroup#getTagsFor because it's client only
 	 */
-	public static Collection<Identifier> getTagsFor(TagGroup<Item> tagGroup, Item item) {
-		return tagGroup.getTags().entrySet().stream()
+	public static Collection<ResourceLocation> getTagsFor(TagCollection<Item> tagGroup, Item item) {
+		return tagGroup.getAllTags().entrySet().stream()
 						.filter(identifierTagEntry -> identifierTagEntry.getValue().contains(item))
 						.map(Map.Entry::getKey).collect(Collectors.toList());
 	}
 
-	public static boolean isHoldingDank(PlayerEntity player) {
-		ItemStack stack = player.getMainHandStack();
+	public static boolean isHoldingDank(Player player) {
+		ItemStack stack = player.getMainHandItem();
 		if (stack.getItem() instanceof DankItem)return true;
-		stack = player.getOffHandStack();
+		stack = player.getOffhandItem();
 		return stack.getItem() instanceof DankItem;
 	}
 
-	public static boolean canMerge(ItemStack first, ItemStack second, Inventory inventory) {
+	public static boolean canMerge(ItemStack first, ItemStack second, Container inventory) {
 		if (first.getItem() != second.getItem()) {
 			return false;
-		} else if (first.getDamage() != second.getDamage()) {
+		} else if (first.getDamageValue() != second.getDamageValue()) {
 			return false;
-		} else if (first.getCount() > inventory.getMaxCountPerStack()) {
+		} else if (first.getCount() > inventory.getMaxStackSize()) {
 			return false;
 		} else {
-			return ItemStack.areTagsEqual(first, second);
+			return ItemStack.tagMatches(first, second);
 		}
 	}
 

@@ -1,19 +1,19 @@
 package tfar.dankstorage.mixin;
 
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(SimpleInventory.class)
+@Mixin(SimpleContainer.class)
 public interface SimpleInventoryAccessor {
 
 	@Accessor
-	DefaultedList<ItemStack> getStacks();
+	NonNullList<ItemStack> getStacks();
 
 	@Accessor
-	void setStacks(DefaultedList<ItemStack> stacks);
+	void setStacks(NonNullList<ItemStack> stacks);
 
 	@Accessor void setSize(int slots);
 

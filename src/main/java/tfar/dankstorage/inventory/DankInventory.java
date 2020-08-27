@@ -1,12 +1,12 @@
 package tfar.dankstorage.inventory;
 
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.mixin.ItemStackMixin;
 import tfar.dankstorage.mixin.SimpleInventoryAccessor;
 import tfar.dankstorage.utils.Constants;
@@ -15,7 +15,7 @@ import tfar.dankstorage.utils.Utils;
 
 import java.util.stream.IntStream;
 
-public class DankInventory extends SimpleInventory {
+public class DankInventory extends SimpleContainer {
 
 	public DankStats dankStats;
 	public int[] lockedSlots;
@@ -34,7 +34,7 @@ public class DankInventory extends SimpleInventory {
 	private void setSize() {
 		((SimpleInventoryAccessor)this).setSize(dankStats.slots);
 
-		DefaultedList<ItemStack> newStacks = DefaultedList.ofSize(dankStats.slots,ItemStack.EMPTY);
+		NonNullList<ItemStack> newStacks = NonNullList.withSize(dankStats.slots,ItemStack.EMPTY);
 		int max = Math.min(lockedSlots.length,dankStats.slots);
 
 		for (int i = 0; i < max; i++) {
@@ -49,15 +49,15 @@ public class DankInventory extends SimpleInventory {
 	}
 
 	@Override
-	public ItemStack removeStack(int slot, int amount) {
+	public ItemStack removeItem(int slot, int amount) {
 		if (!isLocked(slot)) {
-			return super.removeStack(slot,amount);
+			return super.removeItem(slot,amount);
 		}
 
-		int amountInSlot = getStack(slot).getCount();
+		int amountInSlot = getItem(slot).getCount();
 
 		if (amountInSlot < amount) {
-			return super.removeStack(slot,amount);
+			return super.removeItem(slot,amount);
 		}
 
 		amount = Math.min(amount,amountInSlot - 1);
@@ -66,27 +66,27 @@ public class DankInventory extends SimpleInventory {
 			return ItemStack.EMPTY;
 		}
 
-		ItemStack itemStack = Inventories.splitStack(getContents(), slot, amount);
+		ItemStack itemStack = ContainerHelper.removeItem(getContents(), slot, amount);
 		if (!itemStack.isEmpty()) {
-			this.markDirty();
+			this.setChanged();
 		}
 
 		return itemStack;
 	}
 
 	@Override
-	public int getMaxCountPerStack() {
+	public int getMaxStackSize() {
 		return dankStats.stacklimit;
 	}
 
-	public DefaultedList<ItemStack> getContents() {
+	public NonNullList<ItemStack> getContents() {
 		return ((SimpleInventoryAccessor)this).getStacks();
 	}
 
 	public boolean noValidSlots() {
-		return IntStream.range(0,size())
-						.mapToObj(this::getStack)
-						.allMatch(stack -> stack.isEmpty() || stack.getItem().isIn(Utils.BLACKLISTED_USAGE));
+		return IntStream.range(0,getContainerSize())
+						.mapToObj(this::getItem)
+						.allMatch(stack -> stack.isEmpty() || stack.getItem().is(Utils.BLACKLISTED_USAGE));
 	}
 
 	public boolean isLocked(int slot){
@@ -94,8 +94,8 @@ public class DankInventory extends SimpleInventory {
 	}
 
 	@Override
-	public boolean canInsert(ItemStack stack) {
-		return !stack.getItem().isIn(Utils.BLACKLISTED_STORAGE) && super.canInsert(stack);
+	public boolean canAddItem(ItemStack stack) {
+		return !stack.getItem().is(Utils.BLACKLISTED_STORAGE) && super.canAddItem(stack);
 	}
 
 	public CompoundTag serializeNBT() {
@@ -105,7 +105,7 @@ public class DankInventory extends SimpleInventory {
 				int realCount = Math.min(dankStats.stacklimit, getContents().get(i).getCount());
 				CompoundTag itemTag = new CompoundTag();
 				itemTag.putInt("Slot", i);
-				getContents().get(i).toTag(itemTag);
+				getContents().get(i).save(itemTag);
 				itemTag.putInt("ExtendedCount", realCount);
 				nbtTagList.add(itemTag);
 			}
@@ -124,31 +124,31 @@ public class DankInventory extends SimpleInventory {
 		for (int i = 0; i < tagList.size(); i++) {
 			CompoundTag itemTags = tagList.getCompound(i);
 			int slot = itemTags.getInt("Slot");
-			if (slot >= 0 && slot < size()) {
+			if (slot >= 0 && slot < getContainerSize()) {
 				if (itemTags.contains("StackList", Constants.NBT.TAG_LIST)) {
 					ItemStack stack = ItemStack.EMPTY;
 					ListTag stackTagList = itemTags.getList("StackList", Constants.NBT.TAG_COMPOUND);
 					for (int j = 0; j < stackTagList.size(); j++) {
 						CompoundTag itemTag = stackTagList.getCompound(j);
-						ItemStack temp = ItemStack.fromTag(itemTag);
+						ItemStack temp = ItemStack.of(itemTag);
 						if (!temp.isEmpty()) {
 							if (stack.isEmpty()) stack = temp;
-							else stack.increment(temp.getCount());
+							else stack.grow(temp.getCount());
 						}
 					}
 					if (!stack.isEmpty()) {
 						int count = stack.getCount();
-						count = Math.min(count, getMaxCountPerStack());
+						count = Math.min(count, getMaxStackSize());
 						stack.setCount(count);
 
-						this.setStack(slot, stack);
+						this.setItem(slot, stack);
 					}
 				} else {
-					ItemStack stack = ItemStack.fromTag(itemTags);
+					ItemStack stack = ItemStack.of(itemTags);
 					if (itemTags.contains("ExtendedCount", Constants.NBT.TAG_INT)) {
 						stack.setCount(itemTags.getInt("ExtendedCount"));
 					}
-					this.setStack(slot, stack);
+					this.setItem(slot, stack);
 				}
 			}
 		}
@@ -162,31 +162,31 @@ public class DankInventory extends SimpleInventory {
 		for (int i = 0; i < tagList.size(); i++) {
 			CompoundTag itemTags = tagList.getCompound(i);
 			int slot = itemTags.getInt("Slot");
-			if (slot >= 0 && slot < size()) {
+			if (slot >= 0 && slot < getContainerSize()) {
 				if (itemTags.contains("StackList", Constants.NBT.TAG_LIST)) {
 					ItemStack stack = ItemStack.EMPTY;
 					ListTag stackTagList = itemTags.getList("StackList", Constants.NBT.TAG_COMPOUND);
 					for (int j = 0; j < stackTagList.size(); j++) {
 						CompoundTag itemTag = stackTagList.getCompound(j);
-						ItemStack temp = ItemStack.fromTag(itemTag);
+						ItemStack temp = ItemStack.of(itemTag);
 						if (!temp.isEmpty()) {
 							if (stack.isEmpty()) stack = temp;
-							else stack.increment(temp.getCount());
+							else stack.grow(temp.getCount());
 						}
 					}
 					if (!stack.isEmpty()) {
 						int count = stack.getCount();
-						count = Math.min(count, getMaxCountPerStack());
+						count = Math.min(count, getMaxStackSize());
 						stack.setCount(count);
 
-						this.setStack(slot, stack);
+						this.setItem(slot, stack);
 					}
 				} else {
-					ItemStack stack = ItemStack.fromTag(itemTags);
+					ItemStack stack = ItemStack.of(itemTags);
 					if (itemTags.contains("ExtendedCount", Constants.NBT.TAG_INT)) {
 						stack.setCount(itemTags.getInt("ExtendedCount"));
 					}
-					this.setStack(slot, stack);
+					this.setItem(slot, stack);
 				}
 			}
 		}
@@ -202,17 +202,17 @@ public class DankInventory extends SimpleInventory {
 		int numStacks = 0;
 		float f = 0F;
 
-		for (int slot = 0; slot < this.size(); slot++) {
-			ItemStack stack = this.getStack(slot);
+		for (int slot = 0; slot < this.getContainerSize(); slot++) {
+			ItemStack stack = this.getItem(slot);
 
 			if (!stack.isEmpty()) {
-				f += (float) stack.getCount() / (float) this.getMaxCountPerStack();
+				f += (float) stack.getCount() / (float) this.getMaxStackSize();
 				numStacks++;
 			}
 		}
 
-		f /= this.size();
-		return MathHelper.floor(f * 14F) + (numStacks > 0 ? 1 : 0);
+		f /= this.getContainerSize();
+		return Mth.floor(f * 14F) + (numStacks > 0 ? 1 : 0);
 	}
 
 }

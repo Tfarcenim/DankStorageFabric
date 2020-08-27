@@ -19,11 +19,6 @@
 
 package tfar.dankstorage.utils;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
 /**
  * A class containing constants for magic numbers used in the minecraft codebase.
  * Everything here should be checked each update, and have a comment relating to where to check it.

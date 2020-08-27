@@ -1,20 +1,20 @@
 package tfar.dankstorage.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.item.ItemColors;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.mixin.MinecraftClientAccessor;
 
 import javax.annotation.Nullable;
@@ -22,30 +22,30 @@ import java.text.DecimalFormat;
 
 public class BigItemRenderer extends ItemRenderer {
 
-  public static final BigItemRenderer INSTANCE = new BigItemRenderer(MinecraftClient.getInstance().getTextureManager(),MinecraftClient.getInstance().getBakedModelManager()
-          ,((MinecraftClientAccessor)MinecraftClient.getInstance()).getItemColors());
+  public static final BigItemRenderer INSTANCE = new BigItemRenderer(Minecraft.getInstance().getTextureManager(),Minecraft.getInstance().getModelManager()
+          ,((MinecraftClientAccessor)Minecraft.getInstance()).getItemColors());
 
-  protected BigItemRenderer(TextureManager textureManagerIn, BakedModelManager modelManagerIn, ItemColors itemColorsIn) {
+  protected BigItemRenderer(TextureManager textureManagerIn, ModelManager modelManagerIn, ItemColors itemColorsIn) {
     super(textureManagerIn, modelManagerIn, itemColorsIn);
   }
 
   @Override
-  public void renderGuiItemOverlay(TextRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text) {
+  public void renderGuiItemDecorations(Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text) {
     if (!stack.isEmpty()) {
-      MatrixStack matrixstack = new MatrixStack();
+      PoseStack matrixstack = new PoseStack();
 
       if (stack.getCount() != 1 || text != null) {
         String s = text == null ? getStringFromInt(stack.getCount()) : text;
-        matrixstack.translate(0.0D, 0.0D, this.zOffset + 200.0F);
-        VertexConsumerProvider.Immediate irendertypebuffer$impl = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+        matrixstack.translate(0.0D, 0.0D, this.blitOffset + 200.0F);
+        MultiBufferSource.BufferSource irendertypebuffer$impl = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
         RenderSystem.pushMatrix();
         float scale = .75f;
         RenderSystem.scalef(scale, scale, 1.0F);
-        fr.draw(s, (xPosition + 19 - 2 - (fr.getWidth(s)*scale)) /scale,
-                (yPosition + 6 + 3 + (1 / (scale * scale) - 1) ) /scale, 16777215,true, matrixstack.peek().getModel(), irendertypebuffer$impl, false, 0, 15728880);
+        fr.drawInBatch(s, (xPosition + 19 - 2 - (fr.width(s)*scale)) /scale,
+                (yPosition + 6 + 3 + (1 / (scale * scale) - 1) ) /scale, 16777215,true, matrixstack.last().pose(), irendertypebuffer$impl, false, 0, 15728880);
                 //true, matrixstack.getLast().getNormal(), irendertypebuffer$impl, false, 0, 15728880);
-        irendertypebuffer$impl.draw();
+        irendertypebuffer$impl.endBatch();
         RenderSystem.popMatrix();
       }
 
@@ -70,19 +70,19 @@ public class BigItemRenderer extends ItemRenderer {
         RenderSystem.enableDepthTest();
       }*/
 
-      ClientPlayerEntity entityplayersp = MinecraftClient.getInstance().player;
+      LocalPlayer entityplayersp = Minecraft.getInstance().player;
       float f3 = entityplayersp == null ? 0.0F
-              : entityplayersp.getItemCooldownManager().getCooldownProgress(stack.getItem(),
-              MinecraftClient.getInstance().getTickDelta());
+              : entityplayersp.getCooldowns().getCooldownPercent(stack.getItem(),
+              Minecraft.getInstance().getFrameTime());
 
       if (f3 > 0.0F) {
         RenderSystem.disableLighting();
         RenderSystem.disableDepthTest();
         RenderSystem.disableTexture();
-        Tessellator tessellator1 = Tessellator.getInstance();
-        BufferBuilder vertexbuffer1 = tessellator1.getBuffer();
-        this.renderGuiQuad(vertexbuffer1, xPosition, yPosition + MathHelper.floor(16.0F * (1.0F - f3)), 16,
-                MathHelper.ceil(16.0F * f3), 255, 255, 255, 127);
+        Tesselator tessellator1 = Tesselator.getInstance();
+        BufferBuilder vertexbuffer1 = tessellator1.getBuilder();
+        this.fillRect(vertexbuffer1, xPosition, yPosition + Mth.floor(16.0F * (1.0F - f3)), 16,
+                Mth.ceil(16.0F * f3), 255, 255, 255, 127);
         RenderSystem.enableTexture();
         RenderSystem.enableLighting();
         RenderSystem.enableDepthTest();
@@ -101,14 +101,14 @@ public class BigItemRenderer extends ItemRenderer {
     return Float.toString(number).replaceAll("\\.?0*$", "");
   }
 
-  private void renderGuiQuad(BufferBuilder renderer, int x, int y, int width, int height, int red, int green, int blue,
+  private void fillRect(BufferBuilder renderer, int x, int y, int width, int height, int red, int green, int blue,
                     int alpha) {
-    renderer.begin(7, VertexFormats.POSITION_COLOR);
-    renderer.vertex(x, y, 0.0D).color(red, green, blue, alpha).next();
-    renderer.vertex(x, y + height, 0.0D).color(red, green, blue, alpha).next();
-    renderer.vertex(x + width, y + height, 0.0D).color(red, green, blue, alpha).next();
-    renderer.vertex(x + width, y, 0.0D).color(red, green, blue, alpha).next();
-    Tessellator.getInstance().draw();
+    renderer.begin(7, DefaultVertexFormat.POSITION_COLOR);
+    renderer.vertex(x, y, 0.0D).color(red, green, blue, alpha).endVertex();
+    renderer.vertex(x, y + height, 0.0D).color(red, green, blue, alpha).endVertex();
+    renderer.vertex(x + width, y + height, 0.0D).color(red, green, blue, alpha).endVertex();
+    renderer.vertex(x + width, y, 0.0D).color(red, green, blue, alpha).endVertex();
+    Tesselator.getInstance().end();
   }
 
 }

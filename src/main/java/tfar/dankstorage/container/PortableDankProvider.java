@@ -1,19 +1,19 @@
 package tfar.dankstorage.container;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
 
 import javax.annotation.Nullable;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 
-public class PortableDankProvider implements NamedScreenHandlerFactory {
+public class PortableDankProvider implements MenuProvider {
 
   public final DankStats tier;
   public PortableDankProvider(DankStats tier){
@@ -21,17 +21,17 @@ public class PortableDankProvider implements NamedScreenHandlerFactory {
   }
 
   @Override
-  public Text getDisplayName() {
-    return new LiteralText("Dank "+(tier.ordinal()+1));
+  public Component getDisplayName() {
+    return new TextComponent("Dank "+(tier.ordinal()+1));
   }
 
   @Nullable
   @Override
-  public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity player) {
+  public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player player) {
 
-    DankInventory dankInventory = Utils.getHandler(player.getMainHandStack());
+    DankInventory dankInventory = Utils.getHandler(player.getMainHandItem());
 
-    PropertyDelegate propertyDelegate = new PropertyDelegate() {
+    ContainerData propertyDelegate = new ContainerData() {
       public int get(int index) {
         return dankInventory.lockedSlots[index];
       }
@@ -40,7 +40,7 @@ public class PortableDankProvider implements NamedScreenHandlerFactory {
         dankInventory.lockedSlots[index] = value;
       }
 
-      public int size() {
+      public int getCount() {
         return dankInventory.lockedSlots.length;
       }
     };

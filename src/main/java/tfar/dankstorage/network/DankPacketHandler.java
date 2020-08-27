@@ -2,22 +2,21 @@ package tfar.dankstorage.network;
 
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-import net.minecraft.network.Packet;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.network.server.*;
 
 public class DankPacketHandler {
 
-  public static final Identifier sync_nbt = new Identifier(DankStorage.MODID,"sync_nbt");
-  public static final Identifier toggle_pickup = new Identifier(DankStorage.MODID,"toggle_pickup");
-  public static final Identifier tag_mode = new Identifier(DankStorage.MODID,"tag_mode");
-  public static final Identifier sort = new Identifier(DankStorage.MODID,"sort");
-  public static final Identifier lock_slot = new Identifier(DankStorage.MODID,"lock_slot");
-  public static final Identifier sync_stacks = new Identifier(DankStorage.MODID,"sync_stacks");
-  public static final Identifier pick_block = new Identifier(DankStorage.MODID,"pick_block");
-  public static Identifier toggle_use = new Identifier(DankStorage.MODID,"toggle_use");
-  public static Identifier scroll = new Identifier(DankStorage.MODID,"scroll");
+  public static final ResourceLocation sync_nbt = new ResourceLocation(DankStorage.MODID,"sync_nbt");
+  public static final ResourceLocation toggle_pickup = new ResourceLocation(DankStorage.MODID,"toggle_pickup");
+  public static final ResourceLocation tag_mode = new ResourceLocation(DankStorage.MODID,"tag_mode");
+  public static final ResourceLocation sort = new ResourceLocation(DankStorage.MODID,"sort");
+  public static final ResourceLocation lock_slot = new ResourceLocation(DankStorage.MODID,"lock_slot");
+  public static final ResourceLocation sync_stacks = new ResourceLocation(DankStorage.MODID,"sync_stacks");
+  public static final ResourceLocation pick_block = new ResourceLocation(DankStorage.MODID,"pick_block");
+  public static ResourceLocation toggle_use = new ResourceLocation(DankStorage.MODID,"toggle_use");
+  public static ResourceLocation scroll = new ResourceLocation(DankStorage.MODID,"scroll");
 
 
 	public static void registerMessages() {

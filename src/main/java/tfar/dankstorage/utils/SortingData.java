@@ -1,8 +1,7 @@
 package tfar.dankstorage.utils;
 
-import net.minecraft.item.ItemStack;
-
 import javax.annotation.Nonnull;
+import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 public class SortingData implements Comparable<SortingData>{
@@ -13,7 +12,7 @@ public class SortingData implements Comparable<SortingData>{
   }
 
   public boolean matches(ItemStack otherStack){
-    return stack.getCount() < Integer.MAX_VALUE && stack.getItem() == otherStack.getItem() && ItemStack.areTagsEqual(stack,otherStack);
+    return stack.getCount() < Integer.MAX_VALUE && stack.getItem() == otherStack.getItem() && ItemStack.tagMatches(stack,otherStack);
   }
 
   public int add(int add){

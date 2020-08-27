@@ -2,26 +2,26 @@ package tfar.dankstorage.recipe;
 
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.utils.Utils;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.ShapedRecipe;
 import javax.annotation.Nonnull;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 
 public class UpgradeRecipe extends ShapedRecipe {
 
   public UpgradeRecipe(ShapedRecipe recipe){
-    super(recipe.getId(),"dank",recipe.getWidth(),recipe.getHeight(),recipe.getPreviewInputs(),recipe.getOutput());
+    super(recipe.getId(),"dank",recipe.getWidth(),recipe.getHeight(),recipe.getIngredients(),recipe.getResultItem());
   }
 
   @Nonnull
   @Override
-  public ItemStack craft(CraftingInventory inv) {
-    ItemStack bag = super.craft(inv).copy();
-    ItemStack oldBag = inv.getStack(4).copy();
+  public ItemStack assemble(CraftingContainer inv) {
+    ItemStack bag = super.assemble(inv).copy();
+    ItemStack oldBag = inv.getItem(4).copy();
     if (!oldBag.hasTag())return bag;
     bag.setTag(oldBag.getTag());
-    bag.getOrCreateSubTag(Utils.INV).putInt("Size",Utils.getSlotCount(bag));
+    bag.getOrCreateTagElement(Utils.INV).putInt("Size",Utils.getSlotCount(bag));
     return bag;
   }
 

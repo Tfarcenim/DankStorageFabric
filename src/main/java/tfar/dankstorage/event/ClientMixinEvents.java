@@ -1,14 +1,14 @@
 package tfar.dankstorage.event;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import tfar.dankstorage.inventory.PortableDankInventory;
@@ -17,12 +17,12 @@ import tfar.dankstorage.utils.Utils;
 
 public class ClientMixinEvents {
 
-	public static final MinecraftClient mc = MinecraftClient.getInstance();
+	public static final Minecraft mc = Minecraft.getInstance();
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	public static boolean onScroll(Mouse mouse, long window, double horizontal, double vertical,double delta) {
-		PlayerEntity player = mc.player;
-		if (player != null && player.isInSneakingPose() && (Utils.isConstruction(player.getMainHandStack()) || Utils.isConstruction(player.getOffHandStack()))) {
+	public static boolean onScroll(MouseHandler mouse, long window, double horizontal, double vertical,double delta) {
+		Player player = mc.player;
+		if (player != null && player.isCrouching() && (Utils.isConstruction(player.getMainHandItem()) || Utils.isConstruction(player.getOffhandItem()))) {
 			boolean right = delta < 0;
 			C2SMessageScrollSlot.send(right);
 			return true;
@@ -32,12 +32,12 @@ public class ClientMixinEvents {
 
 	public static int pickItemFromDank(ItemStack bag) {
 		PortableDankInventory handler = Utils.getHandler(bag);
-		PlayerEntity player = mc.player;
-		ItemStack pickblock = onPickBlock(player.rayTrace(20.0D,0,false),player,player.world);
+		Player player = mc.player;
+		ItemStack pickblock = onPickBlock(player.pick(20.0D,0,false),player,player.level);
 		int slot = -1;
 		if (!pickblock.isEmpty())
-			for (int i = 0; i < handler.size(); i++) {
-				if (pickblock.getItem() == handler.getStack(i).getItem()){
+			for (int i = 0; i < handler.getContainerSize(); i++) {
+				if (pickblock.getItem() == handler.getItem(i).getItem()){
 					slot = i;
 					break;
 				}
@@ -45,7 +45,7 @@ public class ClientMixinEvents {
 		return slot;
 	}
 
-	public static ItemStack onPickBlock(HitResult target, PlayerEntity player, World world) {
+	public static ItemStack onPickBlock(HitResult target, Player player, Level world) {
 		ItemStack result = ItemStack.EMPTY;
 
 		if (target.getType() == HitResult.Type.BLOCK) {
@@ -53,7 +53,7 @@ public class ClientMixinEvents {
 			BlockState state = world.getBlockState(pos);
 
 			if (state.isAir()) return ItemStack.EMPTY;
-			result = state.getBlock().getPickStack(world, pos, state);
+			result = state.getBlock().getCloneItemStack(world, pos, state);
 
 			if (result.isEmpty())
 				LOGGER.warn("Picking on: [{}] {} gave null item", target.getType(), state.getBlock());

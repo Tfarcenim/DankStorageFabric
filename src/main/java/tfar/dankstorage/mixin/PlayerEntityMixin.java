@@ -1,10 +1,5 @@
 package tfar.dankstorage.mixin;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.RangedWeaponItem;
-import net.minecraft.stat.Stat;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,10 +14,14 @@ import tfar.dankstorage.utils.Utils;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import net.minecraft.stats.Stat;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
-@Mixin(PlayerEntity.class)
+@Mixin(Player.class)
 public abstract class PlayerEntityMixin implements UseDankStorage {
-  @Shadow @Final public PlayerInventory inventory;
+  @Shadow @Final public Inventory inventory;
 
   @Shadow public abstract void increaseStat(Stat<?> stat, int amount);
 
@@ -30,7 +29,7 @@ public abstract class PlayerEntityMixin implements UseDankStorage {
 
   @Inject(method = "getArrowType", at = @At("HEAD"), cancellable = true)
   private void findAmmo(ItemStack shootable, CallbackInfoReturnable<ItemStack> cir) {
-    ItemStack ammo = MixinHooks.myFindAmmo((PlayerEntity)(Object)this,shootable);
+    ItemStack ammo = MixinHooks.myFindAmmo((Player)(Object)this,shootable);
     useDankStorage = !ammo.isEmpty();
     if (!ammo.isEmpty()) {
       cir.setReturnValue(ammo);

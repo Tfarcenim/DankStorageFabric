@@ -1,8 +1,8 @@
 package tfar.dankstorage.inventory;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.utils.Constants;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
@@ -22,11 +22,11 @@ public class PortableDankInventory extends DankInventory {
 	}
 
 	public void readItemStack() {
-		deserializeNBT(bag.getOrCreateSubTag(Utils.INV));
+		deserializeNBT(bag.getOrCreateTagElement(Utils.INV));
 	}
 
 	@Override
-	public void markDirty() {
+	public void setChanged() {
 		bag.getOrCreateTag().put(Utils.INV,serializeNBT());
 	}
 
@@ -36,31 +36,31 @@ public class PortableDankInventory extends DankInventory {
 		for (int i = 0; i < tagList.size(); i++) {
 			CompoundTag itemTags = tagList.getCompound(i);
 			int slot = itemTags.getInt("Slot");
-			if (slot >= 0 && slot < size()) {
+			if (slot >= 0 && slot < getContainerSize()) {
 				if (itemTags.contains("StackList", Constants.NBT.TAG_LIST)) {
 					ItemStack stack = ItemStack.EMPTY;
 					ListTag stackTagList = itemTags.getList("StackList", Constants.NBT.TAG_COMPOUND);
 					for (int j = 0; j < stackTagList.size(); j++) {
 						CompoundTag itemTag = stackTagList.getCompound(j);
-						ItemStack temp = ItemStack.fromTag(itemTag);
+						ItemStack temp = ItemStack.of(itemTag);
 						if (!temp.isEmpty()) {
 							if (stack.isEmpty()) stack = temp;
-							else stack.increment(temp.getCount());
+							else stack.grow(temp.getCount());
 						}
 					}
 					if (!stack.isEmpty()) {
 						int count = stack.getCount();
-						count = Math.min(count, getMaxCountPerStack());
+						count = Math.min(count, getMaxStackSize());
 						stack.setCount(count);
 
-						this.setStack(slot, stack);
+						this.setItem(slot, stack);
 					}
 				} else {
-					ItemStack stack = ItemStack.fromTag(itemTags);
+					ItemStack stack = ItemStack.of(itemTags);
 					if (itemTags.contains("ExtendedCount", Constants.NBT.TAG_INT)) {
 						stack.setCount(itemTags.getInt("ExtendedCount"));
 					}
-					this.setStack(slot, stack);
+					this.setItem(slot, stack);
 				}
 			}
 		}

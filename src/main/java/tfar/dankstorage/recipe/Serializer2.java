@@ -2,20 +2,20 @@ package tfar.dankstorage.recipe;
 
 import com.google.gson.JsonObject;
 import javax.annotation.Nonnull;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 
 public class Serializer2 extends ShapedRecipe.Serializer {
    @Override
-    public UpgradeRecipe read(Identifier location, JsonObject json) {
-      return new UpgradeRecipe(super.read(location,json));
+    public UpgradeRecipe fromJson(ResourceLocation location, JsonObject json) {
+      return new UpgradeRecipe(super.fromJson(location,json));
    }
 
 
 
   @Override
-  public UpgradeRecipe read(@Nonnull Identifier p_199426_1_, PacketByteBuf p_199426_2_) {
-    return new UpgradeRecipe(super.read(p_199426_1_, p_199426_2_));
+  public UpgradeRecipe fromNetwork(@Nonnull ResourceLocation p_199426_1_, FriendlyByteBuf p_199426_2_) {
+    return new UpgradeRecipe(super.fromNetwork(p_199426_1_, p_199426_2_));
   }
 }

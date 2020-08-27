@@ -1,20 +1,20 @@
 
 package tfar.dankstorage.tile;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Nameable;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.Nameable;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import tfar.dankstorage.DankItem;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.block.DockBlock;
@@ -26,25 +26,25 @@ import tfar.dankstorage.utils.Utils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class DockBlockEntity extends BlockEntity implements Nameable, NamedScreenHandlerFactory , Inventory {
+public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvider , Container {
 
-  protected final PropertyDelegate propertyDelegate;
+  protected final ContainerData propertyDelegate;
   public int numPlayersUsing = 0;
-  protected Text customName;
+  protected Component customName;
   public int mode = 0;
   public int selectedSlot;
 
   private final DankInventory handler = new DankInventory(DankStats.zero) {
     @Override
-    public void markDirty() {
-      super.markDirty();
-      DockBlockEntity.this.markDirty();
+    public void setChanged() {
+      super.setChanged();
+      DockBlockEntity.this.setChanged();
     }
   };
 
   public DockBlockEntity() {
     super(DankStorage.dank_tile);
-    this.propertyDelegate = new PropertyDelegate() {
+    this.propertyDelegate = new ContainerData() {
       public int get(int index) {
           return DockBlockEntity.this.handler.lockedSlots[index];
       }
@@ -53,7 +53,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, NamedScree
         DockBlockEntity.this.handler.lockedSlots[index] = value;
       }
 
-      public int size() {
+      public int getCount() {
         return DockBlockEntity.this.handler.lockedSlots.length;
       }
     };
@@ -68,81 +68,81 @@ public class DockBlockEntity extends BlockEntity implements Nameable, NamedScree
   }
 
   @Override
-  public boolean onSyncedBlockEvent(int id, int type) {
+  public boolean triggerEvent(int id, int type) {
     if (id == 1) {
       this.numPlayersUsing = type;
-      this.markDirty();
+      this.setChanged();
       return true;
     } else {
-      return super.onSyncedBlockEvent(id, type);
+      return super.triggerEvent(id, type);
     }
   }
 
-  public void openInventory(PlayerEntity player) {
+  public void openInventory(Player player) {
     if (!player.isSpectator()) {
       if (this.numPlayersUsing < 0) {
         this.numPlayersUsing = 0;
       }
 
       ++this.numPlayersUsing;
-      this.world.addSyncedBlockEvent(this.pos, this.getCachedState().getBlock(), 1, this.numPlayersUsing);
-      this.world.updateNeighborsAlways(this.pos, this.getCachedState().getBlock());
-      markDirty();
+      this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.numPlayersUsing);
+      this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
+      setChanged();
     }
   }
 
-  public void closeInventory(PlayerEntity player) {
-    if (!player.isSpectator() && this.getCachedState().getBlock() instanceof DockBlock) {
+  public void closeInventory(Player player) {
+    if (!player.isSpectator() && this.getBlockState().getBlock() instanceof DockBlock) {
       --this.numPlayersUsing;
-      this.world.addSyncedBlockEvent(this.pos, this.getCachedState().getBlock(), 1, this.numPlayersUsing);
-      this.world.updateNeighborsAlways(this.pos, this.getCachedState().getBlock());
-      markDirty();
+      this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.numPlayersUsing);
+      this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
+      setChanged();
     }
   }
 
   @Override
-  public void fromTag(BlockState state,CompoundTag compound) {
-    super.fromTag(state,compound);
+  public void load(BlockState state,CompoundTag compound) {
+    super.load(state,compound);
     this.mode = compound.getInt("mode");
     this.selectedSlot = compound.getInt("selectedSlot");
     if (compound.contains(Utils.INV)) {
       handler.deserializeNBT(compound.getCompound(Utils.INV));
     }
     if (compound.contains("CustomName", 8)) {
-      this.setCustomName(Text.Serializer.fromJson(compound.getString("CustomName")));
+      this.setCustomName(Component.Serializer.fromJson(compound.getString("CustomName")));
     }
   }
 
   @Nonnull
   @Override
-  public CompoundTag toTag(CompoundTag tag) {
-    super.toTag(tag);
+  public CompoundTag save(CompoundTag tag) {
+    super.save(tag);
     tag.putInt("mode",mode);
     tag.putInt("selectedSlot",selectedSlot);
     tag.put(Utils.INV, handler.serializeNBT());
     if (this.hasCustomName()) {
-      tag.putString("CustomName", Text.Serializer.toJson(this.customName));
+      tag.putString("CustomName", Component.Serializer.toJson(this.customName));
     }
     return tag;
   }
 
   @Nonnull
   @Override
-  public CompoundTag toInitialChunkDataTag() {
-    return toTag(new CompoundTag());
+  public CompoundTag getUpdateTag() {
+    return save(new CompoundTag());
   }
 
   @Nullable
   @Override
-  public BlockEntityUpdateS2CPacket toUpdatePacket() {
-    return new BlockEntityUpdateS2CPacket(getPos(), 1, toInitialChunkDataTag());
+  public ClientboundBlockEntityDataPacket getUpdatePacket() {
+    return new ClientboundBlockEntityDataPacket(getBlockPos(), 1, getUpdateTag());
   }
 
   //Inventory nonsense
 
   @Override
-  public int size() {
-    return handler.size();
+  public int getContainerSize() {
+    return handler.getContainerSize();
   }
 
   @Override
@@ -151,65 +151,65 @@ public class DockBlockEntity extends BlockEntity implements Nameable, NamedScree
   }
 
   @Override
-  public ItemStack getStack(int slot) {
-    return handler.getStack(slot);
+  public ItemStack getItem(int slot) {
+    return handler.getItem(slot);
   }
 
   @Override
-  public ItemStack removeStack(int slot, int amount) {
-    return handler.removeStack(slot,amount);
+  public ItemStack removeItem(int slot, int amount) {
+    return handler.removeItem(slot,amount);
   }
 
   @Override
-  public ItemStack removeStack(int slot) {
-    return handler.removeStack(slot);
+  public ItemStack removeItemNoUpdate(int slot) {
+    return handler.removeItemNoUpdate(slot);
   }
 
   @Override
-  public void setStack(int slot, ItemStack stack) {
-    handler.setStack(slot,stack);
+  public void setItem(int slot, ItemStack stack) {
+    handler.setItem(slot,stack);
   }
 
   @Override
-  public int getMaxCountPerStack() {
-    return handler.getMaxCountPerStack();
+  public int getMaxStackSize() {
+    return handler.getMaxStackSize();
   }
 
   @Override
-  public void markDirty() {
-    super.markDirty();
-    if (getWorld() != null) {
-      getWorld().updateListeners(pos, getWorld().getBlockState(pos), getWorld().getBlockState(pos), 3);
-      this.world.updateNeighborsAlways(this.pos, this.getCachedState().getBlock());
+  public void setChanged() {
+    super.setChanged();
+    if (getLevel() != null) {
+      getLevel().sendBlockUpdated(worldPosition, getLevel().getBlockState(worldPosition), getLevel().getBlockState(worldPosition), 3);
+      this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
     }
   }
 
   @Override
-  public boolean canPlayerUse(PlayerEntity player) {
+  public boolean stillValid(Player player) {
     return true;
   }
 
-  public void setCustomName(Text text) {
+  public void setCustomName(Component text) {
     this.customName = text;
   }
 
   @Override
-  public Text getName() {
+  public Component getName() {
     return customName != null ? customName : getDefaultName();
   }
 
-  public Text getDefaultName() {
-    return new TranslatableText("container.dankstorage.dank_"+getCachedState().get(DockBlock.TIER));
+  public Component getDefaultName() {
+    return new TranslatableComponent("container.dankstorage.dank_"+getBlockState().getValue(DockBlock.TIER));
   }
 
   @Override
-  public Text getDisplayName() {
+  public Component getDisplayName() {
     return this.getName();
   }
 
   @Nullable
   @Override
-  public Text getCustomName() {
+  public Component getCustomName() {
     return customName;
   }
 
@@ -219,8 +219,8 @@ public class DockBlockEntity extends BlockEntity implements Nameable, NamedScree
 
   @Nullable
   @Override
-  public DockContainer createMenu(int syncId, PlayerInventory p_createMenu_2_, PlayerEntity p_createMenu_3_) {
-    switch (getCachedState().get(DockBlock.TIER)) {
+  public DockContainer createMenu(int syncId, Inventory p_createMenu_2_, Player p_createMenu_3_) {
+    switch (getBlockState().getValue(DockBlock.TIER)) {
       case 1:return DockContainer.t1s(syncId,p_createMenu_2_,handler,propertyDelegate);
       case 2:return DockContainer.t2s(syncId,p_createMenu_2_,handler,propertyDelegate);
       case 3:return DockContainer.t3s(syncId,p_createMenu_2_,handler,propertyDelegate);
@@ -233,20 +233,20 @@ public class DockBlockEntity extends BlockEntity implements Nameable, NamedScree
   }
 
   public void removeTank() {
-    int tier = getCachedState().get(DockBlock.TIER);
+    int tier = getBlockState().getValue(DockBlock.TIER);
     CompoundTag nbt = handler.serializeNBT();
-    world.setBlockState(pos,getCachedState().with(DockBlock.TIER,0));
+    level.setBlockAndUpdate(worldPosition,getBlockState().setValue(DockBlock.TIER,0));
     ItemStack stack = new ItemStack(Utils.getItemFromTier(tier));
     stack.getOrCreateTag().put(Utils.INV,nbt);
-    ItemEntity entity = new ItemEntity(world,pos.getX(),pos.getY(),pos.getZ(),stack);
-    world.spawnEntity(entity);
+    ItemEntity entity = new ItemEntity(level,worldPosition.getX(),worldPosition.getY(),worldPosition.getZ(),stack);
+    level.addFreshEntity(entity);
     handler.setDankStats(DankStats.zero);
   }
 
   public ItemStack removeTank0() {
-    int tier = getCachedState().get(DockBlock.TIER);
+    int tier = getBlockState().getValue(DockBlock.TIER);
     CompoundTag nbt = handler.serializeNBT();
-    world.setBlockState(pos,getCachedState().with(DockBlock.TIER,0));
+    level.setBlockAndUpdate(worldPosition,getBlockState().setValue(DockBlock.TIER,0));
     ItemStack stack = new ItemStack(Utils.getItemFromTier(tier));
     stack.getOrCreateTag().put(Utils.INV,nbt);
     handler.setDankStats(DankStats.zero);
@@ -256,14 +256,14 @@ public class DockBlockEntity extends BlockEntity implements Nameable, NamedScree
   public void addTank(ItemStack tank){
     if (tank.getItem() instanceof DankItem) {
       DankStats stats = ((DankItem)tank.getItem()).stats;
-      world.setBlockState(pos,getCachedState().with(DockBlock.TIER,stats.ordinal()));
+      level.setBlockAndUpdate(worldPosition,getBlockState().setValue(DockBlock.TIER,stats.ordinal()));
       handler.addTank(tank.getOrCreateTag().getCompound(Utils.INV),tank);
-      tank.decrement(1);
+      tank.shrink(1);
     }
   }
 
   @Override
-  public void clear() {
+  public void clearContent() {
 
   }
 }

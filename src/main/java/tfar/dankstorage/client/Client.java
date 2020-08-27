@@ -4,13 +4,13 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.client.screens.DockScreen;
 import tfar.dankstorage.client.screens.PortableDankStorageScreen;
 import tfar.dankstorage.event.FabricEvents;
 import tfar.dankstorage.network.DankPacketHandler;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
 import org.lwjgl.glfw.GLFW;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 import tfar.dankstorage.network.server.C2SMessagePickBlock;
@@ -18,8 +18,8 @@ import tfar.dankstorage.utils.Utils;
 
 public class Client {
 
-  public static KeyBinding CONSTRUCTION;
-  public static final MinecraftClient mc = MinecraftClient.getInstance();
+  public static KeyMapping CONSTRUCTION;
+  public static final Minecraft mc = Minecraft.getInstance();
 
   public static void client() {
 
@@ -41,14 +41,14 @@ public class Client {
     ScreenRegistry.register(DankStorage.dank_7_container, DockScreen::t7);
     ScreenRegistry.register(DankStorage.portable_dank_7_container, PortableDankStorageScreen::t7);
 
-    CONSTRUCTION = new KeyBinding("key.dankstorage.construction", GLFW.GLFW_KEY_I, "key.categories.dankstorage");
+    CONSTRUCTION = new KeyMapping("key.dankstorage.construction", GLFW.GLFW_KEY_I, "key.categories.dankstorage");
 
     KeyBindingHelper.registerKeyBinding(CONSTRUCTION);
     ClientTickCallback.EVENT.register(Client::keyPressed);
   }
 
-  public static void keyPressed(MinecraftClient client) {
-    if (CONSTRUCTION.wasPressed()) {
+  public static void keyPressed(Minecraft client) {
+    if (CONSTRUCTION.consumeClick()) {
       C2SMessageToggleUseType.send();
     }
   }

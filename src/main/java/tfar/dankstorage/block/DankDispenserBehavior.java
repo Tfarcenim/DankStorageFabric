@@ -1,22 +1,22 @@
 package tfar.dankstorage.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.dispenser.DispenserBehavior;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPointer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import tfar.dankstorage.tile.DockBlockEntity;
 
-public class DankDispenserBehavior implements DispenserBehavior {
+public class DankDispenserBehavior implements DispenseItemBehavior {
 
 	@Override
-	public ItemStack dispense(BlockPointer pointer, ItemStack stack) {
-		ServerWorld world = pointer.getWorld();
-		BlockPos blockPos = pointer.getBlockPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
+	public ItemStack dispense(BlockSource pointer, ItemStack stack) {
+		ServerLevel world = pointer.getLevel();
+		BlockPos blockPos = pointer.getPos().relative(pointer.getBlockState().getValue(DispenserBlock.FACING));
 		BlockState state = world.getBlockState(blockPos);
-		if (state.getBlock() instanceof DockBlock && state.get(DockBlock.TIER) == 0) {
+		if (state.getBlock() instanceof DockBlock && state.getValue(DockBlock.TIER) == 0) {
 			insertDank(world,blockPos,stack);
 			return ItemStack.EMPTY;
 		} else if (state.getBlock() instanceof DockBlock) {
@@ -27,13 +27,13 @@ public class DankDispenserBehavior implements DispenserBehavior {
 		return stack;
 	}
 
-	public ItemStack removeDank(ServerWorld world,BlockPos pos,ItemStack stack) {
+	public ItemStack removeDank(ServerLevel world,BlockPos pos,ItemStack stack) {
 		DockBlockEntity dockBlockEntity = (DockBlockEntity)world.getBlockEntity(pos);
 		ItemStack old = dockBlockEntity.removeTank0();
 		return old;
 	}
 
-	public void insertDank(ServerWorld world,BlockPos pos,ItemStack stack) {
+	public void insertDank(ServerLevel world,BlockPos pos,ItemStack stack) {
 		DockBlockEntity dockBlockEntity = (DockBlockEntity)world.getBlockEntity(pos);
 		dockBlockEntity.addTank(stack);
 	}

@@ -3,22 +3,22 @@ package tfar.dankstorage.utils;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.EncoderException;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.PositionTracker;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import javax.annotation.Nullable;
 import java.io.IOException;
 
 public class PacketBufferEX {
 
-  public static void writeExtendedItemStack(PacketByteBuf buf,ItemStack stack) {
+  public static void writeExtendedItemStack(FriendlyByteBuf buf,ItemStack stack) {
     if (stack.isEmpty()) {
       buf.writeInt(-1);
     } else {
-      buf.writeInt(Item.getRawId(stack.getItem()));
+      buf.writeInt(Item.getId(stack.getItem()));
       buf.writeInt(stack.getCount());
 
       CompoundTag nbttagcompound = stack.getTag();
@@ -27,7 +27,7 @@ public class PacketBufferEX {
     }
   }
 
-  public static void writeNBT(PacketByteBuf buf, @Nullable CompoundTag nbt) {
+  public static void writeNBT(FriendlyByteBuf buf, @Nullable CompoundTag nbt) {
     if (nbt == null) {
       buf.writeByte(0);
     } else {
@@ -39,20 +39,20 @@ public class PacketBufferEX {
     }
   }
 
-  public static ItemStack readExtendedItemStack(PacketByteBuf buf) {
+  public static ItemStack readExtendedItemStack(FriendlyByteBuf buf) {
     int i = buf.readInt();
 
     if (i < 0) {
       return ItemStack.EMPTY;
     } else {
       int j = buf.readInt();
-      ItemStack itemstack = new ItemStack(Item.byRawId(i), j);
+      ItemStack itemstack = new ItemStack(Item.byId(i), j);
       itemstack.setTag(readNBT(buf));
       return itemstack;
     }
   }
 
-  public static CompoundTag readNBT(PacketByteBuf buf) {
+  public static CompoundTag readNBT(FriendlyByteBuf buf) {
     int i = buf.readerIndex();
     byte b0 = buf.readByte();
 
@@ -61,7 +61,7 @@ public class PacketBufferEX {
     } else {
       buf.readerIndex(i);
       try {
-        return NbtIo.read(new ByteBufInputStream(buf), new PositionTracker(2097152L));
+        return NbtIo.read(new ByteBufInputStream(buf), new NbtAccounter(2097152L));
       } catch (IOException ioexception) {
         throw new EncoderException(ioexception);
       }

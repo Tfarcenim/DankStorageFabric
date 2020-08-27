@@ -1,15 +1,15 @@
 package tfar.dankstorage.client.button;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.text.LiteralText;
+import net.minecraft.network.chat.TextComponent;
 import tfar.dankstorage.utils.Mode;
 
 public class TripleToggleButton extends SmallButton {
 
   protected Mode mode;
 
-  public TripleToggleButton(int x, int y, int widthIn, int heightIn, PressAction callback, Mode mode) {
-    super(x, y, widthIn, heightIn, new LiteralText(""), callback);
+  public TripleToggleButton(int x, int y, int widthIn, int heightIn, OnPress callback, Mode mode) {
+    super(x, y, widthIn, heightIn, new TextComponent(""), callback);
     this.mode = mode;
   }
 

@@ -2,20 +2,19 @@ package tfar.dankstorage.item;
 
 import tfar.dankstorage.block.DockBlock;
 import tfar.dankstorage.tile.DockBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.Style;
-import net.minecraft.text.TextColor;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
 import javax.annotation.Nonnull;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,30 +22,30 @@ public class UpgradeItem extends Item {
 
   protected final UpgradeInfo upgradeInfo;
 
-  public UpgradeItem(Settings properties, UpgradeInfo info) {
+  public UpgradeItem(Properties properties, UpgradeInfo info) {
     super(properties);
     this.upgradeInfo = info;
   }
 
   @Nonnull
   @Override
-  public ActionResult useOnBlock(ItemUsageContext context) {
-    PlayerEntity player = context.getPlayer();
-    BlockPos pos = context.getBlockPos();
-    World world = context.getWorld();
-    ItemStack upgradeStack = context.getStack();
+  public InteractionResult useOn(UseOnContext context) {
+    Player player = context.getPlayer();
+    BlockPos pos = context.getClickedPos();
+    Level world = context.getLevel();
+    ItemStack upgradeStack = context.getItemInHand();
     BlockState state = world.getBlockState(pos);
 
     if (player == null || !(state.getBlock() instanceof DockBlock) || !upgradeInfo.canUpgrade(state)) {
-      return ActionResult.FAIL;
+      return InteractionResult.FAIL;
     }
-    if (world.isClient)
-      return ActionResult.PASS;
+    if (world.isClientSide)
+      return InteractionResult.PASS;
 
       if (false) {
-        player.sendMessage(new TranslatableText("metalbarrels.in_use")
+        player.displayClientMessage(new TranslatableComponent("metalbarrels.in_use")
                 .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(1))), true);
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
   }
 
     BlockEntity oldDank = world.getBlockEntity(pos);
@@ -54,22 +53,22 @@ public class UpgradeItem extends Item {
     //shortcut
     final List<ItemStack> oldDankContents = new ArrayList<>(((DockBlockEntity) oldDank).getHandler().getContents());
 
-    oldDank.markRemoved();
+    oldDank.setRemoved();
 
     int newTier = upgradeInfo.end;
 
-    BlockState newState = state.with(DockBlock.TIER,newTier);
+    BlockState newState = state.setValue(DockBlock.TIER,newTier);
 
-    world.setBlockState(pos, newState, 3);
+    world.setBlock(pos, newState, 3);
     BlockEntity newBarrel = world.getBlockEntity(pos);
 
     //newBarrel.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(itemHandler -> IntStream.range(0, oldDankContents.size()).forEach(i -> itemHandler.insertItem(i, oldDankContents.get(i), false)));
 
-    if (!player.abilities.creativeMode)
-      upgradeStack.decrement(1);
+    if (!player.abilities.instabuild)
+      upgradeStack.shrink(1);
 
-    player.sendMessage(new TranslatableText("metalbarrels.upgrade_successful")
+    player.displayClientMessage(new TranslatableComponent("metalbarrels.upgrade_successful")
             .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(1))), true);
-    return ActionResult.SUCCESS;
+    return InteractionResult.SUCCESS;
   }
 }

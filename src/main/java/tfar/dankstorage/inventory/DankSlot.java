@@ -1,10 +1,9 @@
 package tfar.dankstorage.inventory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-
 import javax.annotation.Nonnull;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class DankSlot extends Slot {
 
@@ -13,12 +12,12 @@ public class DankSlot extends Slot {
   }
 
   @Override
-  public boolean canTakeItems(PlayerEntity playerIn) {
+  public boolean mayPickup(Player playerIn) {
     return true;
   }
 
   @Override
-  public int getMaxItemCount(@Nonnull ItemStack stack) {
-    return this.inventory.getMaxCountPerStack();
+  public int getMaxStackSize(@Nonnull ItemStack stack) {
+    return this.container.getMaxStackSize();
   }
 }

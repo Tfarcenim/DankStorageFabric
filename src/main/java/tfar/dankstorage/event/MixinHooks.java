@@ -1,13 +1,5 @@
 package tfar.dankstorage.event;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.RangedWeaponItem;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tfar.dankstorage.DankItem;
 import tfar.dankstorage.container.DankContainer;
@@ -23,12 +15,20 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
+import net.minecraft.world.level.Level;
 
 public class MixinHooks {
 	public static <T extends LivingEntity> void actuallyBreakItem(int p_222118_1_, T livingEntity, Consumer<T> p_222118_3_, CallbackInfo ci) {
-		ItemStack actualStack = livingEntity.getMainHandStack();
+		ItemStack actualStack = livingEntity.getMainHandItem();
 		if (actualStack.getItem() instanceof DankItem && Utils.isConstruction(actualStack)) {
-			Utils.getHandler(actualStack).removeStack(Utils.getSelectedSlot(actualStack), 1);
+			Utils.getHandler(actualStack).removeItem(Utils.getSelectedSlot(actualStack), 1);
 		}
 	}
 
@@ -37,13 +37,13 @@ public class MixinHooks {
 	 * @param incoming the itemstack being picked up
 	 * @return if the item was completely picked up by the dank(s)
 	 */
-	public static boolean interceptItem(PlayerInventory inv, ItemStack incoming) {
-		PlayerEntity player = inv.player;
-		if (player.currentScreenHandler instanceof DankContainer) {
+	public static boolean interceptItem(Inventory inv, ItemStack incoming) {
+		Player player = inv.player;
+		if (player.containerMenu instanceof DankContainer) {
 			return false;
 		}
-		for (int i = 0; i < inv.size(); i++) {
-			ItemStack possibleDank = inv.getStack(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack possibleDank = inv.getItem(i);
 			if (possibleDank.getItem() instanceof DankItem && onItemPickup(player, incoming, possibleDank)) {
 				return true;
 			}
@@ -51,8 +51,8 @@ public class MixinHooks {
 		return false;
 	}
 
-	public static ItemStack myFindAmmo(PlayerEntity player, ItemStack bow) {
-		Predicate<ItemStack> predicate = ((RangedWeaponItem) bow.getItem()).getProjectiles();
+	public static ItemStack myFindAmmo(Player player, ItemStack bow) {
+		Predicate<ItemStack> predicate = ((ProjectileWeaponItem) bow.getItem()).getAllSupportedProjectiles();
 
 		ItemStack dank = getDankStorage(player);
 		if (!dank.isEmpty())
@@ -61,23 +61,23 @@ public class MixinHooks {
 		return ItemStack.EMPTY;
 	}
 
-	private static ItemStack getDankStorage(PlayerEntity player){
-		return IntStream.range(0, player.inventory.size()).mapToObj(player.inventory::getStack)
+	private static ItemStack getDankStorage(Player player){
+		return IntStream.range(0, player.inventory.getContainerSize()).mapToObj(player.inventory::getItem)
 						.filter(stack -> stack.getItem() instanceof DankItem).findFirst()
 						.orElse(ItemStack.EMPTY);
 	}
 
-	public static void onStoppedUsing(ItemStack bow, World worldIn, LivingEntity entityLiving, int timeLeft) {
-		if (entityLiving instanceof PlayerEntity && !worldIn.isClient){
-			PlayerEntity player = (PlayerEntity) entityLiving;
-			Predicate<ItemStack> predicate = ((RangedWeaponItem) bow.getItem()).getProjectiles();
-			if (((UseDankStorage)player).useDankStorage() && !player.abilities.creativeMode) {
+	public static void onStoppedUsing(ItemStack bow, Level worldIn, LivingEntity entityLiving, int timeLeft) {
+		if (entityLiving instanceof Player && !worldIn.isClientSide){
+			Player player = (Player) entityLiving;
+			Predicate<ItemStack> predicate = ((ProjectileWeaponItem) bow.getItem()).getAllSupportedProjectiles();
+			if (((UseDankStorage)player).useDankStorage() && !player.abilities.instabuild) {
 				ItemStack dank = getDankStorage(player);
 				DankInventory dankInventory = Utils.getHandler(dank);
-				for (int i = 0;i < dankInventory.size();i++){
-					ItemStack stack = dankInventory.getStack(i);
+				for (int i = 0;i < dankInventory.getContainerSize();i++){
+					ItemStack stack = dankInventory.getItem(i);
 					if (predicate.test(stack)){
-						dankInventory.removeStack(i,1);
+						dankInventory.removeItem(i,1);
 						break;
 					}
 				}
@@ -85,7 +85,7 @@ public class MixinHooks {
 		}
 	}
 
-	public static boolean onItemPickup(PlayerEntity player, ItemStack pickup, ItemStack dank) {
+	public static boolean onItemPickup(Player player, ItemStack pickup, ItemStack dank) {
 
 		Mode mode = Utils.getMode(dank);
 		if (mode == Mode.normal) return false;
@@ -93,8 +93,8 @@ public class MixinHooks {
 		int count = pickup.getCount();
 		boolean oredict = Utils.oredict(dank);
 		List<ItemStack> existing = new ArrayList<>();
-		for (int i = 0; i < inv.size(); i++) {
-			ItemStack stack = inv.getStack(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack stack = inv.getItem(i);
 			if (stack.isEmpty()) {
 
 			} else {
@@ -112,7 +112,7 @@ public class MixinHooks {
 
 		switch (mode) {
 			case pickup_all: {
-				for (int i = 0; i < inv.size(); i++) {
+				for (int i = 0; i < inv.getContainerSize(); i++) {
 					allPickup(inv, i, pickup, oredict);
 					if (pickup.isEmpty())break;
 				}
@@ -120,7 +120,7 @@ public class MixinHooks {
 			break;
 
 			case filtered_pickup: {
-				for (int i = 0; i < inv.size(); i++) {
+				for (int i = 0; i < inv.getContainerSize(); i++) {
 					filteredPickup(inv, i, pickup,  oredict, existing);
 					if (pickup.isEmpty())break;
 				}
@@ -128,7 +128,7 @@ public class MixinHooks {
 			break;
 
 			case void_pickup: {
-				for (int i = 0; i < inv.size(); i++) {
+				for (int i = 0; i < inv.getContainerSize(); i++) {
 					voidPickup(inv, i, pickup, oredict, existing);
 					if (pickup.isEmpty())break;
 				}
@@ -138,14 +138,14 @@ public class MixinHooks {
 
 		//leftovers
 		if (pickup.getCount() != count) {
-			dank.setCooldown(5);
-			player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+			dank.setPopTime(5);
+			player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
 		}
 		return pickup.isEmpty();
 	}
 
 	public static void voidPickup(PortableDankInventory inv, int slot, ItemStack toInsert, boolean oredict, List<ItemStack> filter) {
-		ItemStack existing = inv.getStack(slot);
+		ItemStack existing = inv.getItem(slot);
 
 		if (doesItemStackExist(toInsert, filter, oredict) && areItemStacksCompatible(existing,toInsert,oredict)) {
 			int stackLimit = inv.dankStats.stacklimit;
@@ -157,7 +157,7 @@ public class MixinHooks {
 	}
 
 	public static void allPickup(PortableDankInventory inv, int slot, ItemStack pickup, boolean oredict) {
-		ItemStack existing = inv.getStack(slot);
+		ItemStack existing = inv.getItem(slot);
 
 		if (existing.isEmpty()) {
 			int stackLimit = inv.dankStats.stacklimit;
@@ -165,10 +165,10 @@ public class MixinHooks {
 			int remainder = total - stackLimit;
 			//no overflow
 			if (remainder <= 0) {
-				 inv.setStack(slot, pickup.copy());
+				 inv.setItem(slot, pickup.copy());
 				pickup.setCount(0);
 			} else {
-				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(pickup, stackLimit));
+				 inv.setItem(slot, ItemHandlerHelper.copyStackWithSize(pickup, stackLimit));
 				pickup.setCount(remainder);
 			}
 			return;
@@ -180,17 +180,17 @@ public class MixinHooks {
 			int remainder = total - stackLimit;
 			//no overflow
 			if (remainder <= 0) {
-				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(existing, total));
+				 inv.setItem(slot, ItemHandlerHelper.copyStackWithSize(existing, total));
 				pickup.setCount(0);
 			} else {
-				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(pickup, stackLimit));
+				 inv.setItem(slot, ItemHandlerHelper.copyStackWithSize(pickup, stackLimit));
 				pickup.setCount(remainder);
 			}
 		}
 	}
 
 	public static void filteredPickup(PortableDankInventory inv, int slot, ItemStack toInsert, boolean oredict, List<ItemStack> filter) {
-		ItemStack existing = inv.getStack(slot);
+		ItemStack existing = inv.getItem(slot);
 
 		if (existing.isEmpty() && doesItemStackExist(toInsert,filter,oredict)) {
 			int stackLimit = inv.dankStats.stacklimit;
@@ -198,10 +198,10 @@ public class MixinHooks {
 			int remainder = total - stackLimit;
 			//no overflow
 			if (remainder <= 0) {
-				 inv.setStack(slot, toInsert.copy());
+				 inv.setItem(slot, toInsert.copy());
 				toInsert.setCount(0);
 			} else {
-				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(toInsert, stackLimit));
+				 inv.setItem(slot, ItemHandlerHelper.copyStackWithSize(toInsert, stackLimit));
 				toInsert.setCount(remainder);
 			}
 			return;
@@ -213,18 +213,18 @@ public class MixinHooks {
 			int remainder = total - stackLimit;
 			//no overflow
 			if (remainder <= 0) {
-				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(existing, total));
+				 inv.setItem(slot, ItemHandlerHelper.copyStackWithSize(existing, total));
 				toInsert.setCount(0);
 			} else {
-				 inv.setStack(slot, ItemHandlerHelper.copyStackWithSize(toInsert, stackLimit));
+				 inv.setItem(slot, ItemHandlerHelper.copyStackWithSize(toInsert, stackLimit));
 				toInsert.setCount(remainder);
 			}
 		}
 	}
 
 	public static boolean areItemStacksCompatible(ItemStack stackA, ItemStack stackB, boolean oredict) {
-		return oredict ? ItemStack.areTagsEqual(stackA, stackB) && ItemStack.areItemsEqualIgnoreDamage(stackA, stackB) || Utils.areItemStacksConvertible(stackA, stackB) :
-						ItemStack.areTagsEqual(stackA, stackB) && ItemStack.areItemsEqualIgnoreDamage(stackA, stackB);
+		return oredict ? ItemStack.tagMatches(stackA, stackB) && ItemStack.isSame(stackA, stackB) || Utils.areItemStacksConvertible(stackA, stackB) :
+						ItemStack.tagMatches(stackA, stackB) && ItemStack.isSame(stackA, stackB);
 	}
 
 	public static boolean doesItemStackExist(ItemStack stack, List<ItemStack> filter, boolean oredict) {

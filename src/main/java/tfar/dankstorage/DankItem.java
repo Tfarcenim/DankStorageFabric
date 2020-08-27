@@ -1,8 +1,5 @@
 package tfar.dankstorage;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.damage.DamageSource;
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.container.PortableDankProvider;
 import tfar.dankstorage.inventory.DankInventory;
@@ -14,23 +11,29 @@ import tfar.dankstorage.utils.Mode;
 import tfar.dankstorage.utils.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.item.*;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PotionItem;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -40,7 +43,7 @@ import java.util.Locale;
 public class DankItem extends Item {
   public final DankStats stats;
 
-  public DankItem(Settings p_i48527_2_, DankStats stats) {
+  public DankItem(Properties p_i48527_2_, DankStats stats) {
     super( p_i48527_2_);
     this.stats = stats;
   }
@@ -76,94 +79,94 @@ public class DankItem extends Item {
   }*/
 
   @Override
-  public int getMaxUseTime(ItemStack bag) {
+  public int getUseDuration(ItemStack bag) {
     if (!Utils.isConstruction(bag))return 0;
     ItemStack stack = Utils.getItemStackInSelectedSlot(bag);
-    return stack.getItem().getMaxUseTime(stack);
+    return stack.getItem().getUseDuration(stack);
   }
 
   @Override
-  public float getMiningSpeedMultiplier(ItemStack bag, BlockState p_150893_2_) {
+  public float getDestroySpeed(ItemStack bag, BlockState p_150893_2_) {
     if (!Utils.isConstruction(bag))return 1;
     ItemStack tool = Utils.getItemStackInSelectedSlot(bag);
-    return tool.getItem().getMiningSpeedMultiplier(tool, p_150893_2_);
+    return tool.getItem().getDestroySpeed(tool, p_150893_2_);
   }
 
   //this is used to damage tools and stuff, we use it here to damage the internal item instead
   @Override
-  public boolean postMine(ItemStack s, World p_179218_2_, BlockState p_179218_3_, BlockPos p_179218_4_, LivingEntity p_179218_5_) {
-    if (!Utils.isConstruction(s))return super.postMine(s, p_179218_2_, p_179218_3_, p_179218_4_, p_179218_5_);
+  public boolean mineBlock(ItemStack s, Level p_179218_2_, BlockState p_179218_3_, BlockPos p_179218_4_, LivingEntity p_179218_5_) {
+    if (!Utils.isConstruction(s))return super.mineBlock(s, p_179218_2_, p_179218_3_, p_179218_4_, p_179218_5_);
 
     ItemStack tool = Utils.getItemStackInSelectedSlot(s);
 
-    return tool.getItem().postMine(tool, p_179218_2_, p_179218_3_, p_179218_4_, p_179218_5_);
+    return tool.getItem().mineBlock(tool, p_179218_2_, p_179218_3_, p_179218_4_, p_179218_5_);
   }
 
   @Nonnull
   @Override
-  public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-    ItemStack bag = player.getStackInHand(hand);
-    if (!world.isClient){
+  public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    ItemStack bag = player.getItemInHand(hand);
+    if (!world.isClientSide){
 
       if (Utils.getUseType(bag) == C2SMessageToggleUseType.UseType.bag) {
-        DankStats type = Utils.getStats(player.getStackInHand(hand));
-        player.openHandledScreen(new PortableDankProvider(type));
+        DankStats type = Utils.getStats(player.getItemInHand(hand));
+        player.openMenu(new PortableDankProvider(type));
         return super.use(world,player,hand);
       } else {
         ItemStack toPlace = Utils.getItemStackInSelectedSlot(bag);
-        EquipmentSlot hand1 = hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+        EquipmentSlot hand1 = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
         //handle empty
         if (toPlace.isEmpty()){
-          return TypedActionResult.pass(bag);
+          return InteractionResultHolder.pass(bag);
         }
 
         //handle food
-        if (toPlace.getItem().isFood()) {
-          if (player.canConsume(false)) {
-            player.setCurrentHand(hand);
-            return TypedActionResult.consume(bag);
+        if (toPlace.getItem().isEdible()) {
+          if (player.canEat(false)) {
+            player.startUsingItem(hand);
+            return InteractionResultHolder.consume(bag);
           }
         }
         //handle potion
         else if (toPlace.getItem() instanceof PotionItem){
-          player.setCurrentHand(hand);
-          return new TypedActionResult<>(ActionResult.SUCCESS, player.getStackInHand(hand));
+          player.startUsingItem(hand);
+          return new InteractionResultHolder<>(InteractionResult.SUCCESS, player.getItemInHand(hand));
         }
         //todo support other items?
         else {
           ItemStack newBag = bag.copy();
-          player.equipStack(hand1, toPlace);
-          TypedActionResult<ItemStack> actionResult = toPlace.getItem().use(world, player, hand);
+          player.setItemSlot(hand1, toPlace);
+          InteractionResultHolder<ItemStack> actionResult = toPlace.getItem().use(world, player, hand);
           PortableDankInventory handler = Utils.getHandler(newBag);
-          handler.setStack(Utils.getSelectedSlot(newBag), actionResult.getValue());
-          player.equipStack(hand1, newBag);
+          handler.setItem(Utils.getSelectedSlot(newBag), actionResult.getObject());
+          player.setItemSlot(hand1, newBag);
         }
         }
       }
-    return new TypedActionResult<>(ActionResult.PASS, player.getStackInHand(hand));
+    return new InteractionResultHolder<>(InteractionResult.PASS, player.getItemInHand(hand));
   }
 
   @Override
-  public ActionResult useOnEntity(ItemStack bag, PlayerEntity player, LivingEntity entity, Hand hand) {
-    if (!Utils.isConstruction(bag))return ActionResult.FAIL;
+  public InteractionResult interactLivingEntity(ItemStack bag, Player player, LivingEntity entity, InteractionHand hand) {
+    if (!Utils.isConstruction(bag))return InteractionResult.FAIL;
     PortableDankInventory handler = Utils.getHandler(bag);
-    ItemStack toPlace = handler.getStack(Utils.getSelectedSlot(bag));
-    EquipmentSlot hand1 = hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-    player.equipStack(hand1, toPlace);
-    ActionResult result = toPlace.getItem().useOnEntity(toPlace, player, entity, hand);
-    handler.setStack(Utils.getSelectedSlot(bag),toPlace);
-    player.equipStack(hand1, bag);
+    ItemStack toPlace = handler.getItem(Utils.getSelectedSlot(bag));
+    EquipmentSlot hand1 = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+    player.setItemSlot(hand1, toPlace);
+    InteractionResult result = toPlace.getItem().interactLivingEntity(toPlace, player, entity, hand);
+    handler.setItem(Utils.getSelectedSlot(bag),toPlace);
+    player.setItemSlot(hand1, bag);
     return result;
   }
 
   @Override
-  public boolean hasGlint(ItemStack stack) {
+  public boolean isFoil(ItemStack stack) {
     return stack.hasTag() && Utils.getMode(stack) != Mode.normal;
   }
 
   @Override
   @Environment(EnvType.CLIENT)
-  public void appendTooltip(ItemStack bag, @Nullable World world, List<Text> tooltip, TooltipContext flag) {
+  public void appendHoverText(ItemStack bag, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
     if (Utils.DEV && bag.hasTag()) {
       String s = bag.getTag().toString();
 
@@ -185,38 +188,38 @@ public class DankItem extends Item {
         bits.add(s1);
       }
 
-      bits.forEach(s1 -> tooltip.add(new LiteralText(s1)));
+      bits.forEach(s1 -> tooltip.add(new TextComponent(s1)));
 
     }
 
 
     if (!Screen.hasShiftDown()){
-      tooltip.add(new TranslatableText("text.dankstorage.shift",
-              new LiteralText("Shift").formatted(Formatting.YELLOW)).formatted(Formatting.GRAY));
+      tooltip.add(new TranslatableComponent("text.dankstorage.shift",
+              new TextComponent("Shift").withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
     }
 
     if (Screen.hasShiftDown()) {
-      tooltip.add(new TranslatableText("text.dankstorage.changemode",new LiteralText(Client.CONSTRUCTION.getBoundKeyTranslationKey()).formatted(Formatting.YELLOW)).formatted(Formatting.GRAY));
+      tooltip.add(new TranslatableComponent("text.dankstorage.changemode",new TextComponent(Client.CONSTRUCTION.saveString()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
       C2SMessageToggleUseType.UseType mode = Utils.getUseType(bag);
       tooltip.add(
-              new TranslatableText("text.dankstorage.currentusetype",new TranslatableText(
-                      "dankstorage.usetype."+mode.name().toLowerCase(Locale.ROOT)).formatted(Formatting.YELLOW)).formatted(Formatting.GRAY));
+              new TranslatableComponent("text.dankstorage.currentusetype",new TranslatableComponent(
+                      "dankstorage.usetype."+mode.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
       tooltip.add(
-              new TranslatableText("text.dankstorage.stacklimit",new LiteralText(stats.stacklimit+"").formatted(Formatting.GREEN)).formatted(Formatting.GRAY));
+              new TranslatableComponent("text.dankstorage.stacklimit",new TextComponent(stats.stacklimit+"").withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
 
       DankInventory handler = Utils.getHandler(bag);
 
       if (handler.isEmpty()){
         tooltip.add(
-                new TranslatableText("text.dankstorage.empty").formatted(Formatting.ITALIC));
+                new TranslatableComponent("text.dankstorage.empty").withStyle(ChatFormatting.ITALIC));
         return;
       }
       int count1 = 0;
-      for (int i = 0; i < handler.size(); i++) {
+      for (int i = 0; i < handler.getContainerSize(); i++) {
         if (count1 > 10)break;
-        ItemStack item = handler.getStack(i);
+        ItemStack item = handler.getItem(i);
         if (item.isEmpty())continue;
-        Text count = new LiteralText(Integer.toString(item.getCount())).formatted(Formatting.AQUA);
+        Component count = new TextComponent(Integer.toString(item.getCount())).withStyle(ChatFormatting.AQUA);
         //tooltip.add(new TranslationTextComponent("text.dankstorage.formatcontaineditems", count, item.getDisplayName().(item.getRarity().color)));
         count1++;
       }
@@ -225,35 +228,35 @@ public class DankItem extends Item {
 
   @Nonnull
   @Override
-  public UseAction getUseAction(ItemStack stack) {
-    if (!Utils.isConstruction(stack))return UseAction.NONE;
+  public UseAnim getUseAnimation(ItemStack stack) {
+    if (!Utils.isConstruction(stack))return UseAnim.NONE;
     ItemStack internal = Utils.getItemStackInSelectedSlot(stack);
-    return internal.getItem().getUseAction(stack);
+    return internal.getItem().getUseAnimation(stack);
   }
 
   //called for stuff like food and potions
   @Nonnull
   @Override
-  public ItemStack finishUsing(ItemStack stack, World world, LivingEntity entity) {
+  public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity entity) {
     if (!Utils.isConstruction(stack))return stack;
 
     ItemStack internal = Utils.getItemStackInSelectedSlot(stack);
 
-    if (internal.getItem().isFood()){
-     ItemStack food = entity.eatFood(world, internal);
+    if (internal.getItem().isEdible()){
+     ItemStack food = entity.eat(world, internal);
      PortableDankInventory handler = Utils.getHandler(stack);
-     handler.setStack(Utils.getSelectedSlot(stack), food);
+     handler.setItem(Utils.getSelectedSlot(stack), food);
      return stack;
     }
 
     if (internal.getItem() instanceof PotionItem){
-      ItemStack potion = internal.finishUsing(world,entity);
+      ItemStack potion = internal.finishUsingItem(world,entity);
       PortableDankInventory handler = Utils.getHandler(stack);
-      handler.setStack(Utils.getSelectedSlot(stack), potion);
+      handler.setItem(Utils.getSelectedSlot(stack), potion);
       return stack;
     }
 
-    return super.finishUsing(stack, world, entity);
+    return super.finishUsingItem(stack, world, entity);
   }
 
   public int getGlintColor(ItemStack stack){
@@ -268,34 +271,34 @@ public class DankItem extends Item {
 
   @Nonnull
   @Override
-  public ActionResult useOnBlock(ItemUsageContext ctx) {
-    ItemStack bag = ctx.getStack();
+  public InteractionResult useOn(UseOnContext ctx) {
+    ItemStack bag = ctx.getItemInHand();
     C2SMessageToggleUseType.UseType useType = Utils.getUseType(bag);
 
     if(useType == C2SMessageToggleUseType.UseType.bag) {
-      return ActionResult.PASS;
+      return InteractionResult.PASS;
     }
 
     PortableDankInventory handler = Utils.getHandler(bag);
     int selectedSlot = Utils.getSelectedSlot(bag);
 
-    ItemStack toPlace = handler.getStack(selectedSlot).copy();
+    ItemStack toPlace = handler.getItem(selectedSlot).copy();
     if (toPlace.getCount() == 1 && handler.isLocked(selectedSlot))
-      return ActionResult.PASS;
+      return InteractionResult.PASS;
 
-    ItemUsageContext ctx2 = new ItemUseContextExt(ctx.getWorld(),ctx.getPlayer(),ctx.getHand(),toPlace,((ItemUsageContextAccessor)ctx).getHit());
-    ActionResult actionResultType = toPlace.getItem().useOnBlock(ctx2);//ctx2.getItem().onItemUse(ctx);
-    handler.setStack(selectedSlot, ctx2.getStack());
+    UseOnContext ctx2 = new ItemUseContextExt(ctx.getLevel(),ctx.getPlayer(),ctx.getHand(),toPlace,((ItemUsageContextAccessor)ctx).getHit());
+    InteractionResult actionResultType = toPlace.getItem().useOn(ctx2);//ctx2.getItem().onItemUse(ctx);
+    handler.setItem(selectedSlot, ctx2.getItemInHand());
     return actionResultType;
   }
 
   @Override
-  public boolean damage(DamageSource source) {
+  public boolean canBeHurtBy(DamageSource source) {
     return source == DamageSource.OUT_OF_WORLD;
   }
 
-  public static class ItemUseContextExt extends ItemUsageContext {
-    protected ItemUseContextExt(World p_i50034_1_, @Nullable PlayerEntity p_i50034_2_, Hand p_i50034_3_, ItemStack p_i50034_4_, BlockHitResult p_i50034_5_) {
+  public static class ItemUseContextExt extends UseOnContext {
+    protected ItemUseContextExt(Level p_i50034_1_, @Nullable Player p_i50034_2_, InteractionHand p_i50034_3_, ItemStack p_i50034_4_, BlockHitResult p_i50034_5_) {
       super(p_i50034_1_, p_i50034_2_, p_i50034_3_, p_i50034_4_, p_i50034_5_);
     }
   }
