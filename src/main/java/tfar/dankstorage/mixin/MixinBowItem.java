@@ -4,13 +4,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import tfar.dankstorage.DankItem;
-import tfar.dankstorage.ducks.UseDankStorage;
+import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.event.MixinHooks;
-import tfar.dankstorage.inventory.DankInventory;
-import tfar.dankstorage.utils.Utils;
 
-import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

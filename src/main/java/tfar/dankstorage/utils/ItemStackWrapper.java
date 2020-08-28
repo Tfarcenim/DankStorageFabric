@@ -2,51 +2,12 @@ package tfar.dankstorage.utils;
 
 import javax.annotation.Nonnull;
 import net.minecraft.world.item.ItemStack;
-import java.util.List;
 
-public class SortingData implements Comparable<SortingData>{
+public class ItemStackWrapper implements Comparable<ItemStackWrapper> {
   public final ItemStack stack;
 
-  public SortingData(ItemStack stack) {
+  public ItemStackWrapper(ItemStack stack) {
     this.stack = stack;
-  }
-
-  public boolean matches(ItemStack otherStack){
-    return stack.getCount() < Integer.MAX_VALUE && stack.getItem() == otherStack.getItem() && ItemStack.tagMatches(stack,otherStack);
-  }
-
-  public int add(int add) {
-    //nothing was gained
-    if (add == 0)return 0;
-    //is full, can't add more
-    if (stack.getCount() == Integer.MAX_VALUE)return add;
-    //integer overflow
-    if (this.stack.getCount() + add <= 0){
-      //return the overflow
-      int overflowed = stack.getCount() + add + 1;
-      stack.setCount(Integer.MAX_VALUE);
-      return overflowed - Integer.MIN_VALUE;
-    }
-    //all should be good
-    stack.setCount(stack.getCount() + add);
-    return 0;
-  }
-  public static boolean exists(List<SortingData> existing,ItemStack stackToCheck){
-    for (SortingData data : existing) {
-      if (data.matches(stackToCheck)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public static int addToList(List<SortingData> existing,ItemStack newStack){
-    for (SortingData sortingData : existing){
-      if (sortingData.matches(newStack)) {
-        return sortingData.add(newStack.getCount());
-      }
-    }
-    return 0;
   }
 
   /**
@@ -80,7 +41,7 @@ public class SortingData implements Comparable<SortingData>{
    * <tt>0</tt>, or <tt>1</tt> according to whether the value of
    * <i>expression</i> is negative, zero or positive.
    *
-   * @param data the object to be compared.
+   * @param wrapper the object to be compared.
    * @return a negative integer, zero, or a positive integer as this object
    * is less than, equal to, or greater than the specified object.
    * @throws NullPointerException if the specified object is null
@@ -88,7 +49,7 @@ public class SortingData implements Comparable<SortingData>{
    *                              from being compared to this object.
    */
   @Override
-  public int compareTo(@Nonnull SortingData data) {
-    return data.stack.getCount() - this.stack.getCount();
+  public int compareTo(@Nonnull ItemStackWrapper wrapper) {
+    return wrapper.stack.getCount() - this.stack.getCount();
   }
 }

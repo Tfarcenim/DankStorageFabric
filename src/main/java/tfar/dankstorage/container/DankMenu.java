@@ -7,7 +7,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import tfar.dankstorage.DankItem;
+import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.DankSlot;

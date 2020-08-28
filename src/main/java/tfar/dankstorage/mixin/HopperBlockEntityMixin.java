@@ -20,7 +20,7 @@ public abstract class HopperBlockEntityMixin {
 	 * @param cir
 	 * @see HopperBlockEntity#isFullContainer(Container, Direction)
 	 */
-	@Inject(method = {"method_17769","lambda$isFullContainer$1(Lnet/minecraft/world/Container;I)Z"}, at = @At("HEAD"), cancellable = true)
+	@Inject(method = {"method_17769","lambda$isFullContainer$1(Lnet/minecraft/world/Container;I)Z"}, at = @At("HEAD"), cancellable = true,remap = false)
 	private static void patchHopper(Container inv, int slot, CallbackInfoReturnable<Boolean> cir) {
 		if (inv instanceof DockBlockEntity) {
 			ItemStack stack = inv.getItem(slot);

@@ -14,11 +14,11 @@
     "SimpleInventoryAccessor"
   ],
   "client": [
-    "MouseMixin",
-    "MinecraftClientMixin",
-    "MinecraftClientAccessor",
     "AbstractContainerScreenMixin",
-    "ItemRendererAccessor"
+    "ItemRendererAccessor",
+    "MinecraftClientAccessor",
+    "MinecraftClientMixin",
+    "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

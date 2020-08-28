@@ -15,7 +15,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.DankStorage;
-import tfar.dankstorage.DankItem;
+import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.PortableDankInventory;
@@ -96,38 +96,46 @@ public class Utils {
 		if (player == null) return;
 		AbstractContainerMenu openContainer = player.containerMenu;
 		if (openContainer instanceof AbstractDankMenu) {
-			List<SortingData> itemlist = new ArrayList<>();
 			DankInventory handler = ((AbstractDankMenu) openContainer).dankInventory;
 
-			for (int i = 0; i < handler.getContainerSize(); i++) {
-				ItemStack stack = handler.getItem(i);
-				if (stack.isEmpty()) continue;
-				boolean exists = SortingData.exists(itemlist, stack.copy());
-				if (exists) {
-					int rem = SortingData.addToList(itemlist, stack.copy());
-					if (rem > 0) {
-						ItemStack bigstack = stack.copy();
-						bigstack.setCount(Integer.MAX_VALUE);
-						ItemStack smallstack = stack.copy();
-						smallstack.setCount(rem);
-						itemlist.add(new SortingData(bigstack));
-						itemlist.add(new SortingData(smallstack));
-					}
-				} else {
-					itemlist.add(new SortingData(stack.copy()));
+			List<ItemStack> stacks = new ArrayList<>();
+
+			for (ItemStack stack : handler.getContents()) {
+				if (!stack.isEmpty()) {
+					merge(stacks, stack.copy(), handler.dankStats.stacklimit);
 				}
 			}
-			handler.getContents().clear();
-			Collections.sort(itemlist);
-			for (SortingData data : itemlist) {
-				ItemStack stack = data.stack.copy();
-				ItemStack rem = stack.copy();
-				for (int i = 0; i < handler.getContainerSize(); i++) {
-					rem = handler.addItem(rem);
-					if (rem.isEmpty()) break;
+
+			List<ItemStackWrapper> wrappers = wrap(stacks);
+
+			Collections.sort(wrappers);
+
+			handler.clearContent();
+			for (int i = 0; i < wrappers.size(); i++) {
+				ItemStack stack = wrappers.get(i).stack;
+				handler.setItem(i,stack);
+			}
+		}
+	}
+
+	public static void merge(List<ItemStack> stacks, ItemStack toMerge, int limit) {
+		for (ItemStack stack : stacks) {
+			if (ItemHandlerHelper.canItemStacksStack(stack,toMerge)) {
+				int grow = Math.min(limit - stack.getCount(),toMerge.getCount());
+				if (grow > 0) {
+					stack.grow(grow);
+					toMerge.shrink(grow);
 				}
 			}
 		}
+
+		if (!toMerge.isEmpty()) {
+			stacks.add(toMerge);
+		}
+	}
+
+	public static List<ItemStackWrapper> wrap(List<ItemStack> stacks) {
+		return stacks.stream().map(ItemStackWrapper::new).collect(Collectors.toList());
 	}
 
 	public static int getStackLimit(ItemStack bag) {

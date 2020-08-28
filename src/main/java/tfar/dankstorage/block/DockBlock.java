@@ -21,7 +21,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import tfar.dankstorage.DankItem;
+import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.tile.DockBlockEntity;
 import tfar.dankstorage.utils.Utils;
 

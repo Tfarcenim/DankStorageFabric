@@ -22,11 +22,6 @@ public class DockMenu extends AbstractDankMenu {
     addPlayerSlots(playerInventory);
   }
 
-  @Override
-  public void removed(Player playerIn) {
-    super.removed(playerIn);
-  }
-
     public static DockMenu t1(int p_i50105_2_, Inventory playerInventory) {
       return new DockMenu(DankStorage.dank_1_container, p_i50105_2_, playerInventory, 1);
     }

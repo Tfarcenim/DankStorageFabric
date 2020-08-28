@@ -2,6 +2,7 @@ package tfar.dankstorage;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.SharedConstants;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
@@ -19,6 +20,7 @@ import tfar.dankstorage.block.DockBlock;
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.container.DockMenu;
+import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.item.UpgradeInfo;
 import tfar.dankstorage.item.UpgradeItem;
 import tfar.dankstorage.network.DankPacketHandler;

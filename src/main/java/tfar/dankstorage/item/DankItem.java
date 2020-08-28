@@ -1,4 +1,4 @@
-package tfar.dankstorage;
+package tfar.dankstorage.item;
 
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.container.PortableDankProvider;

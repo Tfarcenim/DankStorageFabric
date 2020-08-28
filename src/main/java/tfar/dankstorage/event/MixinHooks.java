@@ -1,7 +1,7 @@
 package tfar.dankstorage.event;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import tfar.dankstorage.DankItem;
+import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.ducks.UseDankStorage;
 import tfar.dankstorage.inventory.DankInventory;
