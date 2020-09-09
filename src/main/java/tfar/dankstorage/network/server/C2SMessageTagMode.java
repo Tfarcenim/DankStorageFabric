@@ -10,26 +10,33 @@ import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.utils.Utils;
 
-public class C2SMessageTagMode implements PacketConsumer {
+public class C2SMessageTagMode implements PacketConsumer
+{
 
-  public static void send() {
-    FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-    ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.tag_mode, buf);
-  }
+    public static void send()
+    {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.tag_mode, buf);
+    }
 
 
-    public void handle(PacketContext ctx) {
-      Player player = ctx.getPlayer();
+    public void handle(PacketContext ctx)
+    {
+        Player player = ctx.getPlayer();
 
         if (player.getMainHandItem().getItem() instanceof DankItem) {
-          boolean toggle = Utils.oredict(player.getMainHandItem());
-          player.getMainHandItem().getOrCreateTag().putBoolean("tag",!toggle);
+            boolean toggle = Utils.oredict(player.getMainHandItem());
+            player.getMainHandItem().getOrCreateTag().putBoolean("tag", !toggle);
+        } else if (player.getOffhandItem().getItem() instanceof DankItem) {
+            boolean toggle = Utils.oredict(player.getOffhandItem());
+            player.getOffhandItem().getOrCreateTag().putBoolean("tag", !toggle);
         }
-      }
+    }
 
-  @Override
-  public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf) {
-    packetContext.getTaskQueue().execute(() -> handle(packetContext));
-  }
+    @Override
+    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf)
+    {
+        packetContext.getTaskQueue().execute(() -> handle(packetContext));
+    }
 }
 

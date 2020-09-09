@@ -11,26 +11,31 @@ import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.utils.Utils;
 
-public class C2SMessageTogglePickup implements PacketConsumer {
+public class C2SMessageTogglePickup implements PacketConsumer
+{
 
-  public static void send() {
-    FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-    ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.toggle_pickup, buf);
-  }
-
-  public void handle(PacketContext ctx) {
-      Player player = ctx.getPlayer();
-        ItemStack bag = player.getMainHandItem();
-        if (!(bag.getItem() instanceof DankItem)){
-          bag = player.getOffhandItem();
-          if (!(bag.getItem() instanceof DankItem))return;
-        }
-          Utils.cycleMode(bag,player);
+    public static void send()
+    {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.toggle_pickup, buf);
     }
 
-  @Override
-  public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf) {
-    packetContext.getTaskQueue().execute(() -> handle(packetContext));
-  }
+    public void handle(PacketContext ctx)
+    {
+        Player player = ctx.getPlayer();
+        ItemStack bag = player.getMainHandItem();
+        System.out.println(bag);
+        if (!(bag.getItem() instanceof DankItem)) {
+            bag = player.getOffhandItem();
+            if (!(bag.getItem() instanceof DankItem)) return;
+        }
+        Utils.cycleMode(bag, player);
+    }
+
+    @Override
+    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf)
+    {
+        packetContext.getTaskQueue().execute(() -> handle(packetContext));
+    }
 }
 

@@ -6,52 +6,53 @@ import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import org.lwjgl.glfw.GLFW;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.client.screens.DockScreen;
 import tfar.dankstorage.client.screens.PortableDankStorageScreen;
 import tfar.dankstorage.event.FabricEvents;
 import tfar.dankstorage.network.DankPacketHandler;
-import org.lwjgl.glfw.GLFW;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
-import tfar.dankstorage.network.server.C2SMessagePickBlock;
-import tfar.dankstorage.utils.Utils;
 
-public class Client {
+public class Client
+{
 
-  public static KeyMapping CONSTRUCTION;
-  public static final Minecraft mc = Minecraft.getInstance();
+    public static final Minecraft mc = Minecraft.getInstance();
+    public static KeyMapping CONSTRUCTION;
 
-  public static void client() {
+    public static void client()
+    {
 
-    HudRenderCallback.EVENT.register(FabricEvents::renderStack);
+        HudRenderCallback.EVENT.register(FabricEvents::renderStack);
 
-    DankPacketHandler.registerClientMessages();
-    ScreenRegistry.register(DankStorage.dank_1_container, DockScreen::t1);
-    ScreenRegistry.register(DankStorage.portable_dank_1_container, PortableDankStorageScreen::t1);
-    ScreenRegistry.register(DankStorage.dank_2_container, DockScreen::t2);
-    ScreenRegistry.register(DankStorage.portable_dank_2_container, PortableDankStorageScreen::t2);
-    ScreenRegistry.register(DankStorage.dank_3_container, DockScreen::t3);
-    ScreenRegistry.register(DankStorage.portable_dank_3_container, PortableDankStorageScreen::t3);
-    ScreenRegistry.register(DankStorage.dank_4_container, DockScreen::t4);
-    ScreenRegistry.register(DankStorage.portable_dank_4_container, PortableDankStorageScreen::t4);
-    ScreenRegistry.register(DankStorage.dank_5_container, DockScreen::t5);
-    ScreenRegistry.register(DankStorage.portable_dank_5_container, PortableDankStorageScreen::t5);
-    ScreenRegistry.register(DankStorage.dank_6_container, DockScreen::t6);
-    ScreenRegistry.register(DankStorage.portable_dank_6_container, PortableDankStorageScreen::t6);
-    ScreenRegistry.register(DankStorage.dank_7_container, DockScreen::t7);
-    ScreenRegistry.register(DankStorage.portable_dank_7_container, PortableDankStorageScreen::t7);
+        DankPacketHandler.registerClientMessages();
+        ScreenRegistry.register(DankStorage.dank_1_container, DockScreen::t1);
+        ScreenRegistry.register(DankStorage.portable_dank_1_container, PortableDankStorageScreen::t1);
+        ScreenRegistry.register(DankStorage.dank_2_container, DockScreen::t2);
+        ScreenRegistry.register(DankStorage.portable_dank_2_container, PortableDankStorageScreen::t2);
+        ScreenRegistry.register(DankStorage.dank_3_container, DockScreen::t3);
+        ScreenRegistry.register(DankStorage.portable_dank_3_container, PortableDankStorageScreen::t3);
+        ScreenRegistry.register(DankStorage.dank_4_container, DockScreen::t4);
+        ScreenRegistry.register(DankStorage.portable_dank_4_container, PortableDankStorageScreen::t4);
+        ScreenRegistry.register(DankStorage.dank_5_container, DockScreen::t5);
+        ScreenRegistry.register(DankStorage.portable_dank_5_container, PortableDankStorageScreen::t5);
+        ScreenRegistry.register(DankStorage.dank_6_container, DockScreen::t6);
+        ScreenRegistry.register(DankStorage.portable_dank_6_container, PortableDankStorageScreen::t6);
+        ScreenRegistry.register(DankStorage.dank_7_container, DockScreen::t7);
+        ScreenRegistry.register(DankStorage.portable_dank_7_container, PortableDankStorageScreen::t7);
 
-    CONSTRUCTION = new KeyMapping("key.dankstorage.construction", GLFW.GLFW_KEY_I, "key.categories.dankstorage");
+        CONSTRUCTION = new KeyMapping("key.dankstorage.construction", GLFW.GLFW_KEY_I, "key.categories.dankstorage");
 
-    KeyBindingHelper.registerKeyBinding(CONSTRUCTION);
-    ClientTickCallback.EVENT.register(Client::keyPressed);
-  }
-
-  public static void keyPressed(Minecraft client) {
-    if (CONSTRUCTION.consumeClick()) {
-      C2SMessageToggleUseType.send();
+        KeyBindingHelper.registerKeyBinding(CONSTRUCTION);
+        ClientTickCallback.EVENT.register(Client::keyPressed);
     }
-  }
+
+    public static void keyPressed(Minecraft client)
+    {
+        if (CONSTRUCTION.consumeClick()) {
+            C2SMessageToggleUseType.send();
+        }
+    }
 
 
 

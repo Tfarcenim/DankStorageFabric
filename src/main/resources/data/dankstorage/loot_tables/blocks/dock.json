@@ -17,7 +17,7 @@
     },
     {
       "rolls": 1,
-      "name" : "dankstorage",
+      "name": "dankstorage",
       "entries": [
         {
           "type": "minecraft:alternatives",
