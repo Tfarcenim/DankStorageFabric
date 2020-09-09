@@ -18,7 +18,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import tfar.dankstorage.item.DankItem;
@@ -28,104 +27,106 @@ import tfar.dankstorage.utils.Utils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class DockBlock extends Block implements EntityBlock {
+public class DockBlock extends Block implements EntityBlock
+{
 
-  public static final IntegerProperty TIER = IntegerProperty.create("tier",0,7);
+    public static final IntegerProperty TIER = IntegerProperty.create("tier", 0, 7);
 
-  public static final VoxelShape EMPTY;
+    public static final VoxelShape EMPTY;
 
-  public static final VoxelShape DOCKED;
+    public static final VoxelShape DOCKED;
 
-  static {
-    VoxelShape a1 = Block.box(0,0,0,16,4,16);
-    VoxelShape b1 = Block.box(4,0,4,12,4,12);
-    VoxelShape shape1 = Shapes.joinUnoptimized(a1,b1, BooleanOp.NOT_SAME);
+    static {
+        VoxelShape a1 = Block.box(0, 0, 0, 16, 4, 16);
+        VoxelShape b1 = Block.box(4, 0, 4, 12, 4, 12);
+        VoxelShape shape1 = Shapes.joinUnoptimized(a1, b1, BooleanOp.NOT_SAME);
 
-    VoxelShape a2 = Block.box(0,12,0,16,16,16);
-    VoxelShape b2 = Block.box(4,12,4,12,16,12);
-    VoxelShape shape2 = Shapes.joinUnoptimized(a2,b2, BooleanOp.NOT_SAME);
+        VoxelShape a2 = Block.box(0, 12, 0, 16, 16, 16);
+        VoxelShape b2 = Block.box(4, 12, 4, 12, 16, 12);
+        VoxelShape shape2 = Shapes.joinUnoptimized(a2, b2, BooleanOp.NOT_SAME);
 
-    VoxelShape p1 = Block.box(0,4,0,4,12,4);
+        VoxelShape p1 = Block.box(0, 4, 0, 4, 12, 4);
 
-    VoxelShape p2 = Block.box(12,4,0,16,12,4);
+        VoxelShape p2 = Block.box(12, 4, 0, 16, 12, 4);
 
-    VoxelShape p3 = Block.box(0,4,12,4,12,16);
+        VoxelShape p3 = Block.box(0, 4, 12, 4, 12, 16);
 
-    VoxelShape p4 = Block.box(12,4,12,12,12,16);
+        VoxelShape p4 = Block.box(12, 4, 12, 12, 12, 16);
 
-    EMPTY = Shapes.or(shape1,shape2,p1,p2,p3,p4);
+        EMPTY = Shapes.or(shape1, shape2, p1, p2, p3, p4);
 
-    DOCKED = Shapes.or(EMPTY,Block.box(4,4,4,12,12,12));
+        DOCKED = Shapes.or(EMPTY, Block.box(4, 4, 4, 12, 12, 12));
 
-  }
-
-  public DockBlock(Properties p_i48440_1_) {
-    super(p_i48440_1_);
-  }
-
-  @Override
-  public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-    if (context instanceof EntityCollisionContext && context instanceof Player) {
-      //PlayerEntity player = (PlayerEntity)context.getEntity();
-      //if (player.getMainHandStack().getItem() instanceof DankItem)
-     //   return DOCKED;
     }
-    return state.getValue(TIER) > 0 ? DOCKED : EMPTY;
-  }
 
-  @Nonnull
-  @Override
-  public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult p_225533_6_) {
-    if (!world.isClientSide) {
-      final BlockEntity tile = world.getBlockEntity(pos);
-      if (tile instanceof DockBlockEntity) {
-        ItemStack held = player.getItemInHand(hand);
-        if (player.isCrouching() && held.getItem().is(Utils.WRENCHES)) {
-          world.destroyBlock(pos, true, player);
-          return InteractionResult.SUCCESS;
-        }
-
-        if (held.getItem() instanceof DankItem) {
-
-          if (state.getValue(TIER) > 0) {
-            ((DockBlockEntity) tile).removeTank();
-          }
-          ((DockBlockEntity) tile).addTank(held);
-          return InteractionResult.SUCCESS;
-        }
-
-        if (held.isEmpty() && player.isShiftKeyDown()) {
-          ((DockBlockEntity)tile).removeTank();
-          return InteractionResult.SUCCESS;
-        }
-
-        player.openMenu((MenuProvider) tile);
-      }
+    public DockBlock(Properties p_i48440_1_)
+    {
+        super(p_i48440_1_);
     }
-    return InteractionResult.SUCCESS;
-  }
 
-  @Nullable
-  @Override
-  public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-    ItemStack bag = ctx.getItemInHand();
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
+    {
+        return state.getValue(TIER) > 0 ? DOCKED : EMPTY;
+    }
 
-    Block block = Block.byItem(bag.getItem());
-    if (block instanceof DockBlock)return block.defaultBlockState();
-    return block.getStateForPlacement(ctx);
-  }
+    @Nonnull
+    @Override
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult p_225533_6_)
+    {
+        if (!world.isClientSide) {
+            final BlockEntity tile = world.getBlockEntity(pos);
+            if (tile instanceof DockBlockEntity) {
+                ItemStack held = player.getItemInHand(hand);
+                if (player.isCrouching() && held.getItem().is(Utils.WRENCHES)) {
+                    world.destroyBlock(pos, true, player);
+                    return InteractionResult.SUCCESS;
+                }
 
-  @Nullable
-  @Override
-  public BlockEntity newBlockEntity(BlockGetter world) {
-    return new DockBlockEntity();
-  }
+                if (held.getItem() instanceof DankItem) {
 
-  @Override
-  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-    super.createBlockStateDefinition(builder);
-    builder.add(TIER);
-  }
+                    if (state.getValue(TIER) > 0) {
+                        ((DockBlockEntity) tile).removeTank();
+                    }
+                    ((DockBlockEntity) tile).addTank(held);
+                    return InteractionResult.SUCCESS;
+                }
+
+                if (held.isEmpty() && player.isShiftKeyDown()) {
+                    ((DockBlockEntity) tile).removeTank();
+                    return InteractionResult.SUCCESS;
+                }
+
+                player.openMenu((MenuProvider) tile);
+            }
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext ctx)
+    {
+        ItemStack bag = ctx.getItemInHand();
+
+        Block block = Block.byItem(bag.getItem());
+        if (block instanceof DockBlock) return block.defaultBlockState();
+        return block.getStateForPlacement(ctx);
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockGetter world)
+    {
+        return new DockBlockEntity();
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
+    {
+        super.createBlockStateDefinition(builder);
+        builder.add(TIER);
+    }
 
 
 }

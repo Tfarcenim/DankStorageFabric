@@ -1,10 +1,12 @@
 {
   "replace": false,
-  "values": ["dankstorage:dank_1",
+  "values": [
+    "dankstorage:dank_1",
     "dankstorage:dank_2",
     "dankstorage:dank_3",
     "dankstorage:dank_4",
     "dankstorage:dank_5",
     "dankstorage:dank_6",
-    "dankstorage:dank_7"]
+    "dankstorage:dank_7"
+  ]
 }

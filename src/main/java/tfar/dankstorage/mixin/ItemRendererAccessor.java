@@ -6,9 +6,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ItemRenderer.class)
-public interface ItemRendererAccessor {
+public interface ItemRendererAccessor
+{
 
-	@Invoker("fillRect")
-	void $fillRect(BufferBuilder bufferBuilder, int i, int j, int k, int l, int m, int n, int o, int p);
+    @Invoker("fillRect")
+    void $fillRect(BufferBuilder bufferBuilder, int i, int j, int k, int l, int m, int n, int o, int p);
 
 }
