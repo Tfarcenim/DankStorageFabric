@@ -1,5 +1,5 @@
 
-package tfar.dankstorage.tile;
+package tfar.dankstorage.blockentity;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

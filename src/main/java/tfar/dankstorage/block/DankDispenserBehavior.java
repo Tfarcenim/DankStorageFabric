@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import tfar.dankstorage.tile.DockBlockEntity;
+import tfar.dankstorage.blockentity.DockBlockEntity;
 
 public class DankDispenserBehavior implements DispenseItemBehavior {
 

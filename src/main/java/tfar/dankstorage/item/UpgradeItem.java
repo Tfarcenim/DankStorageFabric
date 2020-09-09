@@ -1,7 +1,7 @@
 package tfar.dankstorage.item;
 
 import tfar.dankstorage.block.DockBlock;
-import tfar.dankstorage.tile.DockBlockEntity;
+import tfar.dankstorage.blockentity.DockBlockEntity;
 import javax.annotation.Nonnull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
