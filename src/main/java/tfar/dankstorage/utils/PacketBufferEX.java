@@ -9,64 +9,70 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
 import javax.annotation.Nullable;
 import java.io.IOException;
 
-public class PacketBufferEX {
+public class PacketBufferEX
+{
 
-  public static void writeExtendedItemStack(FriendlyByteBuf buf,ItemStack stack) {
-    if (stack.isEmpty()) {
-      buf.writeInt(-1);
-    } else {
-      buf.writeInt(Item.getId(stack.getItem()));
-      buf.writeInt(stack.getCount());
+    public static void writeExtendedItemStack(FriendlyByteBuf buf, ItemStack stack)
+    {
+        if (stack.isEmpty()) {
+            buf.writeInt(-1);
+        } else {
+            buf.writeInt(Item.getId(stack.getItem()));
+            buf.writeInt(stack.getCount());
 
-      CompoundTag nbttagcompound = stack.getTag();
+            CompoundTag nbttagcompound = stack.getTag();
 
-      writeNBT(buf,nbttagcompound);
+            writeNBT(buf, nbttagcompound);
+        }
     }
-  }
 
-  public static void writeNBT(FriendlyByteBuf buf, @Nullable CompoundTag nbt) {
-    if (nbt == null) {
-      buf.writeByte(0);
-    } else {
-      try {
-        NbtIo.write(nbt, new ByteBufOutputStream(buf));
-      } catch (IOException ioexception) {
-        throw new EncoderException(ioexception);
-      }
+    public static void writeNBT(FriendlyByteBuf buf, @Nullable CompoundTag nbt)
+    {
+        if (nbt == null) {
+            buf.writeByte(0);
+        } else {
+            try {
+                NbtIo.write(nbt, new ByteBufOutputStream(buf));
+            } catch (IOException ioexception) {
+                throw new EncoderException(ioexception);
+            }
+        }
     }
-  }
 
-  public static ItemStack readExtendedItemStack(FriendlyByteBuf buf) {
-    int i = buf.readInt();
+    public static ItemStack readExtendedItemStack(FriendlyByteBuf buf)
+    {
+        int i = buf.readInt();
 
-    if (i < 0) {
-      return ItemStack.EMPTY;
-    } else {
-      int j = buf.readInt();
-      ItemStack itemstack = new ItemStack(Item.byId(i), j);
-      itemstack.setTag(readNBT(buf));
-      return itemstack;
+        if (i < 0) {
+            return ItemStack.EMPTY;
+        } else {
+            int j = buf.readInt();
+            ItemStack itemstack = new ItemStack(Item.byId(i), j);
+            itemstack.setTag(readNBT(buf));
+            return itemstack;
+        }
     }
-  }
 
-  public static CompoundTag readNBT(FriendlyByteBuf buf) {
-    int i = buf.readerIndex();
-    byte b0 = buf.readByte();
+    public static CompoundTag readNBT(FriendlyByteBuf buf)
+    {
+        int i = buf.readerIndex();
+        byte b0 = buf.readByte();
 
-    if (b0 == 0) {
-      return null;
-    } else {
-      buf.readerIndex(i);
-      try {
-        return NbtIo.read(new ByteBufInputStream(buf), new NbtAccounter(2097152L));
-      } catch (IOException ioexception) {
-        throw new EncoderException(ioexception);
-      }
+        if (b0 == 0) {
+            return null;
+        } else {
+            buf.readerIndex(i);
+            try {
+                return NbtIo.read(new ByteBufInputStream(buf), new NbtAccounter(2097152L));
+            } catch (IOException ioexception) {
+                throw new EncoderException(ioexception);
+            }
+        }
     }
-  }
 
 }
 

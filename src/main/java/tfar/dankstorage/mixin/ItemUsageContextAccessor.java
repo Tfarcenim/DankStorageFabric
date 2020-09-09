@@ -6,7 +6,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(UseOnContext.class)
-public interface ItemUsageContextAccessor {
-	@Accessor
-	BlockHitResult getHitResult();
+public interface ItemUsageContextAccessor
+{
+    @Accessor
+    BlockHitResult getHitResult();
 }

@@ -1,5 +1,7 @@
 package tfar.dankstorage.mixin;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,8 +12,6 @@ import tfar.dankstorage.network.server.C2SMessagePickBlock;
 import tfar.dankstorage.utils.Utils;
 
 import javax.annotation.Nullable;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 
 @Mixin(Minecraft.class)
 public class MinecraftClientMixin {

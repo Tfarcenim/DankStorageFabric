@@ -1,7 +1,5 @@
 {
-
   "block.dankstorage.dock": "储物箱框架",
-
   "item.dankstorage.dank_1": "煤炭储物箱",
   "item.dankstorage.dank_2": "红石储物箱",
   "item.dankstorage.dank_3": "金储物箱",
@@ -9,14 +7,12 @@
   "item.dankstorage.dank_5": "钻石储物箱",
   "item.dankstorage.dank_6": "黑曜石储物箱",
   "item.dankstorage.dank_7": "下届储物箱",
-
   "item.dankstorage.1_to_2": "升级：煤炭>红石",
   "item.dankstorage.2_to_3": "升级：红石>金",
   "item.dankstorage.3_to_4": "升级：金>绿宝石",
   "item.dankstorage.4_to_5": "升级：绿宝石>钻石",
   "item.dankstorage.5_to_6": "升级：钻石>黑曜石",
   "item.dankstorage.6_to_7": "升级：黑曜石>下届",
-
   "container.dankstorage.dank_1": "煤炭储物箱",
   "container.dankstorage.dank_2": "红石储物箱",
   "container.dankstorage.dank_3": "金储物箱",
@@ -24,37 +20,25 @@
   "container.dankstorage.dank_5": "钻石储物箱",
   "container.dankstorage.dank_6": "黑曜石储物箱",
   "container.dankstorage.dank_7": "下届储物箱",
-
   "dankstorage.mode.normal": "正常",
   "dankstorage.mode.pickup_all": "一键取出",
   "dankstorage.mode.filtered_pickup": "Filtered Pickup",
   "dankstorage.mode.void_pickup": "Void Pickup",
-
   "key.dankstorage.pickup": "切换模式",
   "key.dankstorage.construction": "放置模式",
-
   "key.categories.dankstorage": "储物箱",
-
   "text.dankstorage.shift": "按 %s 获取信息",
   "text.dankstorage.empty": "无",
   "text.dankstorage.lock": "按 %s 锁定",
-
-
   "text.dankstorage.changemode": "按 %s 切换模式",
   "text.dankstorage.currentmode": "当前使用模式: %s",
-
   "text.dankstorage.changeusetype": "按 %s 改变模式",
   "text.dankstorage.currentusetype": "当前使用模式: %s",
-
   "dankstorage.usetype.bag": "Bag",
   "dankstorage.usetype.construction": "Construction",
-
   "text.dankstorage.blacklisted_storage": "该物品已被储物箱列入黑名单!",
   "text.dankstorage.blacklisted_usage": "该物品无法在储物箱中使用!",
-
   "text.dankstorage.stacklimit": "叠加限制: %s",
-
   "text.dankstorage.exact": "Exact Count: %s",
-
-  "text.dankstorage.formatcontaineditems" : "%s %s"
+  "text.dankstorage.formatcontaineditems": "%s %s"
 }
