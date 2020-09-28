@@ -2,6 +2,7 @@ package tfar.dankstorage.utils;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.tag.TagRegistry;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -38,16 +39,8 @@ public class Utils
 
     public static final String INV = "inv";
     public static final Set<ResourceLocation> taglist = new HashSet<>();
-    public static boolean DEV;
+    public static boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
 
-    static {
-        try {
-            ItemStack.class.getField("field_8036");//empty in ItemStack
-            DEV = false;
-        } catch (NoSuchFieldException e) {
-            DEV = true;
-        }
-    }
 
     public static Mode getMode(ItemStack bag)
     {

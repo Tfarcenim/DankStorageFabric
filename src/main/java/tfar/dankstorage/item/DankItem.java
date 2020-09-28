@@ -177,7 +177,7 @@ public class DankItem extends Item
 
     @Override
     @Environment(EnvType.CLIENT)
-    public void appendHoverText(ItemStack bag, @Nullable Level world, List<Component> tooltip, TooltipFlag flag)
+    public void appendHoverText(ItemStack bag, @Nullable Level level, List<Component> tooltip, TooltipFlag flag)
     {
         if (Utils.DEV && bag.hasTag()) {
             String s = bag.getTag().toString();
