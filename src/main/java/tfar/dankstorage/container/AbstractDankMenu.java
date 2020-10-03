@@ -64,28 +64,14 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
             for (int col = 0; col < 9; ++col) {
                 int x = 8 + col * 18;
                 int y = row * 18 + yStart;
-                this.addSlot(new Slot(playerinventory, col + row * 9 + 9, x, y)
-                {
-                    @Override
-                    public int getMaxStackSize(ItemStack stack)
-                    {
-                        return Math.min(this.getMaxStackSize(), stack.getMaxStackSize());
-                    }
-                });
+                this.addSlot(new CappedSlot(playerinventory, col + row * 9 + 9, x, y));
             }
         }
 
         for (int row = 0; row < 9; ++row) {
             int x = 8 + row * 18;
             int y = yStart + 58;
-            this.addSlot(new Slot(playerinventory, row, x, y)
-            {
-                @Override
-                public int getMaxStackSize(ItemStack stack)
-                {
-                    return Math.min(this.getMaxStackSize(), stack.getMaxStackSize());
-                }
-            });
+            this.addSlot(new CappedSlot(playerinventory, row, x, y));
         }
     }
 
