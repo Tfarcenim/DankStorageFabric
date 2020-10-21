@@ -3,6 +3,7 @@ package tfar.dankstorage.event;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -32,10 +33,11 @@ public class ClientMixinEvents
         return false;
     }
 
-    public static int pickItemFromDank(ItemStack bag)
-    {
+    public static int pickItemFromDank(Player player) {
+        InteractionHand hand = Utils.getHandWithDank(player);
+        if (hand == null) return -1;
+        ItemStack bag = player.getItemInHand(hand);
         PortableDankInventory handler = Utils.getHandler(bag);
-        Player player = mc.player;
         ItemStack pickblock = onPickBlock(player.pick(20.0D, 0, false), player, player.level);
         int slot = -1;
         if (!pickblock.isEmpty())

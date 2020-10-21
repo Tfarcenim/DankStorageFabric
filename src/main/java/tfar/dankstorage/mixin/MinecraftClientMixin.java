@@ -21,7 +21,7 @@ public class MinecraftClientMixin {
 	@Inject(method = "pickBlock",at = @At("HEAD"),cancellable = true)
 	private void dankPickBlock(CallbackInfo ci){
 		if (Utils.isHoldingDank(player)) {
-			int slot = ClientMixinEvents.pickItemFromDank(player.getMainHandItem());
+			int slot = ClientMixinEvents.pickItemFromDank(player);
 			if (slot != -1) {
 				C2SMessagePickBlock.send(slot);
 				ci.cancel();

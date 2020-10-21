@@ -12,6 +12,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagCollection;
 import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -279,5 +280,12 @@ public class Utils
         } else {
             return ItemStack.tagMatches(first, second);
         }
+    }
+
+    @Nullable
+    public static InteractionHand getHandWithDank(Player player) {
+        if (player.getMainHandItem().getItem() instanceof DankItem) return InteractionHand.MAIN_HAND;
+        else if (player.getOffhandItem().getItem() instanceof DankItem) return InteractionHand.OFF_HAND;
+        return null;
     }
 }
