@@ -14,14 +14,12 @@ import tfar.dankstorage.event.FabricEvents;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 
-public class Client
-{
+public class Client {
 
     public static final Minecraft mc = Minecraft.getInstance();
     public static KeyMapping CONSTRUCTION;
 
-    public static void client()
-    {
+    public static void client() {
 
         HudRenderCallback.EVENT.register(FabricEvents::renderStack);
 
@@ -47,8 +45,7 @@ public class Client
         ClientTickCallback.EVENT.register(Client::keyPressed);
     }
 
-    public static void keyPressed(Minecraft client)
-    {
+    public static void keyPressed(Minecraft client) {
         if (CONSTRUCTION.consumeClick()) {
             C2SMessageToggleUseType.send();
         }

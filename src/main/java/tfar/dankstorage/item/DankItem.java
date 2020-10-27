@@ -36,12 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class DankItem extends Item
-{
+public class DankItem extends Item {
     public final DankStats stats;
 
-    public DankItem(Properties p_i48527_2_, DankStats stats)
-    {
+    public DankItem(Properties p_i48527_2_, DankStats stats) {
         super(p_i48527_2_);
         this.stats = stats;
     }
@@ -77,16 +75,14 @@ public class DankItem extends Item
   }*/
 
     @Override
-    public int getUseDuration(ItemStack bag)
-    {
+    public int getUseDuration(ItemStack bag) {
         if (!Utils.isConstruction(bag)) return 0;
         ItemStack stack = Utils.getItemStackInSelectedSlot(bag);
         return stack.getItem().getUseDuration(stack);
     }
 
     @Override
-    public float getDestroySpeed(ItemStack bag, BlockState p_150893_2_)
-    {
+    public float getDestroySpeed(ItemStack bag, BlockState p_150893_2_) {
         if (!Utils.isConstruction(bag)) return 1;
         ItemStack tool = Utils.getItemStackInSelectedSlot(bag);
         return tool.getItem().getDestroySpeed(tool, p_150893_2_);
@@ -94,8 +90,7 @@ public class DankItem extends Item
 
     //this is used to damage tools and stuff, we use it here to damage the internal item instead
     @Override
-    public boolean mineBlock(ItemStack s, Level p_179218_2_, BlockState p_179218_3_, BlockPos p_179218_4_, LivingEntity p_179218_5_)
-    {
+    public boolean mineBlock(ItemStack s, Level p_179218_2_, BlockState p_179218_3_, BlockPos p_179218_4_, LivingEntity p_179218_5_) {
         if (!Utils.isConstruction(s)) return super.mineBlock(s, p_179218_2_, p_179218_3_, p_179218_4_, p_179218_5_);
 
         ItemStack tool = Utils.getItemStackInSelectedSlot(s);
@@ -105,8 +100,7 @@ public class DankItem extends Item
 
     @Nonnull
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
-    {
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack bag = player.getItemInHand(hand);
         if (!world.isClientSide) {
 
@@ -156,8 +150,7 @@ public class DankItem extends Item
     }
 
     @Override
-    public InteractionResult interactLivingEntity(ItemStack bag, Player player, LivingEntity entity, InteractionHand hand)
-    {
+    public InteractionResult interactLivingEntity(ItemStack bag, Player player, LivingEntity entity, InteractionHand hand) {
         if (!Utils.isConstruction(bag)) return InteractionResult.FAIL;
         PortableDankInventory handler = Utils.getHandler(bag);
         ItemStack toPlace = handler.getItem(Utils.getSelectedSlot(bag));
@@ -170,15 +163,13 @@ public class DankItem extends Item
     }
 
     @Override
-    public boolean isFoil(ItemStack stack)
-    {
+    public boolean isFoil(ItemStack stack) {
         return stack.hasTag() && Utils.getMode(stack) != Mode.normal;
     }
 
     @Override
     @Environment(EnvType.CLIENT)
-    public void appendHoverText(ItemStack bag, @Nullable Level level, List<Component> tooltip, TooltipFlag flag)
-    {
+    public void appendHoverText(ItemStack bag, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Utils.DEV && bag.hasTag()) {
             String s = bag.getTag().toString();
 
@@ -242,8 +233,7 @@ public class DankItem extends Item
 
     @Nonnull
     @Override
-    public UseAnim getUseAnimation(ItemStack stack)
-    {
+    public UseAnim getUseAnimation(ItemStack stack) {
         if (!Utils.isConstruction(stack)) return UseAnim.NONE;
         ItemStack internal = Utils.getItemStackInSelectedSlot(stack);
         return internal.getItem().getUseAnimation(stack);
@@ -252,8 +242,7 @@ public class DankItem extends Item
     //called for stuff like food and potions
     @Nonnull
     @Override
-    public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity entity)
-    {
+    public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity entity) {
         if (!Utils.isConstruction(stack)) return stack;
 
         ItemStack internal = Utils.getItemStackInSelectedSlot(stack);
@@ -275,8 +264,7 @@ public class DankItem extends Item
         return super.finishUsingItem(stack, world, entity);
     }
 
-    public int getGlintColor(ItemStack stack)
-    {
+    public int getGlintColor(ItemStack stack) {
         Mode mode = Utils.getMode(stack);
         switch (mode) {
             case normal:
@@ -293,8 +281,7 @@ public class DankItem extends Item
 
     @Nonnull
     @Override
-    public InteractionResult useOn(UseOnContext ctx)
-    {
+    public InteractionResult useOn(UseOnContext ctx) {
         ItemStack bag = ctx.getItemInHand();
         C2SMessageToggleUseType.UseType useType = Utils.getUseType(bag);
 
@@ -316,15 +303,12 @@ public class DankItem extends Item
     }
 
     @Override
-    public boolean canBeHurtBy(DamageSource source)
-    {
+    public boolean canBeHurtBy(DamageSource source) {
         return source == DamageSource.OUT_OF_WORLD;
     }
 
-    public static class ItemUseContextExt extends UseOnContext
-    {
-        protected ItemUseContextExt(Level p_i50034_1_, @Nullable Player p_i50034_2_, InteractionHand p_i50034_3_, ItemStack p_i50034_4_, BlockHitResult p_i50034_5_)
-        {
+    public static class ItemUseContextExt extends UseOnContext {
+        protected ItemUseContextExt(Level p_i50034_1_, @Nullable Player p_i50034_2_, InteractionHand p_i50034_3_, ItemStack p_i50034_4_, BlockHitResult p_i50034_5_) {
             super(p_i50034_1_, p_i50034_2_, p_i50034_3_, p_i50034_4_, p_i50034_5_);
         }
     }

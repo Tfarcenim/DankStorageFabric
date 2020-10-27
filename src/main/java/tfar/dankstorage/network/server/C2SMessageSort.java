@@ -9,24 +9,20 @@ import net.minecraft.world.entity.player.Player;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.utils.Utils;
 
-public class C2SMessageSort implements PacketConsumer
-{
+public class C2SMessageSort implements PacketConsumer {
 
-    public static void send()
-    {
+    public static void send() {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.sort, buf);
     }
 
-    public void handle(PacketContext ctx)
-    {
+    public void handle(PacketContext ctx) {
         Player player = ctx.getPlayer();
         Utils.sort(player);
     }
 
     @Override
-    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf)
-    {
+    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf) {
         packetContext.getTaskQueue().execute(() -> handle(packetContext));
     }
 }

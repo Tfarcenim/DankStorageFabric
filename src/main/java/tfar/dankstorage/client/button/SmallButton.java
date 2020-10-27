@@ -6,26 +6,21 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import tfar.dankstorage.client.Client;
 
-public class SmallButton extends Button
-{
-    public SmallButton(int x, int y, int widthIn, int heightIn, Component buttonText, OnPress callback)
-    {
+public class SmallButton extends Button {
+    public SmallButton(int x, int y, int widthIn, int heightIn, Component buttonText, OnPress callback) {
         super(x, y, widthIn, heightIn, buttonText, callback);
     }
 
-    public boolean shouldDrawText()
-    {
+    public boolean shouldDrawText() {
         return !getMessage().getString().isEmpty();
     }
 
-    public void tint()
-    {
+    public void tint() {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks)
-    {
+    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         if (visible) {
             Client.mc.getTextureManager().bind(WIDGETS_LOCATION);
 
@@ -56,8 +51,7 @@ public class SmallButton extends Button
         }
     }
 
-    public void drawText(PoseStack stack, int halfwidth2)
-    {
+    public void drawText(PoseStack stack, int halfwidth2) {
         int textColor = 0xe0e0e0;
 
         if (1 != 0) {

@@ -13,11 +13,9 @@ import net.minecraft.world.item.ItemStack;
 import javax.annotation.Nullable;
 import java.io.IOException;
 
-public class PacketBufferEX
-{
+public class PacketBufferEX {
 
-    public static void writeExtendedItemStack(FriendlyByteBuf buf, ItemStack stack)
-    {
+    public static void writeExtendedItemStack(FriendlyByteBuf buf, ItemStack stack) {
         if (stack.isEmpty()) {
             buf.writeInt(-1);
         } else {
@@ -30,8 +28,7 @@ public class PacketBufferEX
         }
     }
 
-    public static void writeNBT(FriendlyByteBuf buf, @Nullable CompoundTag nbt)
-    {
+    public static void writeNBT(FriendlyByteBuf buf, @Nullable CompoundTag nbt) {
         if (nbt == null) {
             buf.writeByte(0);
         } else {
@@ -43,8 +40,7 @@ public class PacketBufferEX
         }
     }
 
-    public static ItemStack readExtendedItemStack(FriendlyByteBuf buf)
-    {
+    public static ItemStack readExtendedItemStack(FriendlyByteBuf buf) {
         int i = buf.readInt();
 
         if (i < 0) {
@@ -57,8 +53,7 @@ public class PacketBufferEX
         }
     }
 
-    public static CompoundTag readNBT(FriendlyByteBuf buf)
-    {
+    public static CompoundTag readNBT(FriendlyByteBuf buf) {
         int i = buf.readerIndex();
         byte b0 = buf.readByte();
 
@@ -73,6 +68,5 @@ public class PacketBufferEX
             }
         }
     }
-
 }
 

@@ -11,19 +11,16 @@ import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.utils.Utils;
 
 
-public class C2SMessageToggleUseType implements PacketConsumer
-{
+public class C2SMessageToggleUseType implements PacketConsumer {
 
     public static final UseType[] useTypes = UseType.values();
 
-    public static void send()
-    {
+    public static void send() {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.toggle_use, buf);
     }
 
-    public void handle(PacketContext ctx)
-    {
+    public void handle(PacketContext ctx) {
         Player player = ctx.getPlayer();
         if (player.getMainHandItem().getItem() instanceof DankItem)
             Utils.cyclePlacement(player.getMainHandItem(), player);
@@ -32,13 +29,11 @@ public class C2SMessageToggleUseType implements PacketConsumer
     }
 
     @Override
-    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf)
-    {
+    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf) {
         packetContext.getTaskQueue().execute(() -> handle(packetContext));
     }
 
-    public enum UseType
-    {
+    public enum UseType {
         bag, construction
     }
 }

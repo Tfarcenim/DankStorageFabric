@@ -20,21 +20,18 @@ import tfar.dankstorage.mixin.MinecraftClientAccessor;
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 
-public class BigItemRenderer extends ItemRenderer
-{
+public class BigItemRenderer extends ItemRenderer {
 
     public static final BigItemRenderer INSTANCE = new BigItemRenderer(Minecraft.getInstance().getTextureManager(), Minecraft.getInstance().getModelManager()
             , ((MinecraftClientAccessor) Minecraft.getInstance()).getItemColors());
     private static final DecimalFormat decimalFormat = new DecimalFormat("0.#");
 
-    protected BigItemRenderer(TextureManager textureManagerIn, ModelManager modelManagerIn, ItemColors itemColorsIn)
-    {
+    protected BigItemRenderer(TextureManager textureManagerIn, ModelManager modelManagerIn, ItemColors itemColorsIn) {
         super(textureManagerIn, modelManagerIn, itemColorsIn);
     }
 
     @Override
-    public void renderGuiItemDecorations(Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text)
-    {
+    public void renderGuiItemDecorations(Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text) {
         if (!stack.isEmpty()) {
             PoseStack matrixstack = new PoseStack();
 
@@ -90,8 +87,7 @@ public class BigItemRenderer extends ItemRenderer
         }
     }
 
-    public String getStringFromInt(int number)
-    {
+    public String getStringFromInt(int number) {
 
         if (number >= 1000000000) return decimalFormat.format(number / 1000000000f) + "b";
         if (number >= 1000000) return decimalFormat.format(number / 1000000f) + "m";

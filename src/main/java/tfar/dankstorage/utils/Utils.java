@@ -30,8 +30,7 @@ import java.util.stream.Collectors;
 
 import static tfar.dankstorage.network.server.C2SMessageToggleUseType.useTypes;
 
-public class Utils
-{
+public class Utils {
 
     public static final Tag<Item> BLACKLISTED_STORAGE = TagRegistry.item(new ResourceLocation(DankStorage.MODID, "blacklisted_storage"));
     public static final Tag<Item> BLACKLISTED_USAGE = TagRegistry.item(new ResourceLocation(DankStorage.MODID, "blacklisted_usage"));
@@ -43,20 +42,17 @@ public class Utils
     public static boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 
-    public static Mode getMode(ItemStack bag)
-    {
+    public static Mode getMode(ItemStack bag) {
         return Mode.modes[bag.getOrCreateTag().getInt("mode")];
     }
 
-    public static boolean isConstruction(ItemStack bag)
-    {
+    public static boolean isConstruction(ItemStack bag) {
         return bag.getItem() instanceof DankItem && bag.hasTag()
                 && bag.getTag().contains("construction")
                 && bag.getTag().getInt("construction") == C2SMessageToggleUseType.UseType.construction.ordinal();
     }
 
-    public static DankStats getStatsfromRows(int rows)
-    {
+    public static DankStats getStatsfromRows(int rows) {
         switch (rows) {
             case 1:
                 return DankStats.one;
@@ -77,8 +73,7 @@ public class Utils
     }
 
     //0,1,2,3
-    public static void cycleMode(ItemStack bag, Player player)
-    {
+    public static void cycleMode(ItemStack bag, Player player) {
         int ordinal = bag.getOrCreateTag().getInt("mode");
         ordinal++;
         if (ordinal > Mode.modes.length - 1) ordinal = 0;
@@ -87,14 +82,12 @@ public class Utils
                 new TranslatableComponent("dankstorage.mode." + Mode.modes[ordinal].name()), true);
     }
 
-    public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag)
-    {
+    public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag) {
         return useTypes[bag.getOrCreateTag().getInt("construction")];
     }
 
     //0,1,2
-    public static void cyclePlacement(ItemStack bag, Player player)
-    {
+    public static void cyclePlacement(ItemStack bag, Player player) {
         int ordinal = bag.getOrCreateTag().getInt("construction");
         ordinal++;
         if (ordinal >= useTypes.length) ordinal = 0;
@@ -103,18 +96,15 @@ public class Utils
                 new TranslatableComponent("dankstorage.usetype." + useTypes[ordinal].name()), true);
     }
 
-    public static int getSelectedSlot(ItemStack bag)
-    {
+    public static int getSelectedSlot(ItemStack bag) {
         return bag.getOrCreateTag().getInt("selectedSlot");
     }
 
-    public static void setSelectedSlot(ItemStack bag, int slot)
-    {
+    public static void setSelectedSlot(ItemStack bag, int slot) {
         bag.getOrCreateTag().putInt("selectedSlot", slot);
     }
 
-    public static void sort(Player player)
-    {
+    public static void sort(Player player) {
         if (player == null) return;
         AbstractContainerMenu openContainer = player.containerMenu;
         if (openContainer instanceof AbstractDankMenu) {
@@ -140,8 +130,7 @@ public class Utils
         }
     }
 
-    public static void merge(List<ItemStack> stacks, ItemStack toMerge, int limit)
-    {
+    public static void merge(List<ItemStack> stacks, ItemStack toMerge, int limit) {
         for (ItemStack stack : stacks) {
             if (ItemHandlerHelper.canItemStacksStack(stack, toMerge)) {
                 int grow = Math.min(limit - stack.getCount(), toMerge.getCount());
@@ -157,28 +146,23 @@ public class Utils
         }
     }
 
-    public static List<ItemStackWrapper> wrap(List<ItemStack> stacks)
-    {
+    public static List<ItemStackWrapper> wrap(List<ItemStack> stacks) {
         return stacks.stream().map(ItemStackWrapper::new).collect(Collectors.toList());
     }
 
-    public static int getStackLimit(ItemStack bag)
-    {
+    public static int getStackLimit(ItemStack bag) {
         return getStats(bag).stacklimit;
     }
 
-    public static int getSlotCount(ItemStack bag)
-    {
+    public static int getSlotCount(ItemStack bag) {
         return getStats(bag).slots;
     }
 
-    public static DankStats getStats(ItemStack bag)
-    {
+    public static DankStats getStats(ItemStack bag) {
         return ((DankItem) bag.getItem()).stats;
     }
 
-    public static void changeSlot(ItemStack bag, boolean right)
-    {
+    public static void changeSlot(ItemStack bag, boolean right) {
         PortableDankInventory handler = getHandler(bag);
         //don't change slot if empty
         if (handler.noValidSlots()) return;
@@ -199,43 +183,36 @@ public class Utils
         setSelectedSlot(bag, selectedSlot);
     }
 
-    public static boolean oredict(ItemStack bag)
-    {
+    public static boolean oredict(ItemStack bag) {
         return bag.getItem() instanceof DankItem && bag.hasTag() && bag.getTag().getBoolean("tag");
     }
 
-    public static PortableDankInventory getHandler(ItemStack bag)
-    {
+    public static PortableDankInventory getHandler(ItemStack bag) {
         return new PortableDankInventory(bag);
     }
 
-    public static int getNbtSize(ItemStack stack)
-    {
+    public static int getNbtSize(ItemStack stack) {
         return getNbtSize(stack.getTag());
     }
 
-    public static DankItem getItemFromTier(int tier)
-    {
+    public static DankItem getItemFromTier(int tier) {
         return (DankItem) Registry.ITEM.get(new ResourceLocation(DankStorage.MODID, "dank_" + tier));
     }
 
-    public static int getNbtSize(@Nullable CompoundTag nbt)
-    {
+    public static int getNbtSize(@Nullable CompoundTag nbt) {
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         buffer.writeNbt(nbt);
         buffer.release();
         return buffer.writerIndex();
     }
 
-    public static ItemStack getItemStackInSelectedSlot(ItemStack bag)
-    {
+    public static ItemStack getItemStackInSelectedSlot(ItemStack bag) {
         PortableDankInventory inv = getHandler(bag);
         ItemStack stack = inv.getItem(Utils.getSelectedSlot(bag));
         return stack.getItem().is(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
     }
 
-    public static boolean areItemStacksConvertible(final ItemStack stack1, final ItemStack stack2)
-    {
+    public static boolean areItemStacksConvertible(final ItemStack stack1, final ItemStack stack2) {
         if (stack1.hasTag() || stack2.hasTag()) return false;
         Collection<ResourceLocation> taglistofstack1 = getTags(stack1.getItem());
         Collection<ResourceLocation> taglistofstack2 = getTags(stack2.getItem());
@@ -246,31 +223,27 @@ public class Utils
         return !commontags.isEmpty();
     }
 
-    public static Collection<ResourceLocation> getTags(Item item)
-    {
+    public static Collection<ResourceLocation> getTags(Item item) {
         return getTagsFor(ItemTags.getAllTags(), item);
     }
 
     /**
      * can't use TagGroup#getTagsFor because it's client only
      */
-    public static Collection<ResourceLocation> getTagsFor(TagCollection<Item> tagGroup, Item item)
-    {
+    public static Collection<ResourceLocation> getTagsFor(TagCollection<Item> tagGroup, Item item) {
         return tagGroup.getAllTags().entrySet().stream()
                 .filter(identifierTagEntry -> identifierTagEntry.getValue().contains(item))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    public static boolean isHoldingDank(Player player)
-    {
+    public static boolean isHoldingDank(Player player) {
         ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof DankItem) return true;
         stack = player.getOffhandItem();
         return stack.getItem() instanceof DankItem;
     }
 
-    public static boolean canMerge(ItemStack first, ItemStack second, Container inventory)
-    {
+    public static boolean canMerge(ItemStack first, ItemStack second, Container inventory) {
         if (first.getItem() != second.getItem()) {
             return false;
         } else if (first.getDamageValue() != second.getDamageValue()) {

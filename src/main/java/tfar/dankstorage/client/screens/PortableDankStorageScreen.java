@@ -13,54 +13,44 @@ import tfar.dankstorage.utils.Utils;
 
 import static tfar.dankstorage.client.screens.DockScreen.*;
 
-public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMenu>
-{
+public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMenu> {
 
     public static int max_nbt = 1048576;
 
-    public PortableDankStorageScreen(DankMenu container, Inventory playerinventory, Component component, ResourceLocation background)
-    {
+    public PortableDankStorageScreen(DankMenu container, Inventory playerinventory, Component component, ResourceLocation background) {
         super(container, playerinventory, component, background);
     }
 
-    public static PortableDankStorageScreen t1(DankMenu container, Inventory playerinventory, Component component)
-    {
+    public static PortableDankStorageScreen t1(DankMenu container, Inventory playerinventory, Component component) {
         return new PortableDankStorageScreen(container, playerinventory, component, background1);
     }
 
-    public static PortableDankStorageScreen t2(DankMenu container, Inventory playerinventory, Component component)
-    {
+    public static PortableDankStorageScreen t2(DankMenu container, Inventory playerinventory, Component component) {
         return new PortableDankStorageScreen(container, playerinventory, component, background2);
     }
 
-    public static PortableDankStorageScreen t3(DankMenu container, Inventory playerinventory, Component component)
-    {
+    public static PortableDankStorageScreen t3(DankMenu container, Inventory playerinventory, Component component) {
         return new PortableDankStorageScreen(container, playerinventory, component, background3);
     }
 
-    public static PortableDankStorageScreen t4(DankMenu container, Inventory playerinventory, Component component)
-    {
+    public static PortableDankStorageScreen t4(DankMenu container, Inventory playerinventory, Component component) {
         return new PortableDankStorageScreen(container, playerinventory, component, background4);
     }
 
-    public static PortableDankStorageScreen t5(DankMenu container, Inventory playerinventory, Component component)
-    {
+    public static PortableDankStorageScreen t5(DankMenu container, Inventory playerinventory, Component component) {
         return new PortableDankStorageScreen(container, playerinventory, component, background5);
     }
 
-    public static PortableDankStorageScreen t6(DankMenu container, Inventory playerinventory, Component component)
-    {
+    public static PortableDankStorageScreen t6(DankMenu container, Inventory playerinventory, Component component) {
         return new PortableDankStorageScreen(container, playerinventory, component, background6);
     }
 
-    public static PortableDankStorageScreen t7(DankMenu container, Inventory playerinventory, Component component)
-    {
+    public static PortableDankStorageScreen t7(DankMenu container, Inventory playerinventory, Component component) {
         return new PortableDankStorageScreen(container, playerinventory, component, background7);
     }
 
     @Override
-    protected void init()
-    {
+    protected void init() {
         super.init();
         int start = this.titleLabelX;
         int namelength = font.width(title.getContents());
@@ -76,8 +66,7 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     }
 
     @Override
-    protected void renderLabels(PoseStack stack, int mouseX, int mouseY)
-    {
+    protected void renderLabels(PoseStack stack, int mouseX, int mouseY) {
         super.renderLabels(stack, mouseX, mouseY);
         int namelength = font.width(title.getContents());
         int start = this.titleLabelX;

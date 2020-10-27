@@ -9,25 +9,21 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.network.DankPacketHandler;
 
-public class C2SMessageLockSlot implements PacketConsumer
-{
+public class C2SMessageLockSlot implements PacketConsumer {
 
-    public static void send(int slot)
-    {
+    public static void send(int slot) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeInt(slot);
         ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.lock_slot, buf);
     }
 
     @Override
-    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf)
-    {
+    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf) {
         int slot = packetByteBuf.readInt();
         packetContext.getTaskQueue().execute(() -> handle(packetContext, slot));
     }
 
-    public void handle(PacketContext ctx, int slot)
-    {
+    public void handle(PacketContext ctx, int slot) {
         AbstractContainerMenu container = ctx.getPlayer().containerMenu;
         if (container instanceof AbstractDankMenu) {
             AbstractDankMenu dankContainer = (AbstractDankMenu) container;

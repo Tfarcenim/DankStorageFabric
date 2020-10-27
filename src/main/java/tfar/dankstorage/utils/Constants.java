@@ -23,16 +23,14 @@ package tfar.dankstorage.utils;
  * A class containing constants for magic numbers used in the minecraft codebase.
  * Everything here should be checked each update, and have a comment relating to where to check it.
  */
-public class Constants
-{
+public class Constants {
     /**
      * NBT Tag type IDS, used when storing the nbt to disc, Should align with {@link net.minecraft.nbt.INBT#create}
      * and {@link net.minecraft.nbt.INBT#getTypeName}
      * <p>
      * Main use is checking tag type in {@link net.minecraft.nbt.CompoundNBT#contains(String, int)}
      */
-    public static class NBT
-    {
+    public static class NBT {
         public static final int TAG_END = 0;
         public static final int TAG_BYTE = 1;
         public static final int TAG_SHORT = 2;
@@ -54,8 +52,7 @@ public class Constants
      * Can be found from {@link net.minecraft.client.renderer.WorldRenderer#playEvent}<br>
      * Some of the events use the {@code data} parameter. If this is the case, an explanation of what {@code data} does is also provided
      */
-    public static class WorldEvents
-    {
+    public static class WorldEvents {
         public static final int DISPENSER_DISPENSE_SOUND = 1000;
         public static final int DISPENSER_FAIL_SOUND = 1001;
         /**
@@ -152,8 +149,7 @@ public class Constants
      * {@link WorldRenderer#notifyBlockUpdate}<br>
      * Flags can be combined with bitwise OR
      */
-    public static class BlockFlags
-    {
+    public static class BlockFlags {
         /**
          * Calls
          * {@link Block#neighborChanged(BlockState, World, BlockPos, Block, BlockPos, boolean)

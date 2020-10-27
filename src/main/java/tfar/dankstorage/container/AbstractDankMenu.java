@@ -13,16 +13,14 @@ import tfar.dankstorage.network.S2CSyncExtendedSlotContents;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class AbstractDankMenu extends AbstractContainerMenu
-{
+public abstract class AbstractDankMenu extends AbstractContainerMenu {
 
     public final int rows;
     public final Inventory playerInventory;
     public final ContainerData propertyDelegate;
     public DankInventory dankInventory;
 
-    public AbstractDankMenu(MenuType<?> type, int p_i50105_2_, Inventory playerInventory, int rows, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public AbstractDankMenu(MenuType<?> type, int p_i50105_2_, Inventory playerInventory, int rows, DankInventory dankInventory, ContainerData propertyDelegate) {
         super(type, p_i50105_2_);
         this.rows = rows;
         this.playerInventory = playerInventory;
@@ -31,8 +29,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
         addDataSlots(propertyDelegate);
     }
 
-    public static boolean canItemQuickReplace(@Nullable Slot slot, @Nonnull ItemStack stack, boolean stackSizeMatters)
-    {
+    public static boolean canItemQuickReplace(@Nullable Slot slot, @Nonnull ItemStack stack, boolean stackSizeMatters) {
         boolean flag = slot == null || !slot.hasItem();
         if (slot != null) {
             ItemStack slotStack = slot.getItem();
@@ -44,8 +41,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
         return flag;
     }
 
-    protected void addDankSlots()
-    {
+    protected void addDankSlots() {
         int slotIndex = 0;
         for (int row = 0; row < rows; ++row) {
             for (int col = 0; col < 9; ++col) {
@@ -57,8 +53,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
         }
     }
 
-    protected void addPlayerSlots(Inventory playerinventory)
-    {
+    protected void addPlayerSlots(Inventory playerinventory) {
         int yStart = 32 + 18 * rows;
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
@@ -77,8 +72,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
 
     @Nonnull
     @Override
-    public ItemStack quickMoveStack(Player playerIn, int index)
-    {
+    public ItemStack quickMoveStack(Player playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 
@@ -106,8 +100,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
 
     @Nonnull
     @Override
-    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player)
-    {
+    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
         boolean locked = slotId >= 0 && slotId < (rows * 9) && propertyDelegate.get(slotId) == 1;
         ItemStack itemstack = ItemStack.EMPTY;
         Inventory PlayerInventory = player.inventory;
@@ -425,14 +418,12 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
     }
 
     @Override
-    public boolean stillValid(@Nonnull Player playerIn)
-    {
+    public boolean stillValid(@Nonnull Player playerIn) {
         return true;
     }
 
     @Override
-    protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection)
-    {
+    protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
         boolean flag = false;
         int i = startIndex;
 
@@ -505,8 +496,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
 
     //don't touch this
     @Override
-    public void broadcastChanges()
-    {
+    public void broadcastChanges() {
         for (int i = 0; i < this.slots.size(); ++i) {
             ItemStack itemstack = this.slots.get(i).getItem();
             ItemStack itemstack1 = this.lastSlots.get(i);
@@ -538,8 +528,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
     }
 
     @Override
-    public void addSlotListener(ContainerListener listener)
-    {
+    public void addSlotListener(ContainerListener listener) {
         if (this.containerListeners.contains(listener)) {
             throw new IllegalArgumentException("Listener already listening");
         } else {
@@ -553,8 +542,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
         }
     }
 
-    public void syncInventory(ServerPlayer player)
-    {
+    public void syncInventory(ServerPlayer player) {
         for (int i = 0; i < this.slots.size(); i++) {
             ItemStack stack = (this.slots.get(i)).getItem();
             S2CSyncExtendedSlotContents.send(player, this.containerId, i, stack);
@@ -562,8 +550,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu
         player.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, player.inventory.getCarried()));
     }
 
-    public void syncSlot(ServerPlayer player, int slot, ItemStack stack)
-    {
+    public void syncSlot(ServerPlayer player, int slot, ItemStack stack) {
         S2CSyncExtendedSlotContents.send(player, this.containerId, slot, stack);
     }
 }

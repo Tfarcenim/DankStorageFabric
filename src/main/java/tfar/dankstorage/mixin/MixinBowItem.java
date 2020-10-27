@@ -15,17 +15,14 @@ import tfar.dankstorage.item.DankItem;
 import java.util.stream.IntStream;
 
 @Mixin(BowItem.class)
-public class MixinBowItem
-{
+public class MixinBowItem {
     @Inject(method = "releaseUsing", at = @At("TAIL"))
-    private void onPlayerStoppedUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft, CallbackInfo callbackInfo)
-    {
+    private void onPlayerStoppedUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft, CallbackInfo callbackInfo) {
         MixinHooks.onStoppedUsing(stack, worldIn, entityLiving, timeLeft);
     }
 
 
-    private ItemStack getDankStorage(Player player)
-    {
+    private ItemStack getDankStorage(Player player) {
         return IntStream.range(0, player.inventory.getContainerSize()).mapToObj(player.inventory::getItem).filter(stack -> stack.getItem() instanceof DankItem).findFirst().orElse(ItemStack.EMPTY);
     }
 

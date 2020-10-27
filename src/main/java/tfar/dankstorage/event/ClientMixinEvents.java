@@ -16,14 +16,12 @@ import tfar.dankstorage.inventory.PortableDankInventory;
 import tfar.dankstorage.network.server.C2SMessageScrollSlot;
 import tfar.dankstorage.utils.Utils;
 
-public class ClientMixinEvents
-{
+public class ClientMixinEvents {
 
     public static final Minecraft mc = Minecraft.getInstance();
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static boolean onScroll(MouseHandler mouse, long window, double horizontal, double vertical, double delta)
-    {
+    public static boolean onScroll(MouseHandler mouse, long window, double horizontal, double vertical, double delta) {
         Player player = mc.player;
         if (player != null && player.isCrouching() && (Utils.isConstruction(player.getMainHandItem()) || Utils.isConstruction(player.getOffhandItem()))) {
             boolean right = delta < 0;
@@ -50,8 +48,7 @@ public class ClientMixinEvents
         return slot;
     }
 
-    public static ItemStack onPickBlock(HitResult target, Player player, Level world)
-    {
+    public static ItemStack onPickBlock(HitResult target, Player player, Level world) {
         ItemStack result = ItemStack.EMPTY;
 
         if (target.getType() == HitResult.Type.BLOCK) {

@@ -27,8 +27,7 @@ import tfar.dankstorage.utils.Utils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class DockBlock extends Block implements EntityBlock
-{
+public class DockBlock extends Block implements EntityBlock {
 
     public static final IntegerProperty TIER = IntegerProperty.create("tier", 0, 7);
 
@@ -59,21 +58,18 @@ public class DockBlock extends Block implements EntityBlock
 
     }
 
-    public DockBlock(Properties p_i48440_1_)
-    {
+    public DockBlock(Properties p_i48440_1_) {
         super(p_i48440_1_);
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context)
-    {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return state.getValue(TIER) > 0 ? DOCKED : EMPTY;
     }
 
     @Nonnull
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult p_225533_6_)
-    {
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult p_225533_6_) {
         if (!world.isClientSide) {
             final BlockEntity tile = world.getBlockEntity(pos);
             if (tile instanceof DockBlockEntity) {
@@ -105,8 +101,7 @@ public class DockBlock extends Block implements EntityBlock
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext ctx)
-    {
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         ItemStack bag = ctx.getItemInHand();
 
         Block block = Block.byItem(bag.getItem());
@@ -116,14 +111,12 @@ public class DockBlock extends Block implements EntityBlock
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockGetter world)
-    {
+    public BlockEntity newBlockEntity(BlockGetter world) {
         return new DockBlockEntity();
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
-    {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(TIER);
     }

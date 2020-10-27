@@ -4,12 +4,10 @@ import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
-public class ItemStackWrapper implements Comparable<ItemStackWrapper>
-{
+public class ItemStackWrapper implements Comparable<ItemStackWrapper> {
     public final ItemStack stack;
 
-    public ItemStackWrapper(ItemStack stack)
-    {
+    public ItemStackWrapper(ItemStack stack) {
         this.stack = stack;
     }
 
@@ -52,8 +50,7 @@ public class ItemStackWrapper implements Comparable<ItemStackWrapper>
      *                              from being compared to this object.
      */
     @Override
-    public int compareTo(@Nonnull ItemStackWrapper wrapper)
-    {
+    public int compareTo(@Nonnull ItemStackWrapper wrapper) {
         return wrapper.stack.getCount() - this.stack.getCount();
     }
 }

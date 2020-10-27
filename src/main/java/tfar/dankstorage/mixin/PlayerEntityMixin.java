@@ -13,8 +13,7 @@ import tfar.dankstorage.ducks.UseDankStorage;
 import tfar.dankstorage.event.MixinHooks;
 
 @Mixin(Player.class)
-public abstract class PlayerEntityMixin implements UseDankStorage
-{
+public abstract class PlayerEntityMixin implements UseDankStorage {
     @Shadow
     @Final
     public Inventory inventory;
@@ -22,8 +21,7 @@ public abstract class PlayerEntityMixin implements UseDankStorage
     public boolean useDankStorage = false;
 
     @Inject(method = "getProjectile", at = @At("HEAD"), cancellable = true)
-    private void findAmmo(ItemStack shootable, CallbackInfoReturnable<ItemStack> cir)
-    {
+    private void findAmmo(ItemStack shootable, CallbackInfoReturnable<ItemStack> cir) {
         ItemStack ammo = MixinHooks.myFindAmmo((Player) (Object) this, shootable);
         useDankStorage = !ammo.isEmpty();
         if (!ammo.isEmpty()) {
@@ -32,8 +30,7 @@ public abstract class PlayerEntityMixin implements UseDankStorage
     }
 
     @Override
-    public boolean useDankStorage()
-    {
+    public boolean useDankStorage() {
         return useDankStorage;
     }
 }

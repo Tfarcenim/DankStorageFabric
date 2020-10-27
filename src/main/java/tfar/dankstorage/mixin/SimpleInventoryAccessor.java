@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(SimpleContainer.class)
-public interface SimpleInventoryAccessor
-{
+public interface SimpleInventoryAccessor {
 
     @Accessor
     NonNullList<ItemStack> getItems();

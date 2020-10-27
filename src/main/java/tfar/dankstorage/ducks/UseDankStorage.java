@@ -1,6 +1,5 @@
 package tfar.dankstorage.ducks;
 
-public interface UseDankStorage
-{
+public interface UseDankStorage {
     boolean useDankStorage();
 }

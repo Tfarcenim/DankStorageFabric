@@ -26,15 +26,12 @@ import tfar.dankstorage.utils.Utils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvider, Container
-{
+public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvider, Container {
 
     protected final ContainerData propertyDelegate;
-    private final DankInventory handler = new DankInventory(DankStats.zero)
-    {
+    private final DankInventory handler = new DankInventory(DankStats.zero) {
         @Override
-        public void setChanged()
-        {
+        public void setChanged() {
             super.setChanged();
             DockBlockEntity.this.setChanged();
         }
@@ -44,43 +41,35 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     public int selectedSlot;
     protected Component customName;
 
-    public DockBlockEntity()
-    {
+    public DockBlockEntity() {
         super(DankStorage.dank_tile);
-        this.propertyDelegate = new ContainerData()
-        {
-            public int get(int index)
-            {
+        this.propertyDelegate = new ContainerData() {
+            public int get(int index) {
                 if (handler.lockedSlots.length == 0)
                     return -1;
                 return handler.lockedSlots[index];
             }
 
-            public void set(int index, int value)
-            {
+            public void set(int index, int value) {
                 handler.lockedSlots[index] = value;
             }
 
-            public int getCount()
-            {
+            public int getCount() {
                 return handler.lockedSlots.length;
             }
         };
     }
 
-    public DankInventory getHandler()
-    {
+    public DankInventory getHandler() {
         return handler;
     }
 
-    public int getComparatorSignal()
-    {
+    public int getComparatorSignal() {
         return this.handler.calcRedstone();
     }
 
     @Override
-    public boolean triggerEvent(int id, int type)
-    {
+    public boolean triggerEvent(int id, int type) {
         if (id == 1) {
             this.numPlayersUsing = type;
             this.setChanged();
@@ -90,8 +79,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         }
     }
 
-    public void openInventory(Player player)
-    {
+    public void openInventory(Player player) {
         if (!player.isSpectator()) {
             if (this.numPlayersUsing < 0) {
                 this.numPlayersUsing = 0;
@@ -104,8 +92,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         }
     }
 
-    public void closeInventory(Player player)
-    {
+    public void closeInventory(Player player) {
         if (!player.isSpectator() && this.getBlockState().getBlock() instanceof DockBlock) {
             --this.numPlayersUsing;
             this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.numPlayersUsing);
@@ -115,8 +102,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     }
 
     @Override
-    public void load(BlockState state, CompoundTag compound)
-    {
+    public void load(BlockState state, CompoundTag compound) {
         super.load(state, compound);
         this.mode = compound.getInt("mode");
         this.selectedSlot = compound.getInt("selectedSlot");
@@ -130,8 +116,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
 
     @Nonnull
     @Override
-    public CompoundTag save(CompoundTag tag)
-    {
+    public CompoundTag save(CompoundTag tag) {
         super.save(tag);
         tag.putInt("mode", mode);
         tag.putInt("selectedSlot", selectedSlot);
@@ -144,65 +129,55 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
 
     @Nonnull
     @Override
-    public CompoundTag getUpdateTag()
-    {
+    public CompoundTag getUpdateTag() {
         return save(new CompoundTag());
     }
 
     @Nullable
     @Override
-    public ClientboundBlockEntityDataPacket getUpdatePacket()
-    {
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return new ClientboundBlockEntityDataPacket(getBlockPos(), 1, getUpdateTag());
     }
 
     //Inventory nonsense
 
     @Override
-    public int getContainerSize()
-    {
+    public int getContainerSize() {
         return handler.getContainerSize();
     }
 
     @Override
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return handler.isEmpty();
     }
 
     @Override
-    public ItemStack getItem(int slot)
-    {
+    public ItemStack getItem(int slot) {
         return handler.getItem(slot);
     }
 
     @Override
-    public ItemStack removeItem(int slot, int amount)
-    {
+    public ItemStack removeItem(int slot, int amount) {
         return handler.removeItem(slot, amount);
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int slot)
-    {
+    public ItemStack removeItemNoUpdate(int slot) {
         return handler.removeItemNoUpdate(slot);
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack)
-    {
+    public void setItem(int slot, ItemStack stack) {
         handler.setItem(slot, stack);
     }
 
     @Override
-    public int getMaxStackSize()
-    {
+    public int getMaxStackSize() {
         return handler.getMaxStackSize();
     }
 
     @Override
-    public void setChanged()
-    {
+    public void setChanged() {
         super.setChanged();
         if (getLevel() != null) {
             getLevel().sendBlockUpdated(worldPosition, getLevel().getBlockState(worldPosition), getLevel().getBlockState(worldPosition), 3);
@@ -211,49 +186,41 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     }
 
     @Override
-    public boolean stillValid(Player player)
-    {
+    public boolean stillValid(Player player) {
         return true;
     }
 
     @Override
-    public Component getName()
-    {
+    public Component getName() {
         return customName != null ? customName : getDefaultName();
     }
 
-    public Component getDefaultName()
-    {
+    public Component getDefaultName() {
         return new TranslatableComponent("container.dankstorage.dank_" + getBlockState().getValue(DockBlock.TIER));
     }
 
     @Override
-    public Component getDisplayName()
-    {
+    public Component getDisplayName() {
         return this.getName();
     }
 
     @Nullable
     @Override
-    public Component getCustomName()
-    {
+    public Component getCustomName() {
         return customName;
     }
 
-    public void setCustomName(Component text)
-    {
+    public void setCustomName(Component text) {
         this.customName = text;
     }
 
-    public void setContents(CompoundTag nbt)
-    {
+    public void setContents(CompoundTag nbt) {
         handler.deserializeNBT(nbt);
     }
 
     @Nullable
     @Override
-    public DockMenu createMenu(int syncId, Inventory p_createMenu_2_, Player p_createMenu_3_)
-    {
+    public DockMenu createMenu(int syncId, Inventory p_createMenu_2_, Player p_createMenu_3_) {
         switch (getBlockState().getValue(DockBlock.TIER)) {
             case 1:
                 return DockMenu.t1s(syncId, p_createMenu_2_, handler, propertyDelegate);
@@ -273,8 +240,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         return null;
     }
 
-    public void removeTank()
-    {
+    public void removeTank() {
         int tier = getBlockState().getValue(DockBlock.TIER);
         CompoundTag nbt = handler.serializeNBT();
         level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, 0));
@@ -285,8 +251,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         handler.setDankStats(DankStats.zero);
     }
 
-    public ItemStack removeTank0()
-    {
+    public ItemStack removeTank0() {
         int tier = getBlockState().getValue(DockBlock.TIER);
         CompoundTag nbt = handler.serializeNBT();
         level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, 0));
@@ -296,8 +261,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         return stack;
     }
 
-    public void addTank(ItemStack tank)
-    {
+    public void addTank(ItemStack tank) {
         if (tank.getItem() instanceof DankItem) {
             DankStats stats = ((DankItem) tank.getItem()).stats;
             level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, stats.ordinal()));
@@ -307,8 +271,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     }
 
     @Override
-    public void clearContent()
-    {
+    public void clearContent() {
 
     }
 }

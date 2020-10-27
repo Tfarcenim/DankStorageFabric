@@ -20,14 +20,12 @@ import tfar.dankstorage.utils.Utils;
 
 import java.util.List;
 
-public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> extends AbstractContainerScreen<T>
-{
+public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> extends AbstractContainerScreen<T> {
 
     protected final boolean is7;
     final ResourceLocation background;//= new ResourceLocation("textures/gui/container/shulker_box.png");
 
-    public AbstractDankStorageScreen(T container, Inventory playerinventory, Component component, ResourceLocation background)
-    {
+    public AbstractDankStorageScreen(T container, Inventory playerinventory, Component component, ResourceLocation background) {
         super(container, playerinventory, component);
         this.background = background;
         this.imageHeight = 114 + this.menu.rows * 18;
@@ -36,8 +34,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     @Override
-    protected void init()
-    {
+    protected void init() {
         super.init();
         this.addButton(new SmallButton(leftPos + 143, topPos + 4, 26, 12, new TextComponent("Sort"), b -> {
             C2SMessageSort.send();
@@ -45,8 +42,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     @Override
-    protected void renderBg(PoseStack stack, float partialTicks, int mouseX, int mouseY)
-    {
+    protected void renderBg(PoseStack stack, float partialTicks, int mouseX, int mouseY) {
 
         minecraft.getTextureManager().bind(background);
         if (is7)
@@ -67,23 +63,20 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks)
-    {
+    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(stack);
         super.render(stack, mouseX, mouseY, partialTicks);
         this.renderTooltip(stack, mouseX, mouseY);
     }
 
     @Override
-    public List<Component> getTooltipFromItem(ItemStack itemStack)
-    {
+    public List<Component> getTooltipFromItem(ItemStack itemStack) {
         List<Component> tooltipFromItem = super.getTooltipFromItem(itemStack);
         appendDankInfo(tooltipFromItem, itemStack);
         return tooltipFromItem;
     }
 
-    public void appendDankInfo(List<Component> tooltip, ItemStack stack)
-    {
+    public void appendDankInfo(List<Component> tooltip, ItemStack stack) {
         if (stack.getItem().is(Utils.BLACKLISTED_STORAGE)) {
             Component component = new TranslatableComponent("text.dankstorage.blacklisted_storage").withStyle(ChatFormatting.DARK_RED);
             tooltip.add(component);
@@ -106,8 +99,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
-    {
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         if (Screen.hasControlDown()) {
             Slot slot = findSlot(mouseX, mouseY);
             if (slot instanceof DankSlot) {

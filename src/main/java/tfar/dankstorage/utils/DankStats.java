@@ -1,7 +1,6 @@
 package tfar.dankstorage.utils;
 
-public enum DankStats
-{
+public enum DankStats {
     zero(0, 0),
     one(9, 256),
     two(18, 1024),
@@ -14,14 +13,12 @@ public enum DankStats
     public int slots;
     public int stacklimit;
 
-    DankStats(int slots, int stacklimit)
-    {
+    DankStats(int slots, int stacklimit) {
         this.slots = slots;
         this.stacklimit = stacklimit;
     }
 
-    public void set(int slots, int stacklimit)
-    {
+    public void set(int slots, int stacklimit) {
         this.slots = slots;
         this.stacklimit = stacklimit;
     }

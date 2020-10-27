@@ -9,12 +9,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import tfar.dankstorage.event.MixinHooks;
 
 @Mixin(Inventory.class)
-public class PlayerInventoryMixin
-{
+public class PlayerInventoryMixin {
 
     @Inject(method = "add(Lnet/minecraft/world/item/ItemStack;)Z", at = @At("HEAD"), cancellable = true)
-    private void interceptItems(ItemStack stack, CallbackInfoReturnable<Boolean> cir)
-    {
+    private void interceptItems(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         if (MixinHooks.interceptItem((Inventory) (Object) this, stack)) cir.setReturnValue(true);
     }
 }

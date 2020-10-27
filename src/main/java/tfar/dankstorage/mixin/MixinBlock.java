@@ -19,14 +19,12 @@ import tfar.dankstorage.utils.Utils;
 import java.util.List;
 
 @Mixin(Block.class)
-public class MixinBlock
-{
+public class MixinBlock {
     @Inject(method = "getDrops(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/entity/BlockEntity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/item/ItemStack;)Ljava/util/List;", at = @At("HEAD"), cancellable = true)
     private static void hijacklootcontextbuilder(BlockState state, ServerLevel worldIn,
                                                  BlockPos pos, BlockEntity tileEntityIn,
                                                  Entity entityIn, ItemStack tool,
-                                                 CallbackInfoReturnable<List<ItemStack>> drops)
-    {
+                                                 CallbackInfoReturnable<List<ItemStack>> drops) {
         if (Utils.isConstruction(tool)) {
             drops.setReturnValue(newlootcontext(state, worldIn, pos, tileEntityIn, entityIn, tool));
             drops.cancel();
@@ -35,8 +33,7 @@ public class MixinBlock
 
     private static List<ItemStack> newlootcontext(BlockState state, ServerLevel worldIn,
                                                   BlockPos pos, BlockEntity tileEntityIn,
-                                                  Entity entityIn, ItemStack dank)
-    {
+                                                  Entity entityIn, ItemStack dank) {
         ItemStack tool = Utils.getItemStackInSelectedSlot(dank);
         LootContext.Builder lootcontext$builder = new LootContext.Builder(worldIn).withRandom(worldIn.random).withParameter(LootContextParams.TOOL, tool).withOptionalParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).withOptionalParameter(LootContextParams.THIS_ENTITY, entityIn).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileEntityIn);
         return state.getDrops(lootcontext$builder);

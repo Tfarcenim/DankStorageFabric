@@ -11,13 +11,11 @@ import tfar.dankstorage.inventory.PortableDankInventory;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.utils.Utils;
 
-public class FabricEvents
-{
+public class FabricEvents {
 
     static Minecraft mc = Minecraft.getInstance();
 
-    public static void renderStack(PoseStack matrixStack, float v)
-    {
+    public static void renderStack(PoseStack matrixStack, float v) {
         Player player = mc.player;
         if (player == null)
             return;
@@ -54,8 +52,7 @@ public class FabricEvents
         mc.getTextureManager().bind(GuiComponent.GUI_ICONS_LOCATION);
     }
 
-    private static void renderHotbarItem(int x, int y, float partialTicks, Player player, ItemStack stack)
-    {
+    private static void renderHotbarItem(int x, int y, float partialTicks, Player player, ItemStack stack) {
         float f = (float) stack.getPopTime() - partialTicks;
         if (f > 0.0F) {
             RenderSystem.pushMatrix();

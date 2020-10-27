@@ -9,12 +9,10 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import tfar.dankstorage.blockentity.DockBlockEntity;
 
-public class DankDispenserBehavior implements DispenseItemBehavior
-{
+public class DankDispenserBehavior implements DispenseItemBehavior {
 
     @Override
-    public ItemStack dispense(BlockSource pointer, ItemStack stack)
-    {
+    public ItemStack dispense(BlockSource pointer, ItemStack stack) {
         ServerLevel world = pointer.getLevel();
         BlockPos blockPos = pointer.getPos().relative(pointer.getBlockState().getValue(DispenserBlock.FACING));
         BlockState state = world.getBlockState(blockPos);
@@ -29,15 +27,13 @@ public class DankDispenserBehavior implements DispenseItemBehavior
         return stack;
     }
 
-    public ItemStack removeDank(ServerLevel world, BlockPos pos)
-    {
+    public ItemStack removeDank(ServerLevel world, BlockPos pos) {
         DockBlockEntity dockBlockEntity = (DockBlockEntity) world.getBlockEntity(pos);
         ItemStack old = dockBlockEntity.removeTank0();
         return old;
     }
 
-    public void insertDank(ServerLevel world, BlockPos pos, ItemStack stack)
-    {
+    public void insertDank(ServerLevel world, BlockPos pos, ItemStack stack) {
         DockBlockEntity dockBlockEntity = (DockBlockEntity) world.getBlockEntity(pos);
         dockBlockEntity.addTank(stack);
     }

@@ -29,8 +29,7 @@ import tfar.dankstorage.utils.DankStats;
 
 import java.util.stream.IntStream;
 
-public class DankStorage implements ModInitializer, ClientModInitializer
-{
+public class DankStorage implements ModInitializer, ClientModInitializer {
 
     public static final String MODID = "dankstorage";
 
@@ -52,13 +51,11 @@ public class DankStorage implements ModInitializer, ClientModInitializer
     public static BlockEntityType<?> dank_tile = null;
     public static RecipeSerializer<?> upgrade = null;
 
-    public DankStorage()
-    {
+    public DankStorage() {
     }
 
     @Override
-    public void onInitialize()
-    {
+    public void onInitialize() {
         Item.Properties properties = new Item.Properties().tab(CreativeModeTab.TAB_DECORATIONS);
         Registry.register(Registry.BLOCK, new ResourceLocation(MODID, "dock"), dock = new DockBlock(BlockBehaviour.Properties.of(Material.METAL).strength(1, 30)));
         Registry.register(Registry.ITEM, new ResourceLocation(MODID, "dock"), new BlockItem(dock, properties));
@@ -98,8 +95,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer
     }
 
     @Override
-    public void onInitializeClient()
-    {
+    public void onInitializeClient() {
         Client.client();
     }
 

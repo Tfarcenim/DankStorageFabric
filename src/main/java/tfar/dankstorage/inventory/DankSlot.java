@@ -6,23 +6,19 @@ import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
-public class DankSlot extends Slot
-{
+public class DankSlot extends Slot {
 
-    public DankSlot(DankInventory itemHandler, int index, int xPosition, int yPosition)
-    {
+    public DankSlot(DankInventory itemHandler, int index, int xPosition, int yPosition) {
         super(itemHandler, index, xPosition, yPosition);
     }
 
     @Override
-    public boolean mayPickup(Player playerIn)
-    {
+    public boolean mayPickup(Player playerIn) {
         return true;
     }
 
     @Override
-    public int getMaxStackSize(@Nonnull ItemStack stack)
-    {
+    public int getMaxStackSize(@Nonnull ItemStack stack) {
         return this.container.getMaxStackSize();
     }
 }

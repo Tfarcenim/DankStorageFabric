@@ -14,18 +14,15 @@ import tfar.dankstorage.inventory.LockedSlot;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.utils.Utils;
 
-public class DankMenu extends AbstractDankMenu
-{
+public class DankMenu extends AbstractDankMenu {
 
     protected ItemStack bag;
 
-    public DankMenu(MenuType<?> type, int id, Inventory inv, int rows)
-    {
+    public DankMenu(MenuType<?> type, int id, Inventory inv, int rows) {
         this(type, id, inv, rows, new DankInventory(Utils.getStatsfromRows(rows)), new SimpleContainerData(9 * rows + 1));
     }
 
-    public DankMenu(MenuType<?> type, int id, Inventory inv, int rows, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public DankMenu(MenuType<?> type, int id, Inventory inv, int rows, DankInventory dankInventory, ContainerData propertyDelegate) {
         super(type, id, inv, rows, dankInventory, propertyDelegate);
         Player player = inv.player;
         this.bag = player.getMainHandItem().getItem() instanceof DankItem ? player.getMainHandItem() : player.getOffhandItem();
@@ -33,91 +30,74 @@ public class DankMenu extends AbstractDankMenu
         addPlayerSlots(inv, inv.selected);
     }
 
-    public static DankMenu t1(int id, Inventory inv)
-    {
+    public static DankMenu t1(int id, Inventory inv) {
         return new DankMenu(DankStorage.portable_dank_1_container, id, inv, 1);
     }
 
-    public static DankMenu t2(int id, Inventory inv)
-    {
+    public static DankMenu t2(int id, Inventory inv) {
         return new DankMenu(DankStorage.portable_dank_2_container, id, inv, 2);
     }
 
-    public static DankMenu t3(int id, Inventory inv)
-    {
+    public static DankMenu t3(int id, Inventory inv) {
         return new DankMenu(DankStorage.portable_dank_3_container, id, inv, 3);
     }
 
-    public static DankMenu t4(int id, Inventory inv)
-    {
+    public static DankMenu t4(int id, Inventory inv) {
         return new DankMenu(DankStorage.portable_dank_4_container, id, inv, 4);
     }
 
-    public static DankMenu t5(int id, Inventory inv)
-    {
+    public static DankMenu t5(int id, Inventory inv) {
         return new DankMenu(DankStorage.portable_dank_5_container, id, inv, 5);
     }
 
-    public static DankMenu t6(int id, Inventory inv)
-    {
+    public static DankMenu t6(int id, Inventory inv) {
         return new DankMenu(DankStorage.portable_dank_6_container, id, inv, 6);
     }
 
-    public static DankMenu t7(int id, Inventory inv)
-    {
+    public static DankMenu t7(int id, Inventory inv) {
         return new DankMenu(DankStorage.portable_dank_7_container, id, inv, 9);
     }
 
-    public static DankMenu t1s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public static DankMenu t1s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
         return new DankMenu(DankStorage.portable_dank_1_container, id, inv, 1, dankInventory, propertyDelegate);
     }
 
-    public static DankMenu t2s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public static DankMenu t2s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
         return new DankMenu(DankStorage.portable_dank_2_container, id, inv, 2, dankInventory, propertyDelegate);
     }
 
-    public static DankMenu t3s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public static DankMenu t3s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
         return new DankMenu(DankStorage.portable_dank_3_container, id, inv, 3, dankInventory, propertyDelegate);
     }
 
-    public static DankMenu t4s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public static DankMenu t4s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
         return new DankMenu(DankStorage.portable_dank_4_container, id, inv, 4, dankInventory, propertyDelegate);
     }
 
-    public static DankMenu t5s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public static DankMenu t5s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
         return new DankMenu(DankStorage.portable_dank_5_container, id, inv, 5, dankInventory, propertyDelegate);
     }
 
-    public static DankMenu t6s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public static DankMenu t6s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
         return new DankMenu(DankStorage.portable_dank_6_container, id, inv, 6, dankInventory, propertyDelegate);
     }
 
     ////////////////////
 
-    public static DankMenu t7s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate)
-    {
+    public static DankMenu t7s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
         return new DankMenu(DankStorage.portable_dank_7_container, id, inv, 9, dankInventory, propertyDelegate);
     }
 
     @Override
-    protected void addDankSlots()
-    {
+    protected void addDankSlots() {
         int slotIndex = 0;
         for (int row = 0; row < rows; ++row) {
             for (int col = 0; col < 9; ++col) {
                 int x = 8 + col * 18;
                 int y = row * 18 + 18;
-                this.addSlot(new DankSlot(dankInventory, slotIndex, x, y)
-                {
+                this.addSlot(new DankSlot(dankInventory, slotIndex, x, y) {
                     @Override
-                    public void setChanged()
-                    {
+                    public void setChanged() {
                         super.setChanged();
                         DankMenu.this.propertyDelegate.set(dankInventory.dankStats.slots, getNBTSize());
                     }
@@ -128,12 +108,10 @@ public class DankMenu extends AbstractDankMenu
     }
 
     @Override
-    protected void addPlayerSlots(Inventory playerinventory)
-    {
+    protected void addPlayerSlots(Inventory playerinventory) {
     }
 
-    protected void addPlayerSlots(Inventory playerinventory, int locked)
-    {
+    protected void addPlayerSlots(Inventory playerinventory, int locked) {
         int yStart = 32 + 18 * rows;
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
@@ -153,19 +131,16 @@ public class DankMenu extends AbstractDankMenu
         }
     }
 
-    private int getNBTSize()
-    {
+    private int getNBTSize() {
         return Utils.getNbtSize(bag);
     }
 
-    public ItemStack getBag()
-    {
+    public ItemStack getBag() {
         return bag;
     }
 
     @Override
-    public void broadcastChanges()
-    {
+    public void broadcastChanges() {
         super.broadcastChanges();
     }
 

@@ -14,27 +14,23 @@ import tfar.dankstorage.utils.Utils;
 
 import java.util.stream.IntStream;
 
-public class DankInventory extends SimpleContainer
-{
+public class DankInventory extends SimpleContainer {
 
     public DankStats dankStats;
     public int[] lockedSlots;
 
-    public DankInventory(DankStats stats)
-    {
+    public DankInventory(DankStats stats) {
         super(stats.slots);
         this.dankStats = stats;
         this.lockedSlots = new int[stats.slots];
     }
 
-    public void setDankStats(DankStats stats)
-    {
+    public void setDankStats(DankStats stats) {
         this.dankStats = stats;
         setSize();
     }
 
-    private void setSize()
-    {
+    private void setSize() {
         ((SimpleInventoryAccessor) this).setSize(dankStats.slots);
 
         NonNullList<ItemStack> newStacks = NonNullList.withSize(dankStats.slots, ItemStack.EMPTY);
@@ -49,11 +45,11 @@ public class DankInventory extends SimpleContainer
         int[] newLockedSlots = new int[dankStats.slots];
         if (max >= 0) System.arraycopy(lockedSlots, 0, newLockedSlots, 0, max);
         lockedSlots = newLockedSlots;
+        setChanged();
     }
 
     @Override
-    public ItemStack removeItem(int slot, int amount)
-    {
+    public ItemStack removeItem(int slot, int amount) {
         if (!isLocked(slot)) {
             return super.removeItem(slot, amount);
         }
@@ -79,36 +75,30 @@ public class DankInventory extends SimpleContainer
     }
 
     @Override
-    public int getMaxStackSize()
-    {
+    public int getMaxStackSize() {
         return dankStats.stacklimit;
     }
 
-    public NonNullList<ItemStack> getContents()
-    {
+    public NonNullList<ItemStack> getContents() {
         return ((SimpleInventoryAccessor) this).getItems();
     }
 
-    public boolean noValidSlots()
-    {
+    public boolean noValidSlots() {
         return IntStream.range(0, getContainerSize())
                 .mapToObj(this::getItem)
                 .allMatch(stack -> stack.isEmpty() || stack.getItem().is(Utils.BLACKLISTED_USAGE));
     }
 
-    public boolean isLocked(int slot)
-    {
+    public boolean isLocked(int slot) {
         return lockedSlots[slot] == 1;
     }
 
     @Override
-    public boolean canAddItem(ItemStack stack)
-    {
+    public boolean canAddItem(ItemStack stack) {
         return !stack.getItem().is(Utils.BLACKLISTED_STORAGE) && super.canAddItem(stack);
     }
 
-    public CompoundTag serializeNBT()
-    {
+    public CompoundTag serializeNBT() {
         ListTag nbtTagList = new ListTag();
         for (int i = 0; i < this.getContents().size(); i++) {
             if (!getContents().get(i).isEmpty()) {
@@ -128,8 +118,7 @@ public class DankInventory extends SimpleContainer
         return nbt;
     }
 
-    public void addTank(CompoundTag nbt, ItemStack bag)
-    {
+    public void addTank(CompoundTag nbt, ItemStack bag) {
         this.setDankStats(Utils.getStats(bag));
         ListTag tagList = nbt.getList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++) {
@@ -166,8 +155,7 @@ public class DankInventory extends SimpleContainer
         lockedSlots = nbt.getIntArray("LockedSlots");
     }
 
-    public void deserializeNBT(CompoundTag nbt)
-    {
+    public void deserializeNBT(CompoundTag nbt) {
         DankStats stats = DankStats.valueOf(nbt.getString("DankStats"));
         this.setDankStats(stats);
         ListTag tagList = nbt.getList("Items", Constants.NBT.TAG_COMPOUND);
@@ -210,8 +198,7 @@ public class DankInventory extends SimpleContainer
         }
     }
 
-    public int calcRedstone()
-    {
+    public int calcRedstone() {
         int numStacks = 0;
         float f = 0F;
 

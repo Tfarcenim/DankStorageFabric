@@ -6,8 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.network.server.*;
 
-public class DankPacketHandler
-{
+public class DankPacketHandler {
 
     public static final ResourceLocation toggle_pickup = new ResourceLocation(DankStorage.MODID, "toggle_pickup");
     public static final ResourceLocation tag_mode = new ResourceLocation(DankStorage.MODID, "tag_mode");
@@ -19,8 +18,7 @@ public class DankPacketHandler
     public static ResourceLocation scroll = new ResourceLocation(DankStorage.MODID, "scroll");
 
 
-    public static void registerMessages()
-    {
+    public static void registerMessages() {
         ServerSidePacketRegistry.INSTANCE.register(scroll, new C2SMessageScrollSlot());
         ServerSidePacketRegistry.INSTANCE.register(lock_slot, new C2SMessageLockSlot());
         ServerSidePacketRegistry.INSTANCE.register(sort, new C2SMessageSort());
@@ -30,8 +28,7 @@ public class DankPacketHandler
         ServerSidePacketRegistry.INSTANCE.register(pick_block, new C2SMessagePickBlock());
     }
 
-    public static void registerClientMessages()
-    {
+    public static void registerClientMessages() {
         ClientSidePacketRegistry.INSTANCE.register(sync_stacks, new S2CSyncExtendedSlotContents());
     }
 }
