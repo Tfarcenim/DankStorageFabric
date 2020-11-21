@@ -1,13 +1,13 @@
 package tfar.dankstorage.container;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
@@ -16,15 +16,15 @@ import javax.annotation.Nullable;
 
 public class PortableDankProvider implements MenuProvider {
 
-    public final DankStats tier;
+    public final ItemStack stack;
 
-    public PortableDankProvider(DankStats tier) {
-        this.tier = tier;
+    public PortableDankProvider(ItemStack stack) {
+        this.stack = stack;
     }
 
     @Override
     public Component getDisplayName() {
-        return new TextComponent("Dank " + tier.ordinal());
+        return stack.getHoverName();
     }
 
     @Nullable
@@ -32,10 +32,12 @@ public class PortableDankProvider implements MenuProvider {
     public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player player) {
         InteractionHand hand = Utils.getHandWithDank(player);
         if (hand == null) return null;
-        DankInventory dankInventory = Utils.getHandler(player.getItemInHand(hand));
+        ItemStack bag = player.getItemInHand(hand);
+        DankInventory dankInventory = Utils.getHandler(bag);
         ContainerData propertyDelegate = new DankContainerData(dankInventory);
+        DankStats type = Utils.getStats(bag);
 
-        switch (tier) {
+        switch (type) {
             case one:
             default:
                 return DankMenu.t1s(i, playerInventory, dankInventory, propertyDelegate);

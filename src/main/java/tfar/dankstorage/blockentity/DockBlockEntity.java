@@ -240,23 +240,20 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         return null;
     }
 
-    public void removeTank() {
-        int tier = getBlockState().getValue(DockBlock.TIER);
-        CompoundTag nbt = handler.serializeNBT();
-        level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, 0));
-        ItemStack stack = new ItemStack(Utils.getItemFromTier(tier));
-        stack.getOrCreateTag().put(Utils.INV, nbt);
-        ItemEntity entity = new ItemEntity(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), stack);
+    public void removeTankWithItemSpawn() {
+        ItemStack dankInStack = removeTankWithoutItemSpawn();
+        ItemEntity entity = new ItemEntity(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), dankInStack);
         level.addFreshEntity(entity);
-        handler.setDankStats(DankStats.zero);
     }
 
-    public ItemStack removeTank0() {
+    public ItemStack removeTankWithoutItemSpawn() {
         int tier = getBlockState().getValue(DockBlock.TIER);
         CompoundTag nbt = handler.serializeNBT();
         level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, 0));
         ItemStack stack = new ItemStack(Utils.getItemFromTier(tier));
         stack.getOrCreateTag().put(Utils.INV, nbt);
+        stack.setHoverName(getCustomName());
+        setCustomName(null);
         handler.setDankStats(DankStats.zero);
         return stack;
     }
@@ -266,6 +263,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
             DankStats stats = ((DankItem) tank.getItem()).stats;
             level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, stats.ordinal()));
             handler.addTank(tank.getOrCreateTag().getCompound(Utils.INV), tank);
+            setCustomName(tank.getHoverName());
             tank.shrink(1);
         }
     }

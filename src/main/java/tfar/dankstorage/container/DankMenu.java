@@ -82,8 +82,6 @@ public class DankMenu extends AbstractDankMenu {
         return new DankMenu(DankStorage.portable_dank_6_container, id, inv, 6, dankInventory, propertyDelegate);
     }
 
-    ////////////////////
-
     public static DankMenu t7s(int id, Inventory inv, DankInventory dankInventory, ContainerData propertyDelegate) {
         return new DankMenu(DankStorage.portable_dank_7_container, id, inv, 9, dankInventory, propertyDelegate);
     }

@@ -53,9 +53,9 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     protected void init() {
         super.init();
         int start = this.titleLabelX;
-        int namelength = font.width(title.getContents());
+        int namelength = font.width(title);
         start += namelength;
-        this.addButton(new RedGreenToggleButton(leftPos + (start += 20), topPos + 6, 8, 8, b -> {
+        this.addButton(new RedGreenToggleButton(leftPos + (start += 8), topPos + 6, 8, 8, b -> {
             ((RedGreenToggleButton) b).toggle();
             C2SMessageTagMode.send();
         }, Utils.oredict(menu.getBag())));
@@ -68,10 +68,10 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     @Override
     protected void renderLabels(PoseStack stack, int mouseX, int mouseY) {
         super.renderLabels(stack, mouseX, mouseY);
-        int namelength = font.width(title.getContents());
+        int namelength = font.width(title);
         int start = this.titleLabelX;
         start += namelength;
-        this.font.draw(stack, "Tag", start += 30, 6, 0x404040);
+        this.font.draw(stack, "Tag", start += 18, 6, 0x404040);
         this.font.draw(stack, "Pickup", start += 30, 6, 0x404040);
         int nbt_size = menu.propertyDelegate.get(menu.rows * 9);
         int color = nbt_size > max_nbt ? 0x800000 : 0x008000;

@@ -105,8 +105,7 @@ public class DankItem extends Item {
         if (!world.isClientSide) {
 
             if (Utils.getUseType(bag) == C2SMessageToggleUseType.UseType.bag) {
-                DankStats type = Utils.getStats(player.getItemInHand(hand));
-                player.openMenu(new PortableDankProvider(type));
+                player.openMenu(new PortableDankProvider(bag));
                 return super.use(world, player, hand);
             } else {
                 ItemStack toPlace = Utils.getItemStackInSelectedSlot(bag);
