@@ -91,7 +91,7 @@ public class MixinHooks {
         if (mode == Mode.normal) return false;
         PortableDankInventory inv = Utils.getHandler(dank);
         int count = pickup.getCount();
-        boolean oredict = Utils.oredict(dank);
+        boolean oredict = false;//Utils.oredict(dank);
         List<ItemStack> existing = new ArrayList<>();
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stack = inv.getItem(i);
