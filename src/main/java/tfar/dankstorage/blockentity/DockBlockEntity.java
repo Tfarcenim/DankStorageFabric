@@ -28,7 +28,6 @@ import javax.annotation.Nullable;
 
 public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvider, Container {
 
-    protected final ContainerData propertyDelegate;
     private final DankInventory handler = new DankInventory(DankStats.zero) {
         @Override
         public void setChanged() {
@@ -36,6 +35,23 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
             DockBlockEntity.this.setChanged();
         }
     };
+
+    protected final ContainerData propertyDelegate = new ContainerData() {
+        public int get(int index) {
+            if (handler.lockedSlots.length == 0)
+                return -1;
+            return handler.lockedSlots[index];
+        }
+
+        public void set(int index, int value) {
+            handler.lockedSlots[index] = value;
+        }
+
+        public int getCount() {
+            return handler.lockedSlots.length;
+        }
+    };
+
     public int numPlayersUsing = 0;
     public int mode = 0;
     public int selectedSlot;
@@ -43,21 +59,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
 
     public DockBlockEntity() {
         super(DankStorage.dank_tile);
-        this.propertyDelegate = new ContainerData() {
-            public int get(int index) {
-                if (handler.lockedSlots.length == 0)
-                    return -1;
-                return handler.lockedSlots[index];
-            }
 
-            public void set(int index, int value) {
-                handler.lockedSlots[index] = value;
-            }
-
-            public int getCount() {
-                return handler.lockedSlots.length;
-            }
-        };
     }
 
     public DankInventory getHandler() {
@@ -174,15 +176,6 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     @Override
     public int getMaxStackSize() {
         return handler.getMaxStackSize();
-    }
-
-    @Override
-    public void setChanged() {
-        super.setChanged();
-        if (getLevel() != null) {
-            getLevel().sendBlockUpdated(worldPosition, getLevel().getBlockState(worldPosition), getLevel().getBlockState(worldPosition), 3);
-            this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
-        }
     }
 
     @Override

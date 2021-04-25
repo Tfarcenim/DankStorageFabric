@@ -6,12 +6,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ProjectileWeaponItem;
-import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tfar.dankstorage.container.DankMenu;
-import tfar.dankstorage.ducks.UseDankStorage;
-import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.PortableDankInventory;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.utils.ItemHandlerHelper;
@@ -21,10 +17,9 @@ import tfar.dankstorage.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.IntStream;
 
 public class MixinHooks {
+
     public static <T extends LivingEntity> void actuallyBreakItem(int p_222118_1_, T livingEntity, Consumer<T> p_222118_3_, CallbackInfo ci) {
         ItemStack actualStack = livingEntity.getMainHandItem();
         if (actualStack.getItem() instanceof DankItem && Utils.isConstruction(actualStack)) {
@@ -49,40 +44,6 @@ public class MixinHooks {
             }
         }
         return false;
-    }
-
-    public static ItemStack myFindAmmo(Player player, ItemStack bow) {
-        Predicate<ItemStack> predicate = ((ProjectileWeaponItem) bow.getItem()).getAllSupportedProjectiles();
-
-        ItemStack dank = getDankStorage(player);
-        if (!dank.isEmpty())
-            return Utils.getHandler(dank).getContents().stream()
-                    .filter(predicate).findFirst().orElse(ItemStack.EMPTY);
-        return ItemStack.EMPTY;
-    }
-
-    private static ItemStack getDankStorage(Player player) {
-        return IntStream.range(0, player.inventory.getContainerSize()).mapToObj(player.inventory::getItem)
-                .filter(stack -> stack.getItem() instanceof DankItem).findFirst()
-                .orElse(ItemStack.EMPTY);
-    }
-
-    public static void onStoppedUsing(ItemStack bow, Level worldIn, LivingEntity entityLiving, int timeLeft) {
-        if (entityLiving instanceof Player && !worldIn.isClientSide) {
-            Player player = (Player) entityLiving;
-            Predicate<ItemStack> predicate = ((ProjectileWeaponItem) bow.getItem()).getAllSupportedProjectiles();
-            if (((UseDankStorage) player).useDankStorage() && !player.abilities.instabuild) {
-                ItemStack dank = getDankStorage(player);
-                DankInventory dankInventory = Utils.getHandler(dank);
-                for (int i = 0; i < dankInventory.getContainerSize(); i++) {
-                    ItemStack stack = dankInventory.getItem(i);
-                    if (predicate.test(stack)) {
-                        dankInventory.removeItem(i, 1);
-                        break;
-                    }
-                }
-            }
-        }
     }
 
     public static boolean onItemPickup(Player player, ItemStack pickup, ItemStack dank) {
