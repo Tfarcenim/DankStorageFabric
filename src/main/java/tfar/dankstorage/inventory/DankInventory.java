@@ -131,10 +131,8 @@ public class DankInventory extends SimpleContainer {
         }
 
         CompoundTag nbt = new CompoundTag();
-        nbt.putString("DankStats", dankStats.toString());
         nbt.put("Items", nbtTagList);
         nbt.putIntArray("LockedSlots", lockedSlots);
-        nbt.putString("stats", dankStats.toString());
         return nbt;
     }
 
@@ -176,8 +174,6 @@ public class DankInventory extends SimpleContainer {
     }
 
     public void deserializeNBT(CompoundTag nbt) {
-        DankStats stats = DankStats.valueOf(nbt.getString("DankStats"));
-        this.setDankStats(stats);
         ListTag tagList = nbt.getList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++) {
             CompoundTag itemTags = tagList.getCompound(i);
