@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import tfar.dankstorage.container.AbstractDankMenu;
+import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.network.DankPacketHandler;
 
 public class C2SMessageLockSlot implements PacketConsumer {
@@ -27,8 +28,8 @@ public class C2SMessageLockSlot implements PacketConsumer {
         AbstractContainerMenu container = ctx.getPlayer().containerMenu;
         if (container instanceof AbstractDankMenu) {
             AbstractDankMenu dankContainer = (AbstractDankMenu) container;
-            int i = 1 - dankContainer.propertyDelegate.get(slot);
-            dankContainer.propertyDelegate.set(slot, i);
+            DankInventory inventory = dankContainer.dankInventory;
+            inventory.toggleLock(slot);
         }
     }
 }

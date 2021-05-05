@@ -1,5 +1,6 @@
 package tfar.dankstorage.inventory;
 
+import net.minecraft.Util;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -7,6 +8,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.mixin.SimpleInventoryAccessor;
 import tfar.dankstorage.utils.Constants;
 import tfar.dankstorage.utils.DankStats;
@@ -93,9 +95,26 @@ public class DankInventory extends SimpleContainer {
         return lockedSlots[slot] == 1;
     }
 
+    public void toggleLock(int slot) {
+        lockedSlots[slot] = 1 - lockedSlots[slot];
+        setChanged();
+    }
+
+    @Override
+    public boolean canPlaceItem(int i, ItemStack itemStack) {
+        return !itemStack.getItem().is(Utils.BLACKLISTED_STORAGE);
+    }
+
+    //paranoia
     @Override
     public boolean canAddItem(ItemStack stack) {
         return !stack.getItem().is(Utils.BLACKLISTED_STORAGE) && super.canAddItem(stack);
+    }
+
+    //returns the portion of the itemstack that was NOT placed into the storage
+    @Override
+    public ItemStack addItem(ItemStack itemStack) {
+        return itemStack.getItem().is(Utils.BLACKLISTED_STORAGE) ? itemStack : super.addItem(itemStack);
     }
 
     public CompoundTag serializeNBT() {
@@ -110,11 +129,10 @@ public class DankInventory extends SimpleContainer {
                 nbtTagList.add(itemTag);
             }
         }
+
         CompoundTag nbt = new CompoundTag();
-        nbt.putString("DankStats", dankStats.toString());
         nbt.put("Items", nbtTagList);
         nbt.putIntArray("LockedSlots", lockedSlots);
-        nbt.putString("stats", dankStats.toString());
         return nbt;
     }
 
@@ -156,8 +174,6 @@ public class DankInventory extends SimpleContainer {
     }
 
     public void deserializeNBT(CompoundTag nbt) {
-        DankStats stats = DankStats.valueOf(nbt.getString("DankStats"));
-        this.setDankStats(stats);
         ListTag tagList = nbt.getList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++) {
             CompoundTag itemTags = tagList.getCompound(i);
