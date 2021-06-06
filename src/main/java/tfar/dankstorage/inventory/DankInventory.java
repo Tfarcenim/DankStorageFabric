@@ -1,6 +1,5 @@
 package tfar.dankstorage.inventory;
 
-import net.minecraft.Util;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -8,7 +7,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
-import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.mixin.SimpleInventoryAccessor;
 import tfar.dankstorage.utils.Constants;
 import tfar.dankstorage.utils.DankStats;

@@ -248,6 +248,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         stack.setHoverName(getCustomName());
         setCustomName(null);
         handler.setDankStats(DankStats.zero);
+        setChanged();
         return stack;
     }
 
@@ -258,6 +259,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
             handler.addTank(tank.getOrCreateTag().getCompound(Utils.INV), tank);
             setCustomName(tank.getHoverName());
             tank.shrink(1);
+            setChanged();
         }
     }
 
