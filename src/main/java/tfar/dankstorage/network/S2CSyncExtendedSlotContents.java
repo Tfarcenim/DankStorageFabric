@@ -1,37 +1,29 @@
 package tfar.dankstorage.network;
 
-import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.network.PacketConsumer;
-import net.fabricmc.fabric.api.network.PacketContext;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.utils.PacketBufferEX;
 
-public class S2CSyncExtendedSlotContents implements PacketConsumer {
+public class S2CSyncExtendedSlotContents implements ClientPlayNetworking.PlayChannelHandler {
 
-    public static void send(Player player, int id, int slot, ItemStack stack) {
-        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-        buf.writeInt(id);
-        buf.writeInt(slot);
-        PacketBufferEX.writeExtendedItemStack(buf, stack);
-        ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, DankPacketHandler.sync_stacks, buf);
-    }
-
-    public void handle(PacketContext ctx, int windowId, int slot, ItemStack stack) {
-        Player player = ctx.getPlayer();
-        if (player.containerMenu instanceof AbstractDankMenu && windowId == player.containerMenu.containerId) {
+    public void handle(@Nullable LocalPlayer player, int windowId, int slot, ItemStack stack) {
+        if (player != null && player.containerMenu instanceof AbstractDankMenu && windowId == player.containerMenu.containerId) {
             player.containerMenu.slots.get(slot).set(stack);
         }
     }
 
     @Override
-    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf) {
-        int windowId = packetByteBuf.readInt();
-        int slot = packetByteBuf.readInt();
-        ItemStack stack = PacketBufferEX.readExtendedItemStack(packetByteBuf);
-        packetContext.getTaskQueue().execute(() -> handle(packetContext, windowId, slot, stack));
+    public void receive(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
+        int windowId = buf.readInt();
+        int slot = buf.readInt();
+        ItemStack stack = PacketBufferEX.readExtendedItemStack(buf);
+        client.execute(() -> handle(client.player, windowId, slot, stack));
     }
 }

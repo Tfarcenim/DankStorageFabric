@@ -1,7 +1,9 @@
 package tfar.dankstorage.network;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.resources.ResourceLocation;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.network.server.*;
@@ -19,16 +21,16 @@ public class DankPacketHandler {
 
 
     public static void registerMessages() {
-        ServerSidePacketRegistry.INSTANCE.register(scroll, new C2SMessageScrollSlot());
-        ServerSidePacketRegistry.INSTANCE.register(lock_slot, new C2SMessageLockSlot());
-        ServerSidePacketRegistry.INSTANCE.register(sort, new C2SMessageSort());
-        ServerSidePacketRegistry.INSTANCE.register(tag_mode, new C2SMessageTagMode());
-        ServerSidePacketRegistry.INSTANCE.register(toggle_pickup, new C2SMessageTogglePickup());
-        ServerSidePacketRegistry.INSTANCE.register(toggle_use, new C2SMessageToggleUseType());
-        ServerSidePacketRegistry.INSTANCE.register(pick_block, new C2SMessagePickBlock());
+        ServerPlayNetworking.registerGlobalReceiver(scroll, new C2SMessageScrollSlot());
+        ServerPlayNetworking.registerGlobalReceiver(lock_slot, new C2SMessageLockSlot());
+        ServerPlayNetworking.registerGlobalReceiver(sort, new C2SMessageSort());
+        ServerPlayNetworking.registerGlobalReceiver(tag_mode, new C2SMessageTagMode());
+        ServerPlayNetworking.registerGlobalReceiver(toggle_pickup, new C2SMessageTogglePickup());
+        ServerPlayNetworking.registerGlobalReceiver(toggle_use, new C2SMessageToggleUseType());
+        ServerPlayNetworking.registerGlobalReceiver(pick_block, new C2SMessagePickBlock());
     }
 
     public static void registerClientMessages() {
-        ClientSidePacketRegistry.INSTANCE.register(sync_stacks, new S2CSyncExtendedSlotContents());
+        ClientPlayNetworking.registerGlobalReceiver(sync_stacks, new S2CSyncExtendedSlotContents());
     }
 }

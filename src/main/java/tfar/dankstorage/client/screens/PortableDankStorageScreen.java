@@ -55,11 +55,11 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
         int start = this.titleLabelX;
         int namelength = font.width(title);
         start += namelength;
-        this.addButton(new RedGreenToggleButton(leftPos + (start += 8), topPos + 6, 8, 8, b -> {
+        this.addWidget(new RedGreenToggleButton(leftPos + (start += 8), topPos + 6, 8, 8, b -> {
             ((RedGreenToggleButton) b).toggle();
             C2SMessageTagMode.send();
         }, Utils.oredict(menu.getBag())));
-        this.addButton(new TripleToggleButton(leftPos + (start += 30), topPos + 6, 8, 8, b -> {
+        this.addWidget(new TripleToggleButton(leftPos + (start += 30), topPos + 6, 8, 8, b -> {
             ((TripleToggleButton) b).toggle();
             C2SMessageTogglePickup.send();
         }, Utils.getMode(menu.getBag())));

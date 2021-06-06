@@ -1,5 +1,6 @@
 package tfar.dankstorage.client.screens;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -36,7 +37,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     @Override
     protected void init() {
         super.init();
-        this.addButton(new SmallButton(leftPos + 143, topPos + 4, 26, 12, new TextComponent("Sort"), b -> {
+        this.addWidget(new SmallButton(leftPos + 143, topPos + 4, 26, 12, new TextComponent("Sort"), b -> {
             C2SMessageSort.send();
         }));
     }
@@ -44,7 +45,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     @Override
     protected void renderBg(PoseStack stack, float partialTicks, int mouseX, int mouseY) {
 
-        minecraft.getTextureManager().bind(background);
+        RenderSystem.setShaderTexture(0,background);
         if (is7)
             blit(stack, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 512);
         else
@@ -77,11 +78,11 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     public void appendDankInfo(List<Component> tooltip, ItemStack stack) {
-        if (stack.getItem().is(Utils.BLACKLISTED_STORAGE)) {
+        if (stack.is(Utils.BLACKLISTED_STORAGE)) {
             Component component = new TranslatableComponent("text.dankstorage.blacklisted_storage").withStyle(ChatFormatting.DARK_RED);
             tooltip.add(component);
         }
-        if (stack.getItem().is(Utils.BLACKLISTED_USAGE)) {
+        if (stack.is(Utils.BLACKLISTED_USAGE)) {
             Component component = new TranslatableComponent("text.dankstorage.blacklisted_usage").
                     withStyle(ChatFormatting.DARK_RED);
             tooltip.add(component);

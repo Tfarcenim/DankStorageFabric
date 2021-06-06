@@ -177,7 +177,7 @@ public class Utils {
                 selectedSlot--;
                 if (selectedSlot < 0) selectedSlot = size - 1;
             }
-            if (!handler.getItem(selectedSlot).isEmpty() && !handler.getItem(selectedSlot).getItem().is(BLACKLISTED_USAGE))
+            if (!handler.getItem(selectedSlot).isEmpty() && !handler.getItem(selectedSlot).is(BLACKLISTED_USAGE))
                 break;
         }
         setSelectedSlot(bag, selectedSlot);
@@ -209,7 +209,7 @@ public class Utils {
     public static ItemStack getItemStackInSelectedSlot(ItemStack bag) {
         PortableDankInventory inv = getHandler(bag);
         ItemStack stack = inv.getItem(Utils.getSelectedSlot(bag));
-        return stack.getItem().is(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
+        return stack.is(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
     }
 
     public static boolean areItemStacksConvertible(final ItemStack stack1, final ItemStack stack2) {

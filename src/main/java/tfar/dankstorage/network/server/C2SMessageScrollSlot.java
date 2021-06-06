@@ -1,35 +1,36 @@
 package tfar.dankstorage.network.server;
 
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.fabricmc.fabric.api.network.PacketConsumer;
-import net.fabricmc.fabric.api.network.PacketContext;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.utils.Utils;
 
-public class C2SMessageScrollSlot implements PacketConsumer {
+public class C2SMessageScrollSlot implements ServerPlayNetworking.PlayChannelHandler {
 
     public static void send(boolean right) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeBoolean(right);
-        ClientSidePacketRegistry.INSTANCE.sendToServer(DankPacketHandler.scroll, buf);
+        ClientPlayNetworking.send(DankPacketHandler.scroll, buf);
     }
 
-    @Override
-    public void accept(PacketContext packetContext, FriendlyByteBuf packetByteBuf) {
-        boolean right = packetByteBuf.readBoolean();
-        packetContext.getTaskQueue().execute(() -> handle(packetContext, right));
-    }
-
-    public void handle(PacketContext ctx, boolean right) {
-        Player player = ctx.getPlayer();
+    public void handle(ServerPlayer player, boolean right) {
         if (player.getMainHandItem().getItem() instanceof DankItem)
             Utils.changeSlot(player.getMainHandItem(), right);
         else if (player.getOffhandItem().getItem() instanceof DankItem)
             Utils.changeSlot(player.getOffhandItem(), right);
+    }
+
+    @Override
+    public void receive(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) {
+        boolean right = buf.readBoolean();
+        server.execute(() -> handle(player, right));
     }
 }
 

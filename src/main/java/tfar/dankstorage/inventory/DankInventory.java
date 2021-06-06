@@ -86,7 +86,7 @@ public class DankInventory extends SimpleContainer {
     public boolean noValidSlots() {
         return IntStream.range(0, getContainerSize())
                 .mapToObj(this::getItem)
-                .allMatch(stack -> stack.isEmpty() || stack.getItem().is(Utils.BLACKLISTED_USAGE));
+                .allMatch(stack -> stack.isEmpty() || stack.is(Utils.BLACKLISTED_USAGE));
     }
 
     public boolean isLocked(int slot) {
@@ -100,19 +100,19 @@ public class DankInventory extends SimpleContainer {
 
     @Override
     public boolean canPlaceItem(int i, ItemStack itemStack) {
-        return !itemStack.getItem().is(Utils.BLACKLISTED_STORAGE);
+        return !itemStack.is(Utils.BLACKLISTED_STORAGE);
     }
 
     //paranoia
     @Override
     public boolean canAddItem(ItemStack stack) {
-        return !stack.getItem().is(Utils.BLACKLISTED_STORAGE) && super.canAddItem(stack);
+        return !stack.is(Utils.BLACKLISTED_STORAGE) && super.canAddItem(stack);
     }
 
     //returns the portion of the itemstack that was NOT placed into the storage
     @Override
     public ItemStack addItem(ItemStack itemStack) {
-        return itemStack.getItem().is(Utils.BLACKLISTED_STORAGE) ? itemStack : super.addItem(itemStack);
+        return itemStack.is(Utils.BLACKLISTED_STORAGE) ? itemStack : super.addItem(itemStack);
     }
 
     public CompoundTag serializeNBT() {

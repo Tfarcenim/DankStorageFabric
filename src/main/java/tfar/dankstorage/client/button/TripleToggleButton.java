@@ -15,7 +15,7 @@ public class TripleToggleButton extends SmallButton {
 
     @Override
     public void tint() {
-        RenderSystem.color4f(mode.r(), mode.g(), mode.b(), 1);
+     //   RenderSystem.color4f(mode.r(), mode.g(), mode.b(), 1);
     }
 
     public void toggle() {

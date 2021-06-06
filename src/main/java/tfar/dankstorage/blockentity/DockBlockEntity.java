@@ -1,6 +1,7 @@
 
 package tfar.dankstorage.blockentity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -57,9 +58,8 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     public int selectedSlot;
     protected Component customName;
 
-    public DockBlockEntity() {
-        super(DankStorage.dank_tile);
-
+    public DockBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(DankStorage.dank_tile,blockPos, blockState);
     }
 
     public DankInventory getHandler() {
@@ -104,8 +104,8 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     }
 
     @Override
-    public void load(BlockState state, CompoundTag compound) {
-        super.load(state, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
         this.mode = compound.getInt("mode");
         this.selectedSlot = compound.getInt("selectedSlot");
         if (compound.contains(Utils.INV)) {
@@ -213,24 +213,17 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
 
     @Nullable
     @Override
-    public DockMenu createMenu(int syncId, Inventory p_createMenu_2_, Player p_createMenu_3_) {
-        switch (getBlockState().getValue(DockBlock.TIER)) {
-            case 1:
-                return DockMenu.t1s(syncId, p_createMenu_2_, handler, propertyDelegate);
-            case 2:
-                return DockMenu.t2s(syncId, p_createMenu_2_, handler, propertyDelegate);
-            case 3:
-                return DockMenu.t3s(syncId, p_createMenu_2_, handler, propertyDelegate);
-            case 4:
-                return DockMenu.t4s(syncId, p_createMenu_2_, handler, propertyDelegate);
-            case 5:
-                return DockMenu.t5s(syncId, p_createMenu_2_, handler, propertyDelegate);
-            case 6:
-                return DockMenu.t6s(syncId, p_createMenu_2_, handler, propertyDelegate);
-            case 7:
-                return DockMenu.t7s(syncId, p_createMenu_2_, handler, propertyDelegate);
-        }
-        return null;
+    public DockMenu createMenu(int syncId, Inventory inventory, Player player) {
+        return switch (getBlockState().getValue(DockBlock.TIER)) {
+            case 1 -> DockMenu.t1s(syncId, inventory, handler, propertyDelegate);
+            case 2 -> DockMenu.t2s(syncId, inventory, handler, propertyDelegate);
+            case 3 -> DockMenu.t3s(syncId, inventory, handler, propertyDelegate);
+            case 4 -> DockMenu.t4s(syncId, inventory, handler, propertyDelegate);
+            case 5 -> DockMenu.t5s(syncId, inventory, handler, propertyDelegate);
+            case 6 -> DockMenu.t6s(syncId, inventory, handler, propertyDelegate);
+            case 7 -> DockMenu.t7s(syncId, inventory, handler, propertyDelegate);
+            default -> null;
+        };
     }
 
     public void removeTankWithItemSpawn() {

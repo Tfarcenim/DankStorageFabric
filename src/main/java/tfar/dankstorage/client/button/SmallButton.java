@@ -16,13 +16,13 @@ public class SmallButton extends Button {
     }
 
     public void tint() {
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+       // RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     @Override
     public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         if (visible) {
-            Client.mc.getTextureManager().bind(WIDGETS_LOCATION);
+            Client.mc.getTextureManager().bindForSetup(WIDGETS_LOCATION);
 
             tint();
 

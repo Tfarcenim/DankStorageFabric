@@ -1,6 +1,5 @@
 package tfar.dankstorage.container;
 
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -8,7 +7,7 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.inventory.DankInventory;
 import tfar.dankstorage.inventory.DankSlot;
-import tfar.dankstorage.network.S2CSyncExtendedSlotContents;
+import tfar.dankstorage.network.ClientDankPacketHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -100,10 +99,10 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
 
     @Nonnull
     @Override
-    public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
         boolean locked = slotId >= 0 && slotId < (rows * 9) && propertyDelegate.get(slotId) == 1;
         ItemStack itemstack = ItemStack.EMPTY;
-        Inventory PlayerInventory = player.inventory;
+        Inventory inventory = player.getInventory();
 
         if (clickTypeIn == ClickType.QUICK_CRAFT) {
             int j1 = this.quickcraftStatus;
@@ -111,7 +110,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
 
             if ((j1 != 1 || this.quickcraftStatus != 2) && j1 != this.quickcraftStatus) {
                 this.resetQuickCraft();
-            } else if (PlayerInventory.getCarried().isEmpty()) {
+            } else if (getCarried().isEmpty()) {
                 this.resetQuickCraft();
             } else if (this.quickcraftStatus == 0) {
                 this.quickcraftType = getQuickcraftType(dragType);
@@ -124,18 +123,18 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                 }
             } else if (this.quickcraftStatus == 1) {
                 Slot slot7 = this.slots.get(slotId);
-                ItemStack mouseStack = PlayerInventory.getCarried();
+                ItemStack mouseStack = getCarried();
 
                 if (slot7 != null && DockMenu.canItemQuickReplace(slot7, mouseStack, true) && slot7.mayPlace(mouseStack) && (this.quickcraftType == 2 || mouseStack.getCount() > this.quickcraftSlots.size()) && this.canDragTo(slot7)) {
                     this.quickcraftSlots.add(slot7);
                 }
             } else if (this.quickcraftStatus == 2) {
                 if (!this.quickcraftSlots.isEmpty()) {
-                    ItemStack mouseStackCopy = PlayerInventory.getCarried().copy();
-                    int k1 = PlayerInventory.getCarried().getCount();
+                    ItemStack mouseStackCopy = getCarried().copy();
+                    int k1 = getCarried().getCount();
 
                     for (Slot dragSlot : this.quickcraftSlots) {
-                        ItemStack mouseStack = PlayerInventory.getCarried();
+                        ItemStack mouseStack = getCarried();
 
                         if (dragSlot != null && DockMenu.canItemQuickReplace(dragSlot, mouseStack, true) && dragSlot.mayPlace(mouseStack) && (this.quickcraftType == 2 || mouseStack.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(dragSlot)) {
                             ItemStack itemstack14 = mouseStackCopy.copy();
@@ -153,7 +152,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                     }
 
                     mouseStackCopy.setCount(k1);
-                    PlayerInventory.setCarried(mouseStackCopy);
+                    setCarried(mouseStackCopy);
                 }
 
                 this.resetQuickCraft();
@@ -164,25 +163,25 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
             this.resetQuickCraft();
         } else if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) && (dragType == 0 || dragType == 1)) {
             if (slotId == -999) {
-                if (!PlayerInventory.getCarried().isEmpty()) {
+                if (!getCarried().isEmpty()) {
                     if (dragType == 0) {
-                        player.drop(PlayerInventory.getCarried(), true);
-                        PlayerInventory.setCarried(ItemStack.EMPTY);
+                        player.drop(getCarried(), true);
+                        setCarried(ItemStack.EMPTY);
                     }
 
                     if (dragType == 1) {
-                        player.drop(PlayerInventory.getCarried().split(1), true);
+                        player.drop(getCarried().split(1), true);
                     }
                 }
             } else if (clickTypeIn == ClickType.QUICK_MOVE) {
                 if (slotId < 0) {
-                    return ItemStack.EMPTY;
+                    return;
                 }
 
                 Slot slot5 = this.slots.get(slotId);
 
                 if (slot5 == null || !slot5.mayPickup(player)) {
-                    return ItemStack.EMPTY;
+                    return;
                 }
 
                 for (ItemStack itemstack7 = this.quickMoveStack(player, slotId); !itemstack7.isEmpty() && ItemStack.isSame(slot5.getItem(), itemstack7); itemstack7 = this.quickMoveStack(player, slotId)) {
@@ -190,14 +189,14 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                 }
             } else {
                 if (slotId < 0) {
-                    return ItemStack.EMPTY;
+                    return;
                 }
 
                 Slot slot6 = this.slots.get(slotId);
 
                 if (slot6 != null) {
                     ItemStack slotStack = slot6.getItem();
-                    ItemStack mouseStack = PlayerInventory.getCarried();
+                    ItemStack mouseStack = getCarried();
 
                     //account for locked slots
                     if (!slotStack.isEmpty()) {
@@ -224,7 +223,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                         if (mouseStack.isEmpty()) {
                             if (slotStack.isEmpty()) {
                                 slot6.set(ItemStack.EMPTY);
-                                PlayerInventory.setCarried(ItemStack.EMPTY);
+                                setCarried(ItemStack.EMPTY);
                             } else {
                                 int toMove;
                                 if (slot6 instanceof DankSlot) {
@@ -257,13 +256,13 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                                     toMove = dragType == 0 ? slotStack.getCount() : (slotStack.getCount() + 1) / 2;
                                 }
                                 //int toMove = dragType == 0 ? slotStack.getCount() : (slotStack.getCount() + 1) / 2;
-                                PlayerInventory.setCarried(slot6.remove(toMove));
+                                setCarried(slot6.remove(toMove));
 
                                 if (slotStack.isEmpty()) {
                                     slot6.set(ItemStack.EMPTY);
                                 }
 
-                                slot6.onTake(player, PlayerInventory.getCarried());
+                                slot6.onTake(player, getCarried());
                             }
                         } else if (slot6.mayPlace(mouseStack)) {
                             if (slotStack.getItem() == mouseStack.getItem() && ItemStack.tagMatches(slotStack, mouseStack)) {
@@ -277,7 +276,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                                 slotStack.grow(k2);
                             } else if (mouseStack.getCount() <= slot6.getMaxStackSize(mouseStack) && slotStack.getCount() <= slotStack.getMaxStackSize()) {
                                 slot6.set(mouseStack);
-                                PlayerInventory.setCarried(slotStack);
+                                setCarried(slotStack);
                             }
                         } else if (slotStack.getItem() == mouseStack.getItem() && mouseStack.getMaxStackSize() > 1 && ItemStack.tagMatches(slotStack, mouseStack) && !slotStack.isEmpty()) {
                             int j2 = slotStack.getCount();
@@ -290,7 +289,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                                     slot6.set(ItemStack.EMPTY);
                                 }
 
-                                slot6.onTake(player, PlayerInventory.getCarried());
+                                slot6.onTake(player, getCarried());
                             }
                         }
                     }
@@ -359,15 +358,15 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
           }
         }
       }*/
-        } else if (clickTypeIn == ClickType.CLONE && player.abilities.instabuild && PlayerInventory.getCarried().isEmpty() && slotId >= 0) {
+        } else if (clickTypeIn == ClickType.CLONE && player.getAbilities().instabuild && getCarried().isEmpty() && slotId >= 0) {
             Slot slot3 = this.slots.get(slotId);
 
             if (slot3 != null && slot3.hasItem()) {
                 ItemStack itemstack5 = slot3.getItem().copy();
                 itemstack5.setCount(itemstack5.getMaxStackSize());
-                PlayerInventory.setCarried(itemstack5);
+                setCarried(itemstack5);
             }
-        } else if (clickTypeIn == ClickType.THROW && PlayerInventory.getCarried().isEmpty() && slotId >= 0) {
+        } else if (clickTypeIn == ClickType.THROW && getCarried().isEmpty() && slotId >= 0) {
             Slot slot2 = this.slots.get(slotId);
 
             if (slot2 != null && slot2.hasItem() && slot2.mayPickup(player)) {
@@ -377,7 +376,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
             }
         } else if (clickTypeIn == ClickType.PICKUP_ALL && slotId >= 0) {
             Slot slot = this.slots.get(slotId);
-            ItemStack mouseStack = PlayerInventory.getCarried();
+            ItemStack mouseStack = getCarried();
 
             if (!mouseStack.isEmpty() && (slot == null || !slot.hasItem() || !slot.mayPickup(player))) {
                 int i = dragType == 0 ? 0 : this.slots.size() - 1;
@@ -414,7 +413,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
             itemstack.setCount(64);
         }
 
-        return itemstack;
+        //return itemstack;
     }
 
     @Override
@@ -520,7 +519,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
             if (property.checkAndClearUpdateFlag()) {
 
                 for (ContainerListener containerListener : this.containerListeners) {
-                    containerListener.setContainerData(this, j, property.get());
+                    containerListener.dataChanged(this, j, property.get());
                 }
             }
         }
@@ -545,12 +544,12 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
     public void syncInventory(ServerPlayer player) {
         for (int i = 0; i < this.slots.size(); i++) {
             ItemStack stack = (this.slots.get(i)).getItem();
-            S2CSyncExtendedSlotContents.send(player, this.containerId, i, stack);
+            ClientDankPacketHandler.send(player, this.containerId, i, stack);
         }
-        player.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, player.inventory.getCarried()));
+        //player.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, player.getCarried()));
     }
 
     public void syncSlot(ServerPlayer player, int slot, ItemStack stack) {
-        S2CSyncExtendedSlotContents.send(player, this.containerId, slot, stack);
+        ClientDankPacketHandler.send(player, this.containerId, slot, stack);
     }
 }

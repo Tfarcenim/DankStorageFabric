@@ -49,22 +49,22 @@ public class FabricEvents {
         final int stringY = yStart - 10;
         String mode = Utils.getUseType(bag).name();
         mc.font.drawShadow(matrixStack, mode, stringX, stringY, 0xffffff);
-        mc.getTextureManager().bind(GuiComponent.GUI_ICONS_LOCATION);
+  //      mc.getTextureManager().bind(GuiComponent.GUI_ICONS_LOCATION);
     }
 
     private static void renderHotbarItem(int x, int y, float partialTicks, Player player, ItemStack stack) {
         float f = (float) stack.getPopTime() - partialTicks;
         if (f > 0.0F) {
-            RenderSystem.pushMatrix();
+    //        RenderSystem.pushMatrix();
             float f1 = 1.0F + f / 5.0F;
-            RenderSystem.translatef((float) (x + 8), (float) (y + 12), 0.0F);
-            RenderSystem.scalef(1.0F / f1, (f1 + 1.0F) / 2.0F, 1.0F);
-            RenderSystem.translatef((float) (-(x + 8)), (float) (-(y + 12)), 0.0F);
+    //        RenderSystem.translatef((float) (x + 8), (float) (y + 12), 0.0F);
+    //        RenderSystem.scalef(1.0F / f1, (f1 + 1.0F) / 2.0F, 1.0F);
+    //        RenderSystem.translatef((float) (-(x + 8)), (float) (-(y + 12)), 0.0F);
         }
 
-        mc.getItemRenderer().renderAndDecorateItem(player, stack, x, y);
+     //   mc.getItemRenderer().renderAndDecorateItem(player, stack, x, y);
         if (f > 0.0F) {
-            RenderSystem.popMatrix();
+     //       RenderSystem.popMatrix();
         }
         mc.getItemRenderer().renderGuiItemDecorations(mc.font, stack, x, y);
     }

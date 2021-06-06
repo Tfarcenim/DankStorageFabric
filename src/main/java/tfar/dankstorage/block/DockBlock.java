@@ -74,7 +74,7 @@ public class DockBlock extends Block implements EntityBlock {
             final BlockEntity tile = world.getBlockEntity(pos);
             if (tile instanceof DockBlockEntity) {
                 ItemStack held = player.getItemInHand(hand);
-                if (player.isCrouching() && held.getItem().is(Utils.WRENCHES)) {
+                if (player.isCrouching() && held.is(Utils.WRENCHES)) {
                     world.destroyBlock(pos, true, player);
                     return InteractionResult.SUCCESS;
                 }
@@ -111,8 +111,8 @@ public class DockBlock extends Block implements EntityBlock {
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockGetter world) {
-        return new DockBlockEntity();
+    public BlockEntity newBlockEntity(BlockPos pos,BlockState state) {
+        return new DockBlockEntity(pos,state);
     }
 
     @Override
@@ -120,6 +120,4 @@ public class DockBlock extends Block implements EntityBlock {
         super.createBlockStateDefinition(builder);
         builder.add(TIER);
     }
-
-
 }

@@ -32,7 +32,7 @@ abstract class AbstractContainerScreenMixin extends Screen {
         this.itemRenderer = minecraft.getItemRenderer();
     }
 
-    @Inject(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderAndDecorateItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;II)V"))
+    @Inject(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderAndDecorateItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;III)V"))
     private void swapRendererBack1(PoseStack poseStack, Slot slot, CallbackInfo ci) {
         if (slot instanceof DankSlot) {
             this.itemRenderer = BigItemRenderer.INSTANCE;

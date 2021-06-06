@@ -18,7 +18,7 @@ public class RedGreenToggleButton extends SmallButton {
 
     @Override
     public void tint() {
-        if (toggled) RenderSystem.color3f(0, 1, 0);
-        else RenderSystem.color3f(1, 0, 0);
+  //      if (toggled) RenderSystem.color3f(0, 1, 0);
+  //      else RenderSystem.color3f(1, 0, 0);
     }
 }

@@ -64,9 +64,9 @@ public class UpgradeItem extends Item {
         newBarrel.getHandler().setDankStats(DankStats.values()[newTier]);
         for (int i = 0; i < oldDankContents.size() && i < newBarrel.getContainerSize(); ++i)
             newBarrel.setItem(i, oldDankContents.get(i));
-        if (!player.abilities.instabuild)
+        if (!player.getAbilities().instabuild)
             upgradeStack.shrink(1);
-        player.displayClientMessage(new TranslatableComponent("metalbarrels.upgrade_successful")
+        player.displayClientMessage(new TranslatableComponent("dankstorage.upgrade_successful")
                 .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(1))), true);
         return InteractionResult.SUCCESS;
     }

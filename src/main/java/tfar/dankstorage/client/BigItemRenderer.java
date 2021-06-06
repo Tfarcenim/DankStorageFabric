@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -23,11 +24,11 @@ import java.text.DecimalFormat;
 public class BigItemRenderer extends ItemRenderer {
 
     public static final BigItemRenderer INSTANCE = new BigItemRenderer(Minecraft.getInstance().getTextureManager(), Minecraft.getInstance().getModelManager()
-            , ((MinecraftClientAccessor) Minecraft.getInstance()).getItemColors());
+            , ((MinecraftClientAccessor) Minecraft.getInstance()).getItemColors(),((ItemRendererAccessor)Minecraft.getInstance().getItemRenderer()).getBlockEntityRenderer());
     private static final DecimalFormat decimalFormat = new DecimalFormat("0.#");
 
-    protected BigItemRenderer(TextureManager textureManagerIn, ModelManager modelManagerIn, ItemColors itemColorsIn) {
-        super(textureManagerIn, modelManagerIn, itemColorsIn);
+    protected BigItemRenderer(TextureManager textureManagerIn, ModelManager modelManagerIn, ItemColors itemColorsIn, BlockEntityWithoutLevelRenderer blockEntityWithoutLevelRenderer) {
+        super(textureManagerIn, modelManagerIn, itemColorsIn,blockEntityWithoutLevelRenderer);
     }
 
     @Override
@@ -40,21 +41,21 @@ public class BigItemRenderer extends ItemRenderer {
                 matrixstack.translate(0.0D, 0.0D, this.blitOffset + 200.0F);
                 MultiBufferSource.BufferSource irendertypebuffer$impl = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
-                RenderSystem.pushMatrix();
+                matrixstack.pushPose();
                 float scale = .5f;
-                RenderSystem.scalef(scale, scale, 1.0F);
+                matrixstack.scale(scale, scale, 1.0F);
                 fr.drawInBatch(s, (xPosition + 19 - 2 - (fr.width(s) * scale)) / scale,
                         (yPosition + 6 + 3 + (1 / (scale * scale) - 1)) / scale, 16777215, true, matrixstack.last().pose(), irendertypebuffer$impl, false, 0, 15728880);
                 //true, matrixstack.getLast().getNormal(), irendertypebuffer$impl, false, 0, 15728880);
                 irendertypebuffer$impl.endBatch();
-                RenderSystem.popMatrix();
+                matrixstack.popPose();
             }
 
 
             if (stack.isDamaged()) {
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableTexture();
-                RenderSystem.disableAlphaTest();
+              //  RenderSystem.disableAlphaTest();
                 RenderSystem.disableBlend();
                 Tesselator tesselator = Tesselator.getInstance();
                 BufferBuilder bufferBuilder = tesselator.getBuilder();
@@ -66,7 +67,7 @@ public class BigItemRenderer extends ItemRenderer {
                 ((ItemRendererAccessor) this).$fillRect(bufferBuilder, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
                 ((ItemRendererAccessor) this).$fillRect(bufferBuilder, xPosition + 2, yPosition + 13, k, 1, l >> 16 & 255, l >> 8 & 255, l & 255, 255);
                 RenderSystem.enableBlend();
-                RenderSystem.enableAlphaTest();
+              //  RenderSystem.enableAlphaTest();
                 RenderSystem.enableTexture();
                 RenderSystem.enableDepthTest();
             }
