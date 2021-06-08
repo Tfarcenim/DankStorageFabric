@@ -2,6 +2,7 @@ package tfar.dankstorage.inventory;
 
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import tfar.dankstorage.world.DankInventory;
 
 public class DankSlot extends Slot {
 
@@ -16,5 +17,11 @@ public class DankSlot extends Slot {
     @Override
     public boolean mayPlace(ItemStack itemStack) {
         return itemHandler.canPlaceItem(index,itemStack) && super.mayPlace(itemStack);
+    }
+
+    //make sure items stack as intended
+    @Override
+    public int getMaxStackSize(ItemStack stack) {
+        return super.getMaxStackSize();
     }
 }

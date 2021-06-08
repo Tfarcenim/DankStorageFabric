@@ -9,6 +9,7 @@ import tfar.dankstorage.client.button.TripleToggleButton;
 import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.network.server.C2SMessageTagMode;
 import tfar.dankstorage.network.server.C2SMessageTogglePickup;
+import tfar.dankstorage.utils.PickupMode;
 import tfar.dankstorage.utils.Utils;
 
 import static tfar.dankstorage.client.screens.DockScreen.*;
@@ -55,14 +56,14 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
         int start = this.titleLabelX;
         int namelength = font.width(title);
         start += namelength;
-        this.addWidget(new RedGreenToggleButton(leftPos + (start += 8), topPos + 6, 8, 8, b -> {
-            ((RedGreenToggleButton) b).toggle();
-            C2SMessageTagMode.send();
-        }, Utils.oredict(menu.getBag())));
-        this.addWidget(new TripleToggleButton(leftPos + (start += 30), topPos + 6, 8, 8, b -> {
-            ((TripleToggleButton) b).toggle();
+        start-=10;
+    //    this.addRenderableWidget(new RedGreenToggleButton(leftPos + (start += 8), topPos + 6, 8, 8, b -> {
+     //       ((RedGreenToggleButton) b).toggle();
+    //        C2SMessageTagMode.send();
+    //    }, false));
+        this.addRenderableWidget(new TripleToggleButton(leftPos + (start += 30), topPos + 6, 8, 8, b -> {
             C2SMessageTogglePickup.send();
-        }, Utils.getMode(menu.getBag())));
+        },this));
     }
 
     @Override
@@ -71,10 +72,8 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
         int namelength = font.width(title);
         int start = this.titleLabelX;
         start += namelength;
-        this.font.draw(stack, "Tag", start += 18, 6, 0x404040);
+     //   this.font.draw(stack, "Tag", start += 18, 6, 0x404040);
         this.font.draw(stack, "Pickup", start += 30, 6, 0x404040);
-        int nbt_size = menu.propertyDelegate.get(menu.rows * 9);
-        int color = nbt_size > max_nbt ? 0x800000 : 0x008000;
-        this.font.draw(stack, "NBT: " + nbt_size, 70, this.imageHeight - 94, color);
+
     }
 }

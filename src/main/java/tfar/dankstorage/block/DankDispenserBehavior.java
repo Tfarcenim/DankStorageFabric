@@ -29,11 +29,11 @@ public class DankDispenserBehavior implements DispenseItemBehavior {
 
     public ItemStack removeDank(ServerLevel world, BlockPos pos) {
         DockBlockEntity dockBlockEntity = (DockBlockEntity) world.getBlockEntity(pos);
-        return dockBlockEntity.removeTankWithoutItemSpawn();
+        return dockBlockEntity.removeDankWithoutItemSpawn();
     }
 
     public void insertDank(ServerLevel world, BlockPos pos, ItemStack stack) {
         DockBlockEntity dockBlockEntity = (DockBlockEntity) world.getBlockEntity(pos);
-        dockBlockEntity.addTank(stack);
+        dockBlockEntity.addDank(stack);
     }
 }

@@ -84,11 +84,11 @@ public class DockBlock extends Block implements EntityBlock {
                     if (state.getValue(TIER) > 0) {
                         ((DockBlockEntity) tile).removeTankWithItemSpawn();
                     }
-                    ((DockBlockEntity) tile).addTank(held);
+                    ((DockBlockEntity) tile).addDank(held);
                     return InteractionResult.SUCCESS;
                 }
 
-                if (held.isEmpty() && player.isShiftKeyDown()) {
+                if (held.isEmpty() && player.isShiftKeyDown() && state.getValue(TIER) > 0) {
                     ((DockBlockEntity) tile).removeTankWithItemSpawn();
                     return InteractionResult.SUCCESS;
                 }

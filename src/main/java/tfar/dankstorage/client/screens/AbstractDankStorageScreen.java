@@ -37,7 +37,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     @Override
     protected void init() {
         super.init();
-        this.addWidget(new SmallButton(leftPos + 143, topPos + 4, 26, 12, new TextComponent("Sort"), b -> {
+        this.addRenderableWidget(new SmallButton(leftPos + 143, topPos + 4, 26, 12, new TextComponent("Sort"), b -> {
             C2SMessageSort.send();
         }));
     }
@@ -57,9 +57,10 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
             int k = i / 9;
             int offsetx = 8;
             int offsety = 18;
-            if (this.menu.propertyDelegate.get(i) == 1)
+            if (this.menu.dankInventory.get(i) == 1) {
                 fill(stack, leftPos + j * 18 + offsetx, topPos + k * 18 + offsety,
                         leftPos + j * 18 + offsetx + 16, topPos + k * 18 + offsety + 16, 0xFFFF0000);
+            }
         }
     }
 
@@ -97,6 +98,14 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
                 tooltip.add(component2);
             }
         }
+    }
+
+    @Override
+    protected void renderLabels(PoseStack poseStack, int i, int j) {
+        super.renderLabels(poseStack, i, j);
+        int id = menu.dankInventory.id;//menu.dankInventory.get(menu.rows * 9);
+        int color = 0x008000;
+        this.font.draw(poseStack, "ID: " + id, 70, this.imageHeight - 94, color);
     }
 
     @Override

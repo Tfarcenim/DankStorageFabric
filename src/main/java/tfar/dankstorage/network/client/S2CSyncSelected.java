@@ -1,4 +1,4 @@
-package tfar.dankstorage.network;
+package tfar.dankstorage.network.client;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -8,22 +8,24 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import tfar.dankstorage.container.AbstractDankMenu;
+import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 import tfar.dankstorage.utils.PacketBufferEX;
+import tfar.dankstorage.world.ClientData;
 
-public class S2CSyncExtendedSlotContents implements ClientPlayNetworking.PlayChannelHandler {
+public class S2CSyncSelected implements ClientPlayNetworking.PlayChannelHandler {
 
-    public void handle(@Nullable LocalPlayer player, int windowId, int slot, ItemStack stack) {
-        if (player != null && player.containerMenu instanceof AbstractDankMenu && windowId == player.containerMenu.containerId) {
-            player.containerMenu.slots.get(slot).set(stack);
+    public void handle(@Nullable LocalPlayer player, int id, ItemStack stack, C2SMessageToggleUseType.UseType useType) {
+        if (player != null) {
+            ClientData.addData(id,stack,useType);
         }
     }
 
     @Override
     public void receive(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
-        int windowId = buf.readInt();
-        int slot = buf.readInt();
+      //  int windowId = buf.readInt();
+        int id = buf.readInt();
         ItemStack stack = PacketBufferEX.readExtendedItemStack(buf);
-        client.execute(() -> handle(client.player, windowId, slot, stack));
+        C2SMessageToggleUseType.UseType useType = C2SMessageToggleUseType.UseType.values()[buf.readInt()];
+        client.execute(() -> handle(client.player,id,stack,useType));
     }
 }

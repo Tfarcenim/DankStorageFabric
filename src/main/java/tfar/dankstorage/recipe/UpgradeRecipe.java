@@ -1,12 +1,19 @@
 package tfar.dankstorage.recipe;
 
+import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import tfar.dankstorage.DankStorage;
-import tfar.dankstorage.inventory.DankInventory;
+import tfar.dankstorage.mixin.CraftingContainerAccess;
+import tfar.dankstorage.mixin.CraftingMenuAccess;
+import tfar.dankstorage.world.DankInventory;
 import tfar.dankstorage.utils.Utils;
+import tfar.dankstorage.world.DankSavedData;
 
 import javax.annotation.Nonnull;
 
@@ -22,9 +29,18 @@ public class UpgradeRecipe extends ShapedRecipe {
         ItemStack newBag = super.assemble(inv).copy();
         ItemStack oldBag = inv.getItem(4);
         if (!oldBag.hasTag()) return newBag;
-        newBag.setTag(oldBag.getTag());
-        DankInventory dankInventory = Utils.getHandler(newBag);
-        dankInventory.setDankStats(Utils.getStats(newBag));
+
+        AbstractContainerMenu menu = ((CraftingContainerAccess)inv).getMenu();
+
+        int id = oldBag.getTag().contains(Utils.ID, Tag.TAG_INT) ? oldBag.getTag().getInt(Utils.ID) : -1;
+        if (id != -1) {
+            newBag.getOrCreateTag().putInt(Utils.ID,id);
+        }
+        if (menu instanceof CraftingMenu) {
+            ServerLevel level = (ServerLevel) ((CraftingMenuAccess)menu).getPlayer().level;
+            DankInventory inventory = DankSavedData.getDefault(level).getInventory(id);
+            inventory.setDankStats(Utils.getStats(newBag));
+        }
 
         return newBag;
     }

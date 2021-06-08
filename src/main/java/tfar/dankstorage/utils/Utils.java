@@ -1,6 +1,7 @@
 package tfar.dankstorage.utils;
 
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
@@ -8,6 +9,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagCollection;
@@ -17,10 +20,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.container.AbstractDankMenu;
-import tfar.dankstorage.inventory.DankInventory;
-import tfar.dankstorage.inventory.PortableDankInventory;
+import tfar.dankstorage.network.ClientDankPacketHandler;
+import tfar.dankstorage.network.DankPacketHandler;
+import tfar.dankstorage.world.ClientData;
+import tfar.dankstorage.world.DankInventory;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 
@@ -37,13 +43,13 @@ public class Utils {
 
     public static final Tag<Item> WRENCHES = TagRegistry.item(new ResourceLocation("forge", "wrenches"));
 
-    public static final String INV = "inv";
+    public static final String ID = "dankstorage:id";
     public static final Set<ResourceLocation> taglist = new HashSet<>();
     public static boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 
-    public static Mode getMode(ItemStack bag) {
-        return Mode.modes[bag.getOrCreateTag().getInt("mode")];
+    public static PickupMode getPickupMode(ItemStack bag) {
+        return PickupMode.PICKUP_MODES[bag.getOrCreateTag().getInt("mode")];
     }
 
     public static boolean isConstruction(ItemStack bag) {
@@ -76,10 +82,10 @@ public class Utils {
     public static void cycleMode(ItemStack bag, Player player) {
         int ordinal = bag.getOrCreateTag().getInt("mode");
         ordinal++;
-        if (ordinal > Mode.modes.length - 1) ordinal = 0;
+        if (ordinal > PickupMode.PICKUP_MODES.length - 1) ordinal = 0;
         bag.getOrCreateTag().putInt("mode", ordinal);
         player.displayClientMessage(
-                new TranslatableComponent("dankstorage.mode." + Mode.modes[ordinal].name()), true);
+                new TranslatableComponent("dankstorage.mode." + PickupMode.PICKUP_MODES[ordinal].name()), true);
     }
 
     public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag) {
@@ -98,10 +104,6 @@ public class Utils {
 
     public static int getSelectedSlot(ItemStack bag) {
         return bag.getOrCreateTag().getInt("selectedSlot");
-    }
-
-    public static void setSelectedSlot(ItemStack bag, int slot) {
-        bag.getOrCreateTag().putInt("selectedSlot", slot);
     }
 
     public static void sort(Player player) {
@@ -162,14 +164,14 @@ public class Utils {
         return ((DankItem) bag.getItem()).stats;
     }
 
-    public static void changeSlot(ItemStack bag, boolean right) {
-        PortableDankInventory handler = getHandler(bag);
+    public static void changeSelectedSlot(ItemStack bag, boolean right, ServerPlayer player) {
+        DankInventory handler = getInventory(bag,player.getLevel());
         //don't change slot if empty
         if (handler.noValidSlots()) return;
         int selectedSlot = getSelectedSlot(bag);
         int size = handler.getContainerSize();
         //keep iterating until a valid slot is found (not empty and not blacklisted from usage)
-        while (true) {
+        do {
             if (right) {
                 selectedSlot++;
                 if (selectedSlot >= size) selectedSlot = 0;
@@ -177,18 +179,33 @@ public class Utils {
                 selectedSlot--;
                 if (selectedSlot < 0) selectedSlot = size - 1;
             }
-            if (!handler.getItem(selectedSlot).isEmpty() && !handler.getItem(selectedSlot).is(BLACKLISTED_USAGE))
-                break;
+        } while (handler.getItem(selectedSlot).isEmpty() || handler.getItem(selectedSlot).is(BLACKLISTED_USAGE));
+
+        if (selectedSlot != -1) {
+            ClientDankPacketHandler.sendSelected(player,getID(bag),handler.getItem(selectedSlot),getUseType(bag));
         }
-        setSelectedSlot(bag, selectedSlot);
+    }
+
+    public static int getID(ItemStack bag) {
+        CompoundTag tag = bag.getTag();
+        if (bag.hasTag()) {
+            int id = tag.getInt(Utils.ID);
+            return id;
+        }
+        return -1;
     }
 
     public static boolean oredict(ItemStack bag) {
         return bag.getItem() instanceof DankItem && bag.hasTag() && bag.getTag().getBoolean("tag");
     }
 
-    public static PortableDankInventory getHandler(ItemStack bag) {
-        return new PortableDankInventory(bag);
+    public static DankInventory getInventory(ItemStack bag, Level level) {
+        if (!level.isClientSide) {
+            CompoundTag tag = bag.getTag();
+            int id = tag.getInt(Utils.ID);
+            return DankStorage.instance.data.getOrCreateInventory(id,getStats(bag));
+        }
+        return new DankInventory(DankStats.zero,level);
     }
 
     public static int getNbtSize(ItemStack stack) {
@@ -206,8 +223,8 @@ public class Utils {
         return buffer.writerIndex();
     }
 
-    public static ItemStack getItemStackInSelectedSlot(ItemStack bag) {
-        PortableDankInventory inv = getHandler(bag);
+    public static ItemStack getItemStackInSelectedSlot(ItemStack bag,ServerLevel level) {
+        DankInventory inv = getInventory(bag,level);
         ItemStack stack = inv.getItem(Utils.getSelectedSlot(bag));
         return stack.is(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
     }

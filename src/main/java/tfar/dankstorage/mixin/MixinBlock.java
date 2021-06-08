@@ -34,7 +34,7 @@ public class MixinBlock {
     private static List<ItemStack> newlootcontext(BlockState state, ServerLevel worldIn,
                                                   BlockPos pos, BlockEntity tileEntityIn,
                                                   Entity entityIn, ItemStack dank) {
-        ItemStack tool = Utils.getItemStackInSelectedSlot(dank);
+        ItemStack tool = Utils.getItemStackInSelectedSlot(dank,worldIn);
         LootContext.Builder lootcontext$builder = new LootContext.Builder(worldIn).withRandom(worldIn.random).withParameter(LootContextParams.TOOL, tool).withOptionalParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos)).withOptionalParameter(LootContextParams.THIS_ENTITY, entityIn).withOptionalParameter(LootContextParams.BLOCK_ENTITY, tileEntityIn);
         return state.getDrops(lootcontext$builder);
     }

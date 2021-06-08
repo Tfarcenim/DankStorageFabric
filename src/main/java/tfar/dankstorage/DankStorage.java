@@ -2,13 +2,16 @@ package tfar.dankstorage;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -26,32 +29,35 @@ import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.recipe.Serializer2;
 import tfar.dankstorage.blockentity.DockBlockEntity;
 import tfar.dankstorage.utils.DankStats;
+import tfar.dankstorage.world.DankSavedData;
 
 import java.util.stream.IntStream;
 
-public class DankStorage implements ModInitializer, ClientModInitializer {
+public class DankStorage implements ModInitializer, ClientModInitializer, ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.ServerStopped {
 
     public static final String MODID = "dankstorage";
 
-    public static Block dock = null;
-    public static MenuType<DockMenu> dank_1_container = null;
-    public static MenuType<DockMenu> dank_2_container = null;
-    public static MenuType<DockMenu> dank_3_container = null;
-    public static MenuType<DockMenu> dank_4_container = null;
-    public static MenuType<DockMenu> dank_5_container = null;
-    public static MenuType<DockMenu> dank_6_container = null;
-    public static MenuType<DockMenu> dank_7_container = null;
-    public static MenuType<DankMenu> portable_dank_1_container = null;
-    public static MenuType<DankMenu> portable_dank_2_container = null;
-    public static MenuType<DankMenu> portable_dank_3_container = null;
-    public static MenuType<DankMenu> portable_dank_4_container = null;
-    public static MenuType<DankMenu> portable_dank_5_container = null;
-    public static MenuType<DankMenu> portable_dank_6_container = null;
-    public static MenuType<DankMenu> portable_dank_7_container = null;
-    public static BlockEntityType<?> dank_tile = null;
-    public static RecipeSerializer<?> upgrade = null;
+    public static Block dock;
+    public static MenuType<DockMenu> dank_1_container;
+    public static MenuType<DockMenu> dank_2_container;
+    public static MenuType<DockMenu> dank_3_container;
+    public static MenuType<DockMenu> dank_4_container;
+    public static MenuType<DockMenu> dank_5_container;
+    public static MenuType<DockMenu> dank_6_container;
+    public static MenuType<DockMenu> dank_7_container;
+    public static MenuType<DankMenu> portable_dank_1_container;
+    public static MenuType<DankMenu> portable_dank_2_container;
+    public static MenuType<DankMenu> portable_dank_3_container;
+    public static MenuType<DankMenu> portable_dank_4_container;
+    public static MenuType<DankMenu> portable_dank_5_container;
+    public static MenuType<DankMenu> portable_dank_6_container;
+    public static MenuType<DankMenu> portable_dank_7_container;
+    public static BlockEntityType<?> dank_tile;
+    public static RecipeSerializer<?> upgrade;
 
+    public static DankStorage instance;
     public DankStorage() {
+        instance = this;
     }
 
     @Override
@@ -92,11 +98,26 @@ public class DankStorage implements ModInitializer, ClientModInitializer {
 
 
         DankPacketHandler.registerMessages();
+
+        ServerLifecycleEvents.SERVER_STARTED.register(this);
+        ServerLifecycleEvents.SERVER_STOPPED.register(this);
     }
 
     @Override
     public void onInitializeClient() {
         Client.client();
+    }
+
+    public DankSavedData data;
+
+    @Override
+    public void onServerStarted(MinecraftServer server) {
+        instance.data = DankSavedData.getDefault(server.getLevel(Level.OVERWORLD));
+    }
+
+    @Override
+    public void onServerStopped(MinecraftServer server) {
+        instance.data = null;
     }
 
 

@@ -13,3 +13,11 @@ accessible field net/minecraft/world/inventory/AbstractContainerMenu containerLi
 accessible field net/minecraft/world/inventory/AbstractContainerMenu dataSlots Ljava/util/List;
 
 accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen findSlot (DD)Lnet/minecraft/world/inventory/Slot;
+
+
+accessible field net/minecraft/world/inventory/AbstractContainerMenu remoteDataSlots Lit/unimi/dsi/fastutil/ints/IntList;
+accessible field net/minecraft/world/inventory/AbstractContainerMenu synchronizer Lnet/minecraft/world/inventory/ContainerSynchronizer;
+accessible field net/minecraft/world/inventory/AbstractContainerMenu suppressRemoteUpdates Z
+accessible field net/minecraft/world/inventory/AbstractContainerMenu remoteCarried Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/world/inventory/AbstractContainerMenu remoteSlots Lnet/minecraft/core/NonNullList;
+

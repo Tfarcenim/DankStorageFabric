@@ -1,26 +1,34 @@
-package tfar.dankstorage.inventory;
+package tfar.dankstorage.world;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import tfar.dankstorage.mixin.SimpleInventoryAccessor;
-import tfar.dankstorage.utils.Constants;
+import net.minecraft.world.level.Level;
+import tfar.dankstorage.DankStorage;
+import tfar.dankstorage.ducks.SimpleInventoryAccessor;
 import tfar.dankstorage.utils.DankStats;
+import tfar.dankstorage.utils.PickupMode;
 import tfar.dankstorage.utils.Utils;
 
 import java.util.stream.IntStream;
 
-public class DankInventory extends SimpleContainer {
+public class DankInventory extends SimpleContainer implements ContainerData {
 
     public DankStats dankStats;
     public int[] lockedSlots;
+    public int id;
 
-    public DankInventory(DankStats stats) {
+    public final Level level;
+
+    public DankInventory(DankStats stats,Level level) {
         super(stats.slots);
+        this.level = level;
         this.dankStats = stats;
         this.lockedSlots = new int[stats.slots];
     }
@@ -115,7 +123,7 @@ public class DankInventory extends SimpleContainer {
         return itemStack.is(Utils.BLACKLISTED_STORAGE) ? itemStack : super.addItem(itemStack);
     }
 
-    public CompoundTag serializeNBT() {
+    public CompoundTag save() {
         ListTag nbtTagList = new ListTag();
         for (int i = 0; i < this.getContents().size(); i++) {
             if (!getContents().get(i).isEmpty()) {
@@ -131,19 +139,22 @@ public class DankInventory extends SimpleContainer {
         CompoundTag nbt = new CompoundTag();
         nbt.put("Items", nbtTagList);
         nbt.putIntArray("LockedSlots", lockedSlots);
+        nbt.putString("DankStats",dankStats.name());
+        nbt.putInt(Utils.ID,id);
         return nbt;
     }
 
-    public void addTank(CompoundTag nbt, ItemStack bag) {
-        this.setDankStats(Utils.getStats(bag));
-        ListTag tagList = nbt.getList("Items", Constants.NBT.TAG_COMPOUND);
+    public void read(CompoundTag nbt) {
+        DankStats stats = DankStats.valueOf(nbt.getString("DankStats"));
+        setDankStats(stats);
+        ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++) {
             CompoundTag itemTags = tagList.getCompound(i);
             int slot = itemTags.getInt("Slot");
             if (slot >= 0 && slot < getContainerSize()) {
-                if (itemTags.contains("StackList", Constants.NBT.TAG_LIST)) {
+                if (itemTags.contains("StackList", Tag.TAG_LIST)) {
                     ItemStack stack = ItemStack.EMPTY;
-                    ListTag stackTagList = itemTags.getList("StackList", Constants.NBT.TAG_COMPOUND);
+                    ListTag stackTagList = itemTags.getList("StackList", Tag.TAG_COMPOUND);
                     for (int j = 0; j < stackTagList.size(); j++) {
                         CompoundTag itemTag = stackTagList.getCompound(j);
                         ItemStack temp = ItemStack.of(itemTag);
@@ -161,54 +172,32 @@ public class DankInventory extends SimpleContainer {
                     }
                 } else {
                     ItemStack stack = ItemStack.of(itemTags);
-                    if (itemTags.contains("ExtendedCount", Constants.NBT.TAG_INT)) {
+                    if (itemTags.contains("ExtendedCount", Tag.TAG_INT)) {
                         stack.setCount(itemTags.getInt("ExtendedCount"));
                     }
                     this.setItem(slot, stack);
                 }
             }
         }
-        lockedSlots = nbt.getIntArray("LockedSlots");
+        int[] slots = nbt.getIntArray("LockedSlots");
+        setLockedSlots(slots);
+        id = nbt.getInt(Utils.ID);
+        validate();
     }
 
-    public void deserializeNBT(CompoundTag nbt) {
-        ListTag tagList = nbt.getList("Items", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < tagList.size(); i++) {
-            CompoundTag itemTags = tagList.getCompound(i);
-            int slot = itemTags.getInt("Slot");
-            if (slot >= 0 && slot < getContainerSize()) {
-                if (itemTags.contains("StackList", Constants.NBT.TAG_LIST)) {
-                    ItemStack stack = ItemStack.EMPTY;
-                    ListTag stackTagList = itemTags.getList("StackList", Constants.NBT.TAG_COMPOUND);
-                    for (int j = 0; j < stackTagList.size(); j++) {
-                        CompoundTag itemTag = stackTagList.getCompound(j);
-                        ItemStack temp = ItemStack.of(itemTag);
-                        if (!temp.isEmpty()) {
-                            if (stack.isEmpty()) stack = temp;
-                            else stack.grow(temp.getCount());
-                        }
-                    }
-                    if (!stack.isEmpty()) {
-                        int count = stack.getCount();
-                        count = Math.min(count, getMaxStackSize());
-                        stack.setCount(count);
+    protected void setLockedSlots(int[] slots) {
+        System.arraycopy(slots, 0, this.lockedSlots, 0, slots.length);
+    }
 
-                        this.setItem(slot, stack);
-                    }
-                } else {
-                    ItemStack stack = ItemStack.of(itemTags);
-                    if (itemTags.contains("ExtendedCount", Constants.NBT.TAG_INT)) {
-                        stack.setCount(itemTags.getInt("ExtendedCount"));
-                    }
-                    this.setItem(slot, stack);
-                }
-            }
-        }
-        int[] listTag = nbt.getIntArray("LockedSlots");
-        if (listTag.length == 0) {
-            lockedSlots = new int[dankStats.slots];
+    protected void validate() {
+        if (dankStats == DankStats.zero) {
+            throw new RuntimeException("dank has no stats?");
+        } else if (getContainerSize() == 0) {
+            throw new RuntimeException("dank is empty?");
         } else {
-            lockedSlots = nbt.getIntArray("LockedSlots");
+            if (lockedSlots.length != getContainerSize()) {
+                throw new RuntimeException("inequal size");
+            }
         }
     }
 
@@ -229,4 +218,40 @@ public class DankInventory extends SimpleContainer {
         return Mth.floor(f * 14F) + (numStacks > 0 ? 1 : 0);
     }
 
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        if (!level.isClientSide && DankStorage.instance.data != null) {
+            DankStorage.instance.data.saveToId(id, this);
+        }
+    }
+
+    protected int getIdSlot() {
+        return getContainerSize();
+    }
+
+    @Override
+    public int get(int slot) {
+        if (slot < getContainerSize()) {
+            return lockedSlots[slot];
+        } else if (slot == getIdSlot()) {
+            return id;
+        }
+        return -999;
+    }
+
+    @Override
+    public void set(int slot, int value) {
+        if (slot < getContainerSize()) {
+            lockedSlots[slot] = value;
+        } else if (slot == getIdSlot()) {
+            id = value;
+        }
+    }
+
+    @Override
+    public int getCount() {
+        return getContainerSize() + 1;
+    }
 }

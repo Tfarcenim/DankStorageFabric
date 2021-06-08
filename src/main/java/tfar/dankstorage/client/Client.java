@@ -1,5 +1,6 @@
 package tfar.dankstorage.client;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
@@ -11,6 +12,7 @@ import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.client.screens.DockScreen;
 import tfar.dankstorage.client.screens.PortableDankStorageScreen;
 import tfar.dankstorage.event.FabricEvents;
+import tfar.dankstorage.network.ClientDankPacketHandler;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 
@@ -23,7 +25,7 @@ public class Client {
 
         HudRenderCallback.EVENT.register(FabricEvents::renderStack);
 
-        DankPacketHandler.registerClientMessages();
+        ClientDankPacketHandler.registerClientMessages();
         ScreenRegistry.register(DankStorage.dank_1_container, DockScreen::t1);
         ScreenRegistry.register(DankStorage.portable_dank_1_container, PortableDankStorageScreen::t1);
         ScreenRegistry.register(DankStorage.dank_2_container, DockScreen::t2);
@@ -42,7 +44,7 @@ public class Client {
         CONSTRUCTION = new KeyMapping("key.dankstorage.construction", GLFW.GLFW_KEY_I, "key.categories.dankstorage");
 
         KeyBindingHelper.registerKeyBinding(CONSTRUCTION);
-        ClientTickCallback.EVENT.register(Client::keyPressed);
+        ClientTickEvents.START_CLIENT_TICK.register(Client::keyPressed);
     }
 
     public static void keyPressed(Minecraft client) {

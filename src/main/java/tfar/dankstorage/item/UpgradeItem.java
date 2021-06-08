@@ -50,7 +50,7 @@ public class UpgradeItem extends Item {
 
         //shortcut
         assert oldDank != null;
-        final NonNullList<ItemStack> oldDankContents = oldDank.getHandler().getContents();
+        final NonNullList<ItemStack> oldDankContents = oldDank.getInventory().getContents();
 
         oldDank.setRemoved();
 
@@ -61,7 +61,7 @@ public class UpgradeItem extends Item {
         world.setBlock(pos, newState, 3);
         DockBlockEntity newBarrel = (DockBlockEntity) world.getBlockEntity(pos);
         assert newBarrel != null;
-        newBarrel.getHandler().setDankStats(DankStats.values()[newTier]);
+        newBarrel.getInventory().setDankStats(DankStats.values()[newTier]);
         for (int i = 0; i < oldDankContents.size() && i < newBarrel.getContainerSize(); ++i)
             newBarrel.setItem(i, oldDankContents.get(i));
         if (!player.getAbilities().instabuild)

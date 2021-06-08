@@ -12,9 +12,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import tfar.dankstorage.inventory.PortableDankInventory;
 import tfar.dankstorage.network.server.C2SMessageScrollSlot;
 import tfar.dankstorage.utils.Utils;
+import tfar.dankstorage.world.DankInventory;
 
 public class ClientMixinEvents {
 
@@ -31,11 +31,11 @@ public class ClientMixinEvents {
         return false;
     }
 
-    public static int pickItemFromDank(Player player) {
+    public static int pickItemFromDank(Player player) {/*
         InteractionHand hand = Utils.getHandWithDank(player);
         if (hand == null) return -1;
         ItemStack bag = player.getItemInHand(hand);
-        PortableDankInventory handler = Utils.getHandler(bag);
+        DankInventory handler = Utils.getHandler(bag);
         ItemStack pickblock = onPickBlock(player.pick(20.0D, 0, false), player, player.level);
         int slot = -1;
         if (!pickblock.isEmpty())
@@ -45,7 +45,8 @@ public class ClientMixinEvents {
                     break;
                 }
             }
-        return slot;
+        return slot;*/
+        return -1;
     }
 
     public static ItemStack onPickBlock(HitResult target, Player player, Level world) {

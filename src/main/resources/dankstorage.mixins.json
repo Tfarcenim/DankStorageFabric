@@ -3,13 +3,15 @@
   "package": "tfar.dankstorage.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "CraftingContainerAccess",
+    "CraftingMenuAccess",
     "HopperBlockEntityMixin",
     "ItemEntityMixin",
     "ItemStackMixin",
     "ItemUsageContextAccessor",
     "MixinBlock",
     "PlayerInventoryMixin",
-    "SimpleInventoryAccessor"
+    "SimpleContainerMixin"
   ],
   "client": [
     "AbstractContainerScreenMixin",

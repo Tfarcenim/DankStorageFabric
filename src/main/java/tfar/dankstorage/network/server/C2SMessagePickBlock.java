@@ -26,10 +26,10 @@ public class C2SMessagePickBlock implements ServerPlayNetworking.PlayChannelHand
     }
 
     public void handle(ServerPlayer player, int slot) {
-        if (player.getMainHandItem().getItem() instanceof DankItem)
+       /* if (player.getMainHandItem().getItem() instanceof DankItem)
             Utils.setSelectedSlot(player.getMainHandItem(), slot);
         else if (player.getOffhandItem().getItem() instanceof DankItem)
-            Utils.setSelectedSlot(player.getOffhandItem(), slot);
+            Utils.setSelectedSlot(player.getOffhandItem(), slot); */
     }
 
 
