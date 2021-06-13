@@ -1,20 +1,15 @@
 package tfar.dankstorage.container;
 
-import com.google.common.base.Suppliers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import tfar.dankstorage.world.DankInventory;
 import tfar.dankstorage.inventory.DankSlot;
-import tfar.dankstorage.network.ClientDankPacketHandler;
+import tfar.dankstorage.world.DankInventory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.function.Supplier;
 
 public abstract class AbstractDankMenu extends AbstractContainerMenu {
 
@@ -22,12 +17,16 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
     public final Inventory playerInventory;
     public DankInventory dankInventory;
 
+
     public AbstractDankMenu(MenuType<?> type, int p_i50105_2_, Inventory playerInventory, int rows, DankInventory dankInventory) {
         super(type, p_i50105_2_);
         this.rows = rows;
         this.playerInventory = playerInventory;
         this.dankInventory = dankInventory;
         addDataSlots(dankInventory);
+        if (!playerInventory.player.level.isClientSide) {
+            synchronizer = new CustomSync((ServerPlayer) playerInventory.player);
+        }
     }
 
     public static boolean canItemQuickReplace(@Nullable Slot slot, @Nonnull ItemStack stack, boolean stackSizeMatters) {
@@ -360,7 +359,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         } else if (clickTypeIn == ClickType.CLONE && player.getAbilities().instabuild && getCarried().isEmpty() && slotId >= 0) {
             Slot slot3 = this.slots.get(slotId);
 
-            if (slot3 != null && slot3.hasItem()) {
+            if (slot3.hasItem()) {
                 ItemStack itemstack5 = slot3.getItem().copy();
                 itemstack5.setCount(itemstack5.getMaxStackSize());
                 setCarried(itemstack5);
@@ -368,7 +367,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         } else if (clickTypeIn == ClickType.THROW && getCarried().isEmpty() && slotId >= 0) {
             Slot slot2 = this.slots.get(slotId);
 
-            if (slot2 != null && slot2.hasItem() && slot2.mayPickup(player)) {
+            if (slot2.hasItem() && slot2.mayPickup(player)) {
                 ItemStack itemstack4 = slot2.remove(dragType == 0 ? 1 : slot2.getItem().getCount());
                 slot2.onTake(player, itemstack4);
                 player.drop(itemstack4, true);
@@ -377,7 +376,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
             Slot slot = this.slots.get(slotId);
             ItemStack mouseStack = getCarried();
 
-            if (!mouseStack.isEmpty() && (slot == null || !slot.hasItem() || !slot.mayPickup(player))) {
+            if (!mouseStack.isEmpty() && (!slot.hasItem() || !slot.mayPickup(player))) {
                 int i = dragType == 0 ? 0 : this.slots.size() - 1;
                 int j = dragType == 0 ? 1 : -1;
 
@@ -485,134 +484,16 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                     break;
                 }
 
-                i += (reverseDirection) ? -1 : 1;
+                i += reverseDirection ? -1 : 1;
             }
         }
 
         return flag;
     }
 
-    //don't touch this
-   /* @Override
-    public void broadcastChanges() {
-        for (int i = 0; i < this.slots.size(); ++i) {
-            ItemStack itemstack = this.slots.get(i).getItem();
-            ItemStack itemstack1 = this.lastSlots.get(i);
-
-            if (!ItemStack.matches(itemstack1, itemstack)) {
-                itemstack1 = itemstack.isEmpty() ? ItemStack.EMPTY : itemstack.copy();
-                this.lastSlots.set(i, itemstack1);
-
-                for (ContainerListener listener : this.containerListeners) {
-                    if (listener instanceof ServerPlayer) {
-                        ServerPlayer player = (ServerPlayer) listener;
-
-                        this.syncSlot(player, i, itemstack1);
-                    }
-                }
-            }
-        }
-
-        for (int j = 0; j < this.dataSlots.size(); ++j) {
-            DataSlot property = this.dataSlots.get(j);
-            if (property.checkAndClearUpdateFlag()) {
-
-                for (ContainerListener containerListener : this.containerListeners) {
-                    containerListener.dataChanged(this, j, property.get());
-                }
-            }
-        }
-    }*/
-
-    public void broadcastChanges() {
-        int j;
-        for(j = 0; j < this.slots.size(); ++j) {
-            ItemStack itemStack = this.slots.get(j).getItem();
-            Objects.requireNonNull(itemStack);
-            Supplier<ItemStack> supplier = Suppliers.memoize(itemStack::copy);
-            this.triggerSlotListeners(j, itemStack, supplier);
-            this.synchronizeSlotToRemote(j, itemStack, supplier);
-        }
-
-        this.synchronizeCarriedToRemote();
-
-        for(j = 0; j < this.dataSlots.size(); ++j) {
-            DataSlot dataSlot = this.dataSlots.get(j);
-            int k = dataSlot.get();
-            if (dataSlot.checkAndClearUpdateFlag()) {
-
-                for (ContainerListener containerListener : this.containerListeners) {
-                    containerListener.dataChanged(this, j, k);
-                }
-            }
-
-            this.synchronizeDataSlotToRemote(j, k);
-        }
-
-    }
-
-
-    private void triggerSlotListeners(int i, ItemStack itemStack, Supplier<ItemStack> supplier) {
-        ItemStack itemStack2 = this.lastSlots.get(i);
-        if (!ItemStack.matches(itemStack2, itemStack)) {
-            ItemStack itemStack3 = supplier.get();
-            this.lastSlots.set(i, itemStack3);
-
-            for (ContainerListener containerListener : this.containerListeners) {
-                containerListener.slotChanged(this, i, itemStack3);
-            }
-        }
-
-    }
-
-    private void synchronizeSlotToRemote(int i, ItemStack itemStack, Supplier<ItemStack> supplier) {
-        if (!this.suppressRemoteUpdates) {
-            ItemStack itemStack2 = this.remoteSlots.get(i);
-            if (!ItemStack.matches(itemStack2, itemStack)) {
-                ItemStack itemStack3 = supplier.get();
-                this.remoteSlots.set(i, itemStack3);
-                if (this.synchronizer != null) {
-                    this.synchronizer.sendSlotChange(this, i, itemStack3);
-                }
-            }
-
-        }
-    }
-
-    private void synchronizeDataSlotToRemote(int i, int j) {
-        if (!this.suppressRemoteUpdates) {
-            int k = this.remoteDataSlots.getInt(i);
-            if (k != j) {
-                this.remoteDataSlots.set(i, j);
-                if (this.synchronizer != null) {
-                    this.synchronizer.sendDataChange(this, i, j);
-                }
-            }
-
-        }
-    }
-
-    private void synchronizeCarriedToRemote() {
-        if (!this.suppressRemoteUpdates) {
-            if (!ItemStack.matches(this.getCarried(), this.remoteCarried)) {
-                this.remoteCarried = this.getCarried().copy();
-                if (this.synchronizer != null) {
-                    this.synchronizer.sendCarriedChange(this, this.remoteCarried);
-                }
-            }
-
-        }
-    }
-
-    public void syncInventory(ServerPlayer player) {
-        for (int i = 0; i < this.slots.size(); i++) {
-            ItemStack stack = (this.slots.get(i)).getItem();
-            ClientDankPacketHandler.send(player, this.containerId, i, stack);
-        }
-        //player.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, player.getCarried()));
-    }
-
-    public void syncSlot(ServerPlayer player, int slot, ItemStack stack) {
-        ClientDankPacketHandler.send(player, this.containerId, slot, stack);
+    @Override
+    public void setSynchronizer(ContainerSynchronizer containerSynchronizer) {
+        //super.setSynchronizer(containerSynchronizer);no
+        this.sendAllDataToRemote();
     }
 }

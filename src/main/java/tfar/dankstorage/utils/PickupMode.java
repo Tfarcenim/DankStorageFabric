@@ -22,9 +22,4 @@ public enum PickupMode {
         return (color & 0xff) / 255f;
     }
 
-    public PickupMode cycle() {
-        if (ordinal() < PICKUP_MODES.length - 1)
-            return PICKUP_MODES[ordinal() + 1];
-        return normal;
-    }
 }

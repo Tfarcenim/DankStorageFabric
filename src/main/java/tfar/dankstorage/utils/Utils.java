@@ -182,15 +182,14 @@ public class Utils {
         } while (handler.getItem(selectedSlot).isEmpty() || handler.getItem(selectedSlot).is(BLACKLISTED_USAGE));
 
         if (selectedSlot != -1) {
-            ClientDankPacketHandler.sendSelected(player,getID(bag),handler.getItem(selectedSlot),getUseType(bag));
+            DankPacketHandler.sendSelected(player,getID(bag),handler.getItem(selectedSlot),getUseType(bag));
         }
     }
 
     public static int getID(ItemStack bag) {
         CompoundTag tag = bag.getTag();
         if (bag.hasTag()) {
-            int id = tag.getInt(Utils.ID);
-            return id;
+            return tag.getInt(Utils.ID);
         }
         return -1;
     }
