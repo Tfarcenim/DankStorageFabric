@@ -42,9 +42,12 @@ public class DankPacketHandler {
         ServerPlayNetworking.send(player, DankPacketHandler.sync_slot, buf);
     }
 
-    public static void sendSyncContainer(ServerPlayer player, int id, NonNullList<ItemStack> stacks) {
+    public static void sendSyncContainer(ServerPlayer player,int stateID, int containerID, NonNullList<ItemStack> stacks,ItemStack carried) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-        buf.writeInt(id);
+        buf.writeInt(stateID);
+        buf.writeInt(containerID);
+
+        buf.writeItem(carried);
 
         buf.writeShort(stacks.size());
 
@@ -55,7 +58,7 @@ public class DankPacketHandler {
         ServerPlayNetworking.send(player, DankPacketHandler.sync_container, buf);
     }
 
-    public static void sendSelected(ServerPlayer player, int id, ItemStack stack, C2SMessageToggleUseType.UseType useType) {
+    public static void sendSelectedItem(ServerPlayer player, int id, ItemStack stack, C2SMessageToggleUseType.UseType useType) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeInt(id);
         PacketBufferEX.writeExtendedItemStack(buf, stack);

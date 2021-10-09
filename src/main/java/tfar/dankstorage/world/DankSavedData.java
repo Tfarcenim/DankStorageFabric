@@ -51,7 +51,7 @@ public class DankSavedData extends SavedData {
 
 
     private static DankSavedData get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent((CompoundTag compoundTag) -> DankSavedData.load(level, compoundTag),
+        return level.getDataStorage().computeIfAbsent((CompoundTag compoundTag) -> DankSavedData.loadStatic(level, compoundTag),
                 () -> new DankSavedData(level), level.dimension().location().toString());
     }
 
@@ -69,7 +69,7 @@ public class DankSavedData extends SavedData {
         return compoundTag;
     }
 
-    public static DankSavedData load(ServerLevel serverLevel, CompoundTag compoundTag) {
+    public static DankSavedData loadStatic(ServerLevel serverLevel, CompoundTag compoundTag) {
         DankSavedData dankSavedData = new DankSavedData(serverLevel);
         dankSavedData.load(compoundTag);
         return dankSavedData;

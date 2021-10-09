@@ -1,7 +1,6 @@
 package tfar.dankstorage.utils;
 
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
@@ -23,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.container.AbstractDankMenu;
-import tfar.dankstorage.network.ClientDankPacketHandler;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.world.ClientData;
 import tfar.dankstorage.world.DankInventory;
@@ -103,7 +101,11 @@ public class Utils {
     }
 
     public static int getSelectedSlot(ItemStack bag) {
-        return bag.getOrCreateTag().getInt("selectedSlot");
+        return bag.getTag() != null ? bag.getTag().getInt("selectedSlot") : 0;
+    }
+
+    public static void setSelectedSlot(int slot,ItemStack bag) {
+        bag.getOrCreateTag().putInt("selectedSlot",slot);
     }
 
     public static void sort(Player player) {
@@ -132,6 +134,16 @@ public class Utils {
         }
     }
 
+    public static ItemStack getSelectedItem(ItemStack bag,Level level) {
+        int id = bag.getTag().getInt(ID);
+        int selected = getSelectedSlot(bag);
+        if (!level.isClientSide) {
+            DankInventory dankInventory = getInventory(bag, level);
+            return dankInventory.getItem(selected);
+        }
+        return ClientData.map.get(id).selectedItem;
+    }
+
     public static void merge(List<ItemStack> stacks, ItemStack toMerge, int limit) {
         for (ItemStack stack : stacks) {
             if (ItemHandlerHelper.canItemStacksStack(stack, toMerge)) {
@@ -152,14 +164,6 @@ public class Utils {
         return stacks.stream().map(ItemStackWrapper::new).collect(Collectors.toList());
     }
 
-    public static int getStackLimit(ItemStack bag) {
-        return getStats(bag).stacklimit;
-    }
-
-    public static int getSlotCount(ItemStack bag) {
-        return getStats(bag).slots;
-    }
-
     public static DankStats getStats(ItemStack bag) {
         return ((DankItem) bag.getItem()).stats;
     }
@@ -171,7 +175,16 @@ public class Utils {
         int selectedSlot = getSelectedSlot(bag);
         int size = handler.getContainerSize();
         //keep iterating until a valid slot is found (not empty and not blacklisted from usage)
-        do {
+        if (right) {
+            selectedSlot++;
+            if (selectedSlot >= size) selectedSlot = 0;
+        } else {
+            selectedSlot--;
+            if (selectedSlot < 0) selectedSlot = size - 1;
+        }
+        ItemStack selected = handler.getItem(selectedSlot);
+
+        while (selected.isEmpty() || selected.is(BLACKLISTED_USAGE)) {
             if (right) {
                 selectedSlot++;
                 if (selectedSlot >= size) selectedSlot = 0;
@@ -179,10 +192,11 @@ public class Utils {
                 selectedSlot--;
                 if (selectedSlot < 0) selectedSlot = size - 1;
             }
-        } while (handler.getItem(selectedSlot).isEmpty() || handler.getItem(selectedSlot).is(BLACKLISTED_USAGE));
-
+            selected = handler.getItem(selectedSlot);
+        }
         if (selectedSlot != -1) {
-            DankPacketHandler.sendSelected(player,getID(bag),handler.getItem(selectedSlot),getUseType(bag));
+            setSelectedSlot(selectedSlot,bag);
+            DankPacketHandler.sendSelectedItem(player,getID(bag),selected,getUseType(bag));
         }
     }
 
@@ -204,7 +218,7 @@ public class Utils {
             int id = tag.getInt(Utils.ID);
             return DankStorage.instance.data.getOrCreateInventory(id,getStats(bag));
         }
-        return new DankInventory(DankStats.zero,level);
+        throw new RuntimeException("Attempted to get inventory on client");
     }
 
     public static int getNbtSize(ItemStack stack) {

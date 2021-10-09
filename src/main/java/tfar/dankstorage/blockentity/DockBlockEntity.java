@@ -42,7 +42,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         super(DankStorage.dank_tile,blockPos, blockState);
     }
 
-    private static final DankInventory DUMMY = new DankInventory(DankStats.zero,null);
+    public static final DankInventory DUMMY = new DankInventory(DankStats.zero,null);
 
     public DankInventory getInventory() {
         return id != -1 ? DankStorage.instance.data.getInventory(id) : DUMMY;
@@ -213,10 +213,12 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
 
             CompoundTag tag = tank.getTag();
 
-            if (tag != null) {
+            if (tag != null && tag.contains(Utils.ID)) {
                 this.id = tank.getTag().getInt(Utils.ID);
             } else {
-                DankSavedData.getDefault((ServerLevel) level).getOrCreateInventory(DankSavedData.getDefault((ServerLevel) level).getNextID(),stats);
+                int newId = DankSavedData.getDefault((ServerLevel) level).getNextID();
+                this.id = newId;
+                DankSavedData.getDefault((ServerLevel) level).getOrCreateInventory(newId,stats);
             }
             setChanged();
         }

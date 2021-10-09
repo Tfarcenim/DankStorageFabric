@@ -18,6 +18,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import tfar.dankstorage.utils.DankStats;
+import tfar.dankstorage.world.DankInventory;
 
 public class UpgradeItem extends Item {
 
@@ -52,18 +53,18 @@ public class UpgradeItem extends Item {
         assert oldDank != null;
         final NonNullList<ItemStack> oldDankContents = oldDank.getInventory().getContents();
 
-        oldDank.setRemoved();
-
         int newTier = upgradeInfo.end;
 
         BlockState newState = state.setValue(DockBlock.TIER, newTier);
 
         world.setBlock(pos, newState, 3);
+
         DockBlockEntity newBarrel = (DockBlockEntity) world.getBlockEntity(pos);
-        assert newBarrel != null;
-        newBarrel.getInventory().setDankStats(DankStats.values()[newTier]);
+        DankInventory dankInventory = newBarrel.getInventory();
+
+        dankInventory.setDankStats(DankStats.values()[newTier]);
         for (int i = 0; i < oldDankContents.size() && i < newBarrel.getContainerSize(); ++i)
-            newBarrel.setItem(i, oldDankContents.get(i));
+            dankInventory.setItem(i, oldDankContents.get(i));
         if (!player.getAbilities().instabuild)
             upgradeStack.shrink(1);
         player.displayClientMessage(new TranslatableComponent("dankstorage.upgrade_successful")

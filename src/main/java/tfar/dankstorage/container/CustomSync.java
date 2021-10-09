@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.item.ItemStack;
-import tfar.dankstorage.network.ClientDankPacketHandler;
 import tfar.dankstorage.network.DankPacketHandler;
 
 public class CustomSync implements ContainerSynchronizer {
@@ -20,8 +19,7 @@ public class CustomSync implements ContainerSynchronizer {
 
     public void sendInitialData(AbstractContainerMenu abstractContainerMenu, NonNullList<ItemStack> nonNullList, ItemStack carried, int[] is) {
         //problem, vanilla containers send itemstack size in bytes
-        DankPacketHandler.sendSyncContainer(player,abstractContainerMenu.containerId,nonNullList);
-        this.broadcastCarriedItem(carried);
+        DankPacketHandler.sendSyncContainer(player,abstractContainerMenu.incrementStateId(),abstractContainerMenu.containerId,nonNullList,carried);
         for(int i = 0; i < is.length; ++i) {
             this.broadcastDataValue(abstractContainerMenu, i, is[i]);
         }
@@ -49,6 +47,6 @@ public class CustomSync implements ContainerSynchronizer {
     }
 
     private void broadcastCarriedItem(ItemStack itemStack) {
-        player.connection.send(new ClientboundContainerSetSlotPacket(-1, -1, itemStack));
+        player.connection.send(new ClientboundContainerSetSlotPacket(-1, player.containerMenu.incrementStateId(), -1, itemStack));
     }
 }

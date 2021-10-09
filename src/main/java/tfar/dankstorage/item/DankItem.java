@@ -296,22 +296,26 @@ public class DankItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext ctx) {
         ItemStack bag = ctx.getItemInHand();
+        Level level = ctx.getLevel();
         C2SMessageToggleUseType.UseType useType = Utils.getUseType(bag);
 
         if (useType == C2SMessageToggleUseType.UseType.bag) {
             return InteractionResult.PASS;
         }
 
-        DankInventory handler = Utils.getInventory(bag,ctx.getLevel());
         int selectedSlot = Utils.getSelectedSlot(bag);
 
-        ItemStack toPlace = handler.getItem(selectedSlot).copy();
-        if (toPlace.getCount() == 1 && handler.isLocked(selectedSlot))
+        ItemStack toPlace = Utils.getSelectedItem(bag,level);
+        //todo: sync locked slots to client?
+        if (/*toPlace.getCount() == 1 && handler.isLocked(selectedSlot)*/ false)
             return InteractionResult.PASS;
 
         UseOnContext ctx2 = new ItemUseContextExt(ctx.getLevel(), ctx.getPlayer(), ctx.getHand(), toPlace, ((ItemUsageContextAccessor) ctx).getHitResult());
         InteractionResult actionResultType = toPlace.getItem().useOn(ctx2);//ctx2.getItem().onItemUse(ctx);
-        handler.setItem(selectedSlot, ctx2.getItemInHand());
+        if (!level.isClientSide) {
+            DankInventory dankInventory = Utils.getInventory(bag,level);
+            dankInventory.setItem(selectedSlot, ctx2.getItemInHand());
+        }
         return actionResultType;
     }
 

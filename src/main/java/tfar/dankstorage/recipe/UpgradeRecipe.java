@@ -37,9 +37,14 @@ public class UpgradeRecipe extends ShapedRecipe {
             newBag.getOrCreateTag().putInt(Utils.ID,id);
         }
         if (menu instanceof CraftingMenu) {
-            ServerLevel level = (ServerLevel) ((CraftingMenuAccess)menu).getPlayer().level;
-            DankInventory inventory = DankSavedData.getDefault(level).getInventory(id);
-            inventory.setDankStats(Utils.getStats(newBag));
+            if (!((CraftingMenuAccess) menu).getPlayer().level.isClientSide) {
+                ServerLevel level = (ServerLevel) ((CraftingMenuAccess) menu).getPlayer().level;
+                DankInventory inventory = DankSavedData.getDefault(level).getInventory(id);
+                inventory.setDankStats(Utils.getStats(newBag));
+            } else {
+                System.out.println("Why is someone trying to craft items clientside, now they won't have the correct data.");
+                new RuntimeException().printStackTrace();
+            }
         }
 
         return newBag;

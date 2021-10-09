@@ -1,6 +1,7 @@
 package tfar.dankstorage.client.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -62,6 +63,7 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     //        C2SMessageTagMode.send();
     //    }, false));
         this.addRenderableWidget(new TripleToggleButton(leftPos + (start += 30), topPos + 6, 8, 8, b -> {
+            Utils.cycleMode(menu.bag, Minecraft.getInstance().player);
             C2SMessageTogglePickup.send();
         },this));
     }
