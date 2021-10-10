@@ -45,15 +45,26 @@ public class Utils {
     public static final Set<ResourceLocation> taglist = new HashSet<>();
     public static boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
 
+    public static CompoundTag getSettings(ItemStack bag) {
+        return bag.hasTag() ? bag.getTag().getCompound("settings") : null;
+    }
+
+    public static CompoundTag getOrCreateSettings(ItemStack bag) {
+        if (bag.hasTag()) {
+            return bag.getTag().getCompound("settings");
+        } else {
+            bag.getOrCreateTag().put("settings", new CompoundTag());
+            return getSettings(bag);
+        }
+    }
 
     public static PickupMode getPickupMode(ItemStack bag) {
-        return PickupMode.PICKUP_MODES[bag.getOrCreateTag().getInt("mode")];
+        return PickupMode.PICKUP_MODES[getOrCreateSettings(bag).getInt("mode")];
     }
 
     public static boolean isConstruction(ItemStack bag) {
         return bag.getItem() instanceof DankItem && bag.hasTag()
-                && bag.getTag().contains("construction")
-                && bag.getTag().getInt("construction") == C2SMessageToggleUseType.UseType.construction.ordinal();
+                && getSettings(bag).getInt("construction") == C2SMessageToggleUseType.UseType.construction.ordinal();
     }
 
     public static DankStats getStatsfromRows(int rows) {
@@ -92,20 +103,20 @@ public class Utils {
 
     //0,1,2
     public static void cyclePlacement(ItemStack bag, Player player) {
-        int ordinal = bag.getOrCreateTag().getInt("construction");
+        int ordinal = getOrCreateSettings(bag).getInt("construction");
         ordinal++;
         if (ordinal >= useTypes.length) ordinal = 0;
-        bag.getOrCreateTag().putInt("construction", ordinal);
+        getOrCreateSettings(bag).putInt("construction", ordinal);
         player.displayClientMessage(
                 new TranslatableComponent("dankstorage.usetype." + useTypes[ordinal].name()), true);
     }
 
     public static int getSelectedSlot(ItemStack bag) {
-        return bag.getTag() != null ? bag.getTag().getInt("selectedSlot") : 0;
+        return bag.getTag() != null ? getOrCreateSettings(bag).getInt("selectedSlot") : 0;
     }
 
     public static void setSelectedSlot(int slot,ItemStack bag) {
-        bag.getOrCreateTag().putInt("selectedSlot",slot);
+        getOrCreateSettings(bag).putInt("selectedSlot",slot);
     }
 
     public static void sort(Player player) {
@@ -201,21 +212,19 @@ public class Utils {
     }
 
     public static int getID(ItemStack bag) {
-        CompoundTag tag = bag.getTag();
         if (bag.hasTag()) {
-            return tag.getInt(Utils.ID);
+            return getSettings(bag).getInt(Utils.ID);
         }
         return -1;
     }
 
     public static boolean oredict(ItemStack bag) {
-        return bag.getItem() instanceof DankItem && bag.hasTag() && bag.getTag().getBoolean("tag");
+        return bag.getItem() instanceof DankItem && bag.hasTag() && getSettings(bag).getBoolean("tag");
     }
 
     public static DankInventory getInventory(ItemStack bag, Level level) {
         if (!level.isClientSide) {
-            CompoundTag tag = bag.getTag();
-            int id = tag.getInt(Utils.ID);
+            int id = getID(bag);
             return DankStorage.instance.data.getOrCreateInventory(id,getStats(bag));
         }
         throw new RuntimeException("Attempted to get inventory on client");

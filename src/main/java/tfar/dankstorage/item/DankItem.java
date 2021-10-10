@@ -179,7 +179,7 @@ public class DankItem extends Item {
     @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack bag, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (bag.hasTag()) {
-            int id = bag.getTag().getInt(Utils.ID);
+            int id = Utils.getID(bag);
             tooltip.add(new TextComponent("ID: "+id));
             if (Utils.DEV) {
                 String s = bag.getTag().toString();
@@ -331,15 +331,15 @@ public class DankItem extends Item {
     }
 
     public static void assignId(ItemStack dank,ServerLevel level) {
-        CompoundTag tag = dank.getTag();
-        if (tag != null && tag.contains(Utils.ID, Tag.TAG_INT)) {
+        CompoundTag settings = Utils.getSettings(dank);
+        if (settings != null && settings.contains(Utils.ID, Tag.TAG_INT)) {
 
         } else {
             DankSavedData dankSavedData = DankSavedData.getDefault(level);
             DankStats stats = Utils.getStats(dank);
             int next = dankSavedData.getNextID();
             dankSavedData.getOrCreateInventory(next,stats);
-            dank.getOrCreateTag().putInt(Utils.ID,next);
+            Utils.getOrCreateSettings(dank).putInt(Utils.ID,next);
         }
     }
 }

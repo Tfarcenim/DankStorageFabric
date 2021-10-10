@@ -1,5 +1,6 @@
 package tfar.dankstorage.recipe;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,11 +33,11 @@ public class UpgradeRecipe extends ShapedRecipe {
 
         AbstractContainerMenu menu = ((CraftingContainerAccess)inv).getMenu();
 
-        int id = oldBag.getTag().contains(Utils.ID, Tag.TAG_INT) ? oldBag.getTag().getInt(Utils.ID) : -1;
-        if (id != -1) {
-            newBag.getOrCreateTag().putInt(Utils.ID,id);
-        }
-        if (menu instanceof CraftingMenu) {
+
+        CompoundTag settings = oldBag.getTag().getCompound("settings");
+
+        int id = settings.contains(Utils.ID, Tag.TAG_INT) ? settings.getInt(Utils.ID) : -1;
+        if (menu instanceof CraftingMenu && id > -1) {
             if (!((CraftingMenuAccess) menu).getPlayer().level.isClientSide) {
                 ServerLevel level = (ServerLevel) ((CraftingMenuAccess) menu).getPlayer().level;
                 DankInventory inventory = DankSavedData.getDefault(level).getInventory(id);

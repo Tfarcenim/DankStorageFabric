@@ -34,8 +34,8 @@
                   "source": "block_entity",
                   "ops": [
                     {
-                      "source": "inv",
-                      "target": "inv",
+                      "source": "settings",
+                      "target": "settings",
                       "op": "replace"
                     }
                   ]
@@ -64,8 +64,8 @@
                   "source": "block_entity",
                   "ops": [
                     {
-                      "source": "inv",
-                      "target": "inv",
+                      "source": "settings",
+                      "target": "settings",
                       "op": "replace"
                     }
                   ]
@@ -94,8 +94,8 @@
                   "source": "block_entity",
                   "ops": [
                     {
-                      "source": "inv",
-                      "target": "inv",
+                      "source": "settings",
+                      "target": "settings",
                       "op": "replace"
                     }
                   ]
@@ -124,8 +124,8 @@
                   "source": "block_entity",
                   "ops": [
                     {
-                      "source": "inv",
-                      "target": "inv",
+                      "source": "settings",
+                      "target": "settings",
                       "op": "replace"
                     }
                   ]
@@ -154,8 +154,8 @@
                   "source": "block_entity",
                   "ops": [
                     {
-                      "source": "inv",
-                      "target": "inv",
+                      "source": "settings",
+                      "target": "settings",
                       "op": "replace"
                     }
                   ]
@@ -184,8 +184,8 @@
                   "source": "block_entity",
                   "ops": [
                     {
-                      "source": "inv",
-                      "target": "inv",
+                      "source": "settings",
+                      "target": "settings",
                       "op": "replace"
                     }
                   ]
@@ -214,8 +214,8 @@
                   "source": "block_entity",
                   "ops": [
                     {
-                      "source": "inv",
-                      "target": "inv",
+                      "source": "settings",
+                      "target": "settings",
                       "op": "replace"
                     }
                   ]
@@ -244,8 +244,8 @@
                   "source": "block_entity",
                   "ops": [
                     {
-                      "source": "inv",
-                      "target": "inv",
+                      "source": "settings",
+                      "target": "settings",
                       "op": "replace"
                     }
                   ]
