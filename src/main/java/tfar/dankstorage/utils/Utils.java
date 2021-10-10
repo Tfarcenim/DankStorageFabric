@@ -88,11 +88,11 @@ public class Utils {
     }
 
     //0,1,2,3
-    public static void cycleMode(ItemStack bag, Player player) {
-        int ordinal = bag.getOrCreateTag().getInt("mode");
+    public static void cyclePickupMode(ItemStack bag, Player player) {
+        int ordinal = getOrCreateSettings(bag).getInt("mode");
         ordinal++;
         if (ordinal > PickupMode.PICKUP_MODES.length - 1) ordinal = 0;
-        bag.getOrCreateTag().putInt("mode", ordinal);
+        getOrCreateSettings(bag).putInt("mode", ordinal);
         player.displayClientMessage(
                 new TranslatableComponent("dankstorage.mode." + PickupMode.PICKUP_MODES[ordinal].name()), true);
     }
@@ -147,13 +147,16 @@ public class Utils {
     }
 
     public static ItemStack getSelectedItem(ItemStack bag,Level level) {
-        int id = bag.getTag().getInt(ID);
-        int selected = getSelectedSlot(bag);
-        if (!level.isClientSide) {
-            DankInventory dankInventory = getInventory(bag, level);
-            return dankInventory.getItem(selected);
+        if (bag.hasTag()) {
+            int selected = getSelectedSlot(bag);
+            if (!level.isClientSide) {
+                DankInventory dankInventory = getInventory(bag, level);
+                return dankInventory.getItem(selected);
+            }
+            return ClientData.selectedItem;
+        } else {
+            return ItemStack.EMPTY;
         }
-        return ClientData.selectedItem;
     }
 
     public static void merge(List<ItemStack> stacks, ItemStack toMerge, int limit) {

@@ -5,12 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import tfar.dankstorage.client.button.RedGreenToggleButton;
 import tfar.dankstorage.client.button.TripleToggleButton;
 import tfar.dankstorage.container.DankMenu;
-import tfar.dankstorage.network.server.C2SMessageTagMode;
 import tfar.dankstorage.network.server.C2SMessageTogglePickup;
-import tfar.dankstorage.utils.PickupMode;
 import tfar.dankstorage.utils.Utils;
 
 import static tfar.dankstorage.client.screens.DockScreen.*;
@@ -63,7 +60,7 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     //        C2SMessageTagMode.send();
     //    }, false));
         this.addRenderableWidget(new TripleToggleButton(leftPos + (start += 30), topPos + 6, 8, 8, b -> {
-            Utils.cycleMode(menu.bag, Minecraft.getInstance().player);
+            Utils.cyclePickupMode(menu.bag, Minecraft.getInstance().player);
             C2SMessageTogglePickup.send();
         },this));
     }
