@@ -11,10 +11,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,6 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.container.PortableDankProvider;
+import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.world.DankInventory;
 import tfar.dankstorage.mixin.ItemUsageContextAccessor;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
@@ -317,6 +320,13 @@ public class DankItem extends Item {
             dankInventory.setItem(selectedSlot, ctx2.getItemInHand());
         }
         return actionResultType;
+    }
+
+    @Override
+    public void inventoryTick(ItemStack bag, Level level, Entity entity, int i, boolean bl) {
+        //there has to be a better way
+        if (entity instanceof ServerPlayer player)
+        DankPacketHandler.sendSelectedItem(player,Utils.getID(bag),Utils.getSelectedItem(bag,level),Utils.getUseType(bag));
     }
 
     @Override

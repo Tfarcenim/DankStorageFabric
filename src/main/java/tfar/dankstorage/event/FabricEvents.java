@@ -29,23 +29,19 @@ public class FabricEvents {
         int xStart = mc.getWindow().getGuiScaledWidth() / 2;
         int yStart = mc.getWindow().getGuiScaledHeight();
 
-        int id = Utils.getID(bag);
-        ClientData clientData = ClientData.map.get(id);
-        if (clientData != null) {
-            ItemStack toPlace = clientData.selectedItem;
+        ItemStack toPlace = ClientData.selectedItem;
 
-            if (!toPlace.isEmpty()) {
+        if (!toPlace.isEmpty()) {
 
 
-                Integer color = toPlace.getItem().getRarity(toPlace).color.getColor();
+            Integer color = toPlace.getItem().getRarity(toPlace).color.getColor();
 
-                int c = color != null ? color : 0xFFFFFF;
+            int c = color != null ? color : 0xFFFFFF;
 
 
-                final int itemX = xStart - 150;
-                final int itemY = yStart - 25;
-                renderHotbarItem(matrixStack,itemX, itemY, 0, player, toPlace);
-            }
+            final int itemX = xStart - 150;
+            final int itemY = yStart - 25;
+            renderHotbarItem(matrixStack,itemX, itemY, 0, player, toPlace);
         }
         final int stringX = xStart - 155;
         final int stringY = yStart - 10;

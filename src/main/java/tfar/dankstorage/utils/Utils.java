@@ -98,7 +98,8 @@ public class Utils {
     }
 
     public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag) {
-        return useTypes[bag.getOrCreateTag().getInt("construction")];
+        CompoundTag settings = getSettings(bag);
+        return settings != null ? useTypes[settings.getInt("construction")] : C2SMessageToggleUseType.UseType.bag;
     }
 
     //0,1,2
@@ -152,7 +153,7 @@ public class Utils {
             DankInventory dankInventory = getInventory(bag, level);
             return dankInventory.getItem(selected);
         }
-        return ClientData.map.get(id).selectedItem;
+        return ClientData.selectedItem;
     }
 
     public static void merge(List<ItemStack> stacks, ItemStack toMerge, int limit) {

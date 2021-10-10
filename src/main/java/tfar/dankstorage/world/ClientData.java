@@ -8,17 +8,11 @@ import java.util.Map;
 
 public class ClientData {
 
-    public static Map<Integer,ClientData> map = new HashMap<>();
+    public static ItemStack selectedItem = ItemStack.EMPTY;
+    public static C2SMessageToggleUseType.UseType useType;
 
-    public ItemStack selectedItem = ItemStack.EMPTY;
-    public C2SMessageToggleUseType.UseType useType;
-
-    public ClientData(ItemStack selectedItem, C2SMessageToggleUseType.UseType useType) {
-        this.selectedItem = selectedItem;
-        this.useType = useType;
-    }
-
-    public static void addData(int id, ItemStack selected, C2SMessageToggleUseType.UseType useType) {
-        map.put(id,new ClientData(selected,useType));
+    public static void setData(int id, ItemStack selected, C2SMessageToggleUseType.UseType useType) {
+        selectedItem = selected;
+        ClientData.useType = useType;
     }
 }

@@ -16,7 +16,7 @@ public class S2CSyncSelected implements ClientPlayNetworking.PlayChannelHandler 
 
     public void handle(@Nullable LocalPlayer player, int id, ItemStack stack, C2SMessageToggleUseType.UseType useType) {
         if (player != null) {
-            ClientData.addData(id,stack,useType);
+            ClientData.setData(id,stack,useType);
         }
     }
 
