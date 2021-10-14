@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.anti_ad.mc.ipn.api.IPNIgnore;
 import tfar.dankstorage.client.button.SmallButton;
 import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.inventory.DankSlot;
@@ -20,6 +21,7 @@ import tfar.dankstorage.utils.Utils;
 
 import java.util.List;
 
+@IPNIgnore
 public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> extends AbstractContainerScreen<T> {
 
     protected final boolean is7;
