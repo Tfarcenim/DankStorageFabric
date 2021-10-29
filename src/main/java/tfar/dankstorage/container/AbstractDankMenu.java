@@ -184,9 +184,24 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                     return;
                 }
 
-                for (ItemStack itemstack7 = this.quickMoveStack(player, slotId); !itemstack7.isEmpty() && ItemStack.isSame(slot5.getItem(), itemstack7); itemstack7 = this.quickMoveStack(player, slotId)) {
-                    itemstack = itemstack7.copy();
+                switch (dragType) {
+                    case 0: {
+                        // Left Click, move as much as possible
+
+                        for (ItemStack itemstack7 = this.quickMoveStack(player, slotId); !itemstack7.isEmpty() && ItemStack.isSame(slot5.getItem(), itemstack7); itemstack7 = this.quickMoveStack(player, slotId)) {
+                            itemstack = itemstack7.copy();
+                        }
+                        break;
+                    }
+                    case 1: {
+                        // Right Click, move single stack
+
+                        itemstack = this.quickMoveStack(player, slotId).copy();
+                        break;
+                    }
                 }
+
+
             } else {
                 if (slotId < 0) {
                     return;
