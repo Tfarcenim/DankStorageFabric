@@ -323,9 +323,9 @@ public class DankItem extends Item {
     }
 
     @Override
-    public void inventoryTick(ItemStack bag, Level level, Entity entity, int i, boolean bl) {
+    public void inventoryTick(ItemStack bag, Level level, Entity entity, int i, boolean equipped) {
         //there has to be a better way
-        if (entity instanceof ServerPlayer player)
+        if (entity instanceof ServerPlayer player && equipped)
         DankPacketHandler.sendSelectedItem(player,Utils.getID(bag),Utils.getSelectedItem(bag,level),Utils.getUseType(bag));
     }
 
