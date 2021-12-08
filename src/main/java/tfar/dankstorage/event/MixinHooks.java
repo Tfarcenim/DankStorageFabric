@@ -24,7 +24,7 @@ public class MixinHooks {
      */
     public static boolean interceptItem(Inventory inv, ItemStack incoming) {
         Player player = inv.player;
-        if (player.containerMenu instanceof DankMenu) {
+        if (player.level.isClientSide || player.containerMenu instanceof DankMenu) {
             return false;
         }
         for (int i = 0; i < inv.getContainerSize(); i++) {
