@@ -160,15 +160,22 @@ public class DankItem extends Item {
         return new InteractionResultHolder<>(InteractionResult.PASS, player.getItemInHand(hand));
     }
 
+    //this is called on the client
     @Override
     public InteractionResult interactLivingEntity(ItemStack bag, Player player, LivingEntity entity, InteractionHand hand) {
-        if (!Utils.isConstruction(bag)) return InteractionResult.FAIL;
-        DankInventory handler = Utils.getInventory(bag,player.level);
-        ItemStack toPlace = handler.getItem(Utils.getSelectedSlot(bag));
+        if (!Utils.isConstruction(bag)) return InteractionResult.PASS;
+
+        ItemStack toUse = Utils.getSelectedItem(bag,player.level);
         EquipmentSlot hand1 = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-        player.setItemSlot(hand1, toPlace);
-        InteractionResult result = toPlace.getItem().interactLivingEntity(toPlace, player, entity, hand);
-        handler.setItem(Utils.getSelectedSlot(bag), toPlace);
+        player.setItemSlot(hand1, toUse);
+        InteractionResult result = toUse.getItem().interactLivingEntity(toUse, player, entity, hand);
+
+        //the client doesn't have access to the full inventory
+        if (!player.level.isClientSide) {
+            DankInventory handler = Utils.getInventory(bag, player.level);
+            handler.setItem(Utils.getSelectedSlot(bag), toUse);
+        }
+
         player.setItemSlot(hand1, bag);
         return result;
     }
