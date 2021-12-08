@@ -47,7 +47,7 @@ public class UpgradeRecipe extends ShapedRecipe {
                 new RuntimeException().printStackTrace();
             }
         }
-
+        newBag.setTag(oldBag.getTag());
         return newBag;
     }
 
