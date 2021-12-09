@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "dankstorage",
   "version": "${version}",
-  "accessWidener": "dankstorage.accesswidener",
+  "accessWidener": "dankstorage.aw",
   "name": "Dank Storage",
   "description": "It's a backpack, no it's a chest, no it's dank storage",
   "authors": [

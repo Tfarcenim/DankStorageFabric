@@ -74,10 +74,9 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         }
     }
 
-    @Nonnull
     @Override
-    public CompoundTag save(CompoundTag tag) {
-        super.save(tag);
+    public void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         if (settings != null) {
             tag.put("settings", settings);
         }
@@ -85,19 +84,18 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         if (this.hasCustomName()) {
             tag.putString("CustomName", Component.Serializer.toJson(this.customName));
         }
-        return tag;
     }
 
     @Nonnull
     @Override
     public CompoundTag getUpdateTag() {
-        return save(new CompoundTag());
+        return super.getUpdateTag();//save(new CompoundTag());
     }
 
     @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return new ClientboundBlockEntityDataPacket(getBlockPos(), 1, getUpdateTag());
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     //Inventory nonsense
