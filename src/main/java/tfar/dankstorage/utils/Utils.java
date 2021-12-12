@@ -151,7 +151,9 @@ public class Utils {
             int selected = getSelectedSlot(bag);
             if (!level.isClientSide) {
                 DankInventory dankInventory = getInventory(bag, level);
-                return dankInventory.getItem(selected);
+                if (dankInventory != null) {
+                    return dankInventory.getItem(selected);
+                }
             }
             return ClientData.selectedItem;
         } else {
