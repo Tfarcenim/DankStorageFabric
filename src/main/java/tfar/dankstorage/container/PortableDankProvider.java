@@ -32,7 +32,7 @@ public class PortableDankProvider implements MenuProvider {
         InteractionHand hand = Utils.getHandWithDank(player);
         if (hand == null) return null;
         ItemStack bag = player.getItemInHand(hand);
-        DankInventory dankInventory = Utils.getInventory(bag,player.level);
+        DankInventory dankInventory = Utils.getOrCreateInventory(bag,player.level);
         DankStats type = Utils.getStats(bag);
 
         return switch (type) {

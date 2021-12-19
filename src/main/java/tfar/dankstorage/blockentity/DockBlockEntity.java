@@ -31,8 +31,6 @@ import javax.annotation.Nullable;
 
 public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvider, Container {
 
-    private int id = -1;
-
     private CompoundTag settings;
 
     public int numPlayersUsing = 0;
@@ -46,7 +44,8 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     public static final DankInventory DUMMY = new DankInventory(DankStats.zero,null);
 
     public DankInventory getInventory() {
-        return id != -1 ? DankStorage.instance.data.getInventory(id) : DUMMY;
+        return settings != null && settings.contains(Utils.ID)
+                ? DankStorage.instance.data.getInventory(settings.getInt(Utils.ID)) : DUMMY;
     }
 
     public int getComparatorSignal() {
@@ -67,8 +66,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     @Override
     public void load(CompoundTag compound) {
         super.load(compound);
-        this.settings = compound.getCompound("settings");
-        this.id = compound.getInt(Utils.ID);
+        this.settings = compound.getCompound(Utils.SET);
         if (compound.contains("CustomName", 8)) {
             this.setCustomName(Component.Serializer.fromJson(compound.getString("CustomName")));
         }
@@ -78,9 +76,8 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     public void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         if (settings != null) {
-            tag.put("settings", settings);
+            tag.put(Utils.SET, settings);
         }
-        tag.putInt(Utils.ID,id);
         if (this.hasCustomName()) {
             tag.putString("CustomName", Component.Serializer.toJson(this.customName));
         }
@@ -195,12 +192,17 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
 
         level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, 0));
         ItemStack stack = new ItemStack(Utils.getItemFromTier(tier));
-        CompoundTag settings = Utils.getOrCreateSettings(stack);
-        settings.putInt(Utils.ID,id);
-        this.id = -1;
+
+        if (settings != null) {
+            stack.getOrCreateTag().put(Utils.SET,settings);
+        }
+
+        settings = null;
+
         if (hasCustomName() && originalName) {
             stack.setHoverName(getCustomName());
         }
+
         setCustomName(null);
         originalName = false;
         setChanged();
@@ -213,17 +215,16 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
             level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, stats.ordinal()));
             setCustomName(tank.getHoverName());
             originalName = tank.hasCustomHoverName();
-            CompoundTag settings = Utils.getOrCreateSettings(tank);
+            CompoundTag iSettings = Utils.getSettings(tank);
             tank.shrink(1);
 
-
-            if (settings != null && settings.contains(Utils.ID)) {
-                this.id = settings.getInt(Utils.ID);
-                this.settings = settings;
+            if (iSettings != null && iSettings.contains(Utils.ID)) {
+                this.settings = iSettings;
             } else {
+                this.settings = new CompoundTag();
                 int newId = DankSavedData.getDefault((ServerLevel) level).getNextID();
-                this.id = newId;
                 DankSavedData.getDefault((ServerLevel) level).getOrCreateInventory(newId,stats);
+                settings.putInt(Utils.ID,newId);
             }
             setChanged();
         }

@@ -151,7 +151,7 @@ public class DankItem extends Item {
                     ItemStack newBag = bag.copy();
                     player.setItemSlot(hand1, toPlace);
                     InteractionResultHolder<ItemStack> actionResult = toPlace.getItem().use(level, player, hand);
-                    DankInventory handler = Utils.getInventory(newBag,level);
+                    DankInventory handler = Utils.getOrCreateInventory(newBag,level);
                     handler.setItem(Utils.getSelectedSlot(newBag), actionResult.getObject());
                     player.setItemSlot(hand1, newBag);
                 }
@@ -172,7 +172,7 @@ public class DankItem extends Item {
 
         //the client doesn't have access to the full inventory
         if (!player.level.isClientSide) {
-            DankInventory handler = Utils.getInventory(bag, player.level);
+            DankInventory handler = Utils.getOrCreateInventory(bag, player.level);
             handler.setItem(Utils.getSelectedSlot(bag), toUse);
         }
 
@@ -189,8 +189,7 @@ public class DankItem extends Item {
     @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack bag, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (bag.hasTag()) {
-            int id = Utils.getID(bag);
-            tooltip.add(new TextComponent("ID: "+id));
+
             if (Utils.DEV) {
                 String s = bag.getTag().toString();
 
@@ -219,6 +218,8 @@ public class DankItem extends Item {
             }
         }
 
+        int id = Utils.getID(bag);
+        tooltip.add(new TextComponent("ID: "+id));
 
         if (!Screen.hasShiftDown()) {
             tooltip.add(new TranslatableComponent("text.dankstorage.shift",
@@ -323,7 +324,7 @@ public class DankItem extends Item {
         UseOnContext ctx2 = new ItemUseContextExt(ctx.getLevel(), ctx.getPlayer(), ctx.getHand(), toPlace, ((ItemUsageContextAccessor) ctx).getHitResult());
         InteractionResult actionResultType = toPlace.getItem().useOn(ctx2);//ctx2.getItem().onItemUse(ctx);
         if (!level.isClientSide) {
-            DankInventory dankInventory = Utils.getInventory(bag,level);
+            DankInventory dankInventory = Utils.getOrCreateInventory(bag,level);
             dankInventory.setItem(selectedSlot, ctx2.getItemInHand());
         }
         return actionResultType;
@@ -349,9 +350,7 @@ public class DankItem extends Item {
 
     public static void assignId(ItemStack dank,ServerLevel level) {
         CompoundTag settings = Utils.getSettings(dank);
-        if (settings != null && settings.contains(Utils.ID, Tag.TAG_INT)) {
-
-        } else {
+        if (settings == null || !settings.contains(Utils.ID, Tag.TAG_INT)) {
             DankSavedData dankSavedData = DankSavedData.getDefault(level);
             DankStats stats = Utils.getStats(dank);
             int next = dankSavedData.getNextID();

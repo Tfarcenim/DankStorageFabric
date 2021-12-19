@@ -36,6 +36,7 @@ public class UpgradeRecipe extends ShapedRecipe {
 
         CompoundTag settings = oldBag.getTag().getCompound("settings");
 
+
         int id = settings.contains(Utils.ID, Tag.TAG_INT) ? settings.getInt(Utils.ID) : -1;
         if (menu instanceof CraftingMenu && id > -1) {
             if (!((CraftingMenuAccess) menu).getPlayer().level.isClientSide) {

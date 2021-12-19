@@ -41,14 +41,18 @@ public class MixinHooks {
         PickupMode pickupMode = Utils.getPickupMode(dank);
         if (pickupMode == PickupMode.normal) return false;
         DankInventory inv = Utils.getInventory(dank,player.level);
+
+        if (inv == null) {
+            System.out.println("That's odd, the player somehow got an unassigned dank to change pickup mode");
+            return false;
+        }
+
         int count = pickup.getCount();
         boolean oredict = false;//Utils.oredict(dank);
         List<ItemStack> existing = new ArrayList<>();
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stack = inv.getItem(i);
-            if (stack.isEmpty()) {
-
-            } else {
+            if (!stack.isEmpty()) {
                 boolean exists = false;
                 for (ItemStack stack1 : existing) {
                     if (areItemStacksCompatible(stack, stack1, oredict)) {
@@ -62,29 +66,24 @@ public class MixinHooks {
         }
 
         switch (pickupMode) {
-            case pickup_all: {
+            case pickup_all -> {
                 for (int i = 0; i < inv.getContainerSize(); i++) {
                     allPickup(inv, i, pickup, oredict);
                     if (pickup.isEmpty()) break;
                 }
             }
-            break;
-
-            case filtered_pickup: {
+            case filtered_pickup -> {
                 for (int i = 0; i < inv.getContainerSize(); i++) {
                     filteredPickup(inv, i, pickup, oredict, existing);
                     if (pickup.isEmpty()) break;
                 }
             }
-            break;
-
-            case void_pickup: {
+            case void_pickup -> {
                 for (int i = 0; i < inv.getContainerSize(); i++) {
                     voidPickup(inv, i, pickup, oredict, existing);
                     if (pickup.isEmpty()) break;
                 }
             }
-            break;
         }
 
         //leftovers

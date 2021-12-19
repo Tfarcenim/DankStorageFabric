@@ -9,6 +9,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +22,9 @@ public class DankSavedData extends SavedData {
         this.level = level;
     }
 
+    @Nullable
     public DankInventory getInventory(int id) {
-        return id < storage.size() ? storage.get(id) : null;
+        return (id < storage.size() && id > -1) ? storage.get(id) : null;
     }
 
     public DankInventory getOrCreateInventory(int id,DankStats stats) {
