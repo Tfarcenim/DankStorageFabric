@@ -44,8 +44,18 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     public static final DankInventory DUMMY = new DankInventory(DankStats.zero,null);
 
     public DankInventory getInventory() {
-        return settings != null && settings.contains(Utils.ID)
-                ? DankStorage.instance.data.getInventory(settings.getInt(Utils.ID)) : DUMMY;
+        if (settings != null && settings.contains(Utils.ID)) {
+            int id = settings.getInt(Utils.ID);
+            DankInventory dankInventory = DankStorage.instance.data.getInventory(id);
+
+            if (dankInventory == null) {
+                dankInventory = DankStorage.instance.data.setFreshInventory(id
+                        ,DankStats.values()[getBlockState().getValue(DockBlock.TIER)]);
+                System.out.println("Inventory was detected as null, attempting to fix ID "+id);
+            }
+            return dankInventory;
+        }
+        return DUMMY;
     }
 
     public int getComparatorSignal() {
@@ -222,8 +232,8 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
                 this.settings = iSettings;
             } else {
                 this.settings = new CompoundTag();
-                int newId = DankSavedData.getDefault((ServerLevel) level).getNextID();
-                DankSavedData.getDefault((ServerLevel) level).getOrCreateInventory(newId,stats);
+                int newId = DankStorage.instance.data.getNextID();
+                DankStorage.instance.data.getOrCreateInventory(newId,stats);
                 settings.putInt(Utils.ID,newId);
             }
             setChanged();

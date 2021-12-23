@@ -3,17 +3,21 @@ package tfar.dankstorage.client.screens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.lwjgl.glfw.GLFW;
 import tfar.dankstorage.client.button.SmallButton;
 import tfar.dankstorage.container.AbstractDankMenu;
+import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.inventory.DankSlot;
 import tfar.dankstorage.network.server.C2SMessageLockSlot;
 import tfar.dankstorage.network.server.C2SMessageSort;
@@ -25,6 +29,8 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
     protected final boolean is7;
     final ResourceLocation background;//= new ResourceLocation("textures/gui/container/shulker_box.png");
+    private EditBox id;
+
 
     public AbstractDankStorageScreen(T container, Inventory playerinventory, Component component, ResourceLocation background) {
         super(container, playerinventory, component);
@@ -34,13 +40,50 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
+
     @Override
     protected void init() {
         super.init();
         this.addRenderableWidget(new SmallButton(leftPos + 143, topPos + 4, 26, 12, new TextComponent("Sort"), b -> {
             C2SMessageSort.send();
         }));
+
+
+        if (is7) {
+            this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
+            int i = (this.width - this.imageWidth) / 2;
+            int j = (this.height - this.imageHeight) / 2;
+            this.id = new EditBox(this.font, i + 100, j + 183, 103, 12, new TranslatableComponent("container.repair"));
+            this.id.setCanLoseFocus(false);
+            this.id.setTextColor(-1);
+            this.id.setTextColorUneditable(-1);
+            this.id.setBordered(false);
+            this.id.setMaxLength(10);
+            this.id.setResponder(this::onNameChanged);
+            this.id.setValue(menu.dankInventory.id + "");
+            this.addWidget(this.id);
+            this.setInitialFocus(this.id);
+        }
     }
+
+    private void onNameChanged(String string) {
+        if (string.isEmpty()) {
+            return;
+        }
+        this.minecraft.player.connection.send(new ServerboundRenameItemPacket(string));
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int j, int k) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            this.minecraft.player.closeContainer();
+        }
+        if (is7 && (this.id.keyPressed(keyCode, j, k) || this.id.canConsumeInput())) {
+            return true;
+        }
+        return super.keyPressed(keyCode, j, k);
+    }
+
 
     @Override
     protected void renderBg(PoseStack stack, float partialTicks, int mouseX, int mouseY) {
@@ -68,6 +111,10 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(stack);
         super.render(stack, mouseX, mouseY, partialTicks);
+        if (is7) {
+            RenderSystem.disableBlend();
+            this.id.render(stack, mouseX, mouseY, partialTicks);
+        }
         this.renderTooltip(stack, mouseX, mouseY);
     }
 

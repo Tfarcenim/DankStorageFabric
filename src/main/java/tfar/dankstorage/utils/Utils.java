@@ -165,7 +165,7 @@ public class Utils {
                 if (dankInventory != null) {
                     return dankInventory.getItem(selected);
                 } else {
-                    System.out.println("Attempted to access a selected item from a null inventory");
+                //    System.out.println("Attempted to access a selected item from a null inventory");
                 }
             } else {
                 return ClientData.selectedItem;

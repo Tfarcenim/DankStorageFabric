@@ -20,9 +20,10 @@ public class DankPacketHandler {
     public static final ResourceLocation sync_slot = new ResourceLocation(DankStorage.MODID, "sync_slot");
     public static final ResourceLocation sync_container = new ResourceLocation(DankStorage.MODID, "sync_container");
     public static final ResourceLocation pick_block = new ResourceLocation(DankStorage.MODID, "pick_block");
-    public static ResourceLocation toggle_use = new ResourceLocation(DankStorage.MODID, "toggle_use");
-    public static ResourceLocation scroll = new ResourceLocation(DankStorage.MODID, "scroll");
+    public static final ResourceLocation toggle_use = new ResourceLocation(DankStorage.MODID, "toggle_use");
+    public static final ResourceLocation scroll = new ResourceLocation(DankStorage.MODID, "scroll");
     public static final ResourceLocation sync_data = new ResourceLocation(DankStorage.MODID, "sync_data");
+    public static final ResourceLocation set_id = new ResourceLocation(DankStorage.MODID, "set_id");
 
     public static void registerMessages() {
         ServerPlayNetworking.registerGlobalReceiver(scroll, new C2SMessageScrollSlot());
@@ -32,6 +33,7 @@ public class DankPacketHandler {
         ServerPlayNetworking.registerGlobalReceiver(toggle_pickup, new C2SMessageTogglePickup());
         ServerPlayNetworking.registerGlobalReceiver(toggle_use, new C2SMessageToggleUseType());
         ServerPlayNetworking.registerGlobalReceiver(pick_block, new C2SMessagePickBlock());
+        ServerPlayNetworking.registerGlobalReceiver(set_id, new C2SSetIDPacket());
     }
 
     public static void sendSyncSlot(ServerPlayer player, int id, int slot, ItemStack stack) {

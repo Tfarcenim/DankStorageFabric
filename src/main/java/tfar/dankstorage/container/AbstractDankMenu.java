@@ -496,4 +496,8 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         //super.setSynchronizer(containerSynchronizer);no
         this.sendAllDataToRemote();
     }
+
+    public void setID(String string2) {
+
+    }
 }

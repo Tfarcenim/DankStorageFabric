@@ -40,8 +40,7 @@ public class UpgradeRecipe extends ShapedRecipe {
         int id = settings.contains(Utils.ID, Tag.TAG_INT) ? settings.getInt(Utils.ID) : -1;
         if (menu instanceof CraftingMenu && id > -1) {
             if (!((CraftingMenuAccess) menu).getPlayer().level.isClientSide) {
-                ServerLevel level = (ServerLevel) ((CraftingMenuAccess) menu).getPlayer().level;
-                DankInventory inventory = DankSavedData.getDefault(level).getInventory(id);
+                DankInventory inventory = DankStorage.instance.data.getInventory(id);
                 inventory.setDankStats(Utils.getStats(newBag));
             } else {
                 System.out.println("Why is someone trying to craft items clientside, now they won't have the correct data.");

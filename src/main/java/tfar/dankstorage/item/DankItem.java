@@ -25,6 +25,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.container.PortableDankProvider;
 import tfar.dankstorage.network.DankPacketHandler;
@@ -114,7 +115,7 @@ public class DankItem extends Item {
         ItemStack bag = player.getItemInHand(hand);
         if (!level.isClientSide) {
 
-            assignId(bag,(ServerLevel) level);
+            assignNextId(bag);
 
             if (Utils.getUseType(bag) == C2SMessageToggleUseType.UseType.bag) {
                 player.openMenu(new PortableDankProvider(bag));
@@ -333,8 +334,13 @@ public class DankItem extends Item {
     @Override
     public void inventoryTick(ItemStack bag, Level level, Entity entity, int i, boolean equipped) {
         //there has to be a better way
-        if (entity instanceof ServerPlayer player && equipped)
-        DankPacketHandler.sendSelectedItem(player,Utils.getID(bag),Utils.getSelectedItem(bag,level),Utils.getUseType(bag));
+        if (entity instanceof ServerPlayer player && equipped) {
+            ItemStack sel = Utils.getSelectedItem(bag,level);
+            // do not waste packets sending empty items
+            if (!sel.isEmpty()) {
+                DankPacketHandler.sendSelectedItem(player, Utils.getID(bag), sel, Utils.getUseType(bag));
+            }
+        }
     }
 
     @Override
@@ -348,10 +354,10 @@ public class DankItem extends Item {
         }
     }
 
-    public static void assignId(ItemStack dank,ServerLevel level) {
+    public static void assignNextId(ItemStack dank) {
         CompoundTag settings = Utils.getSettings(dank);
         if (settings == null || !settings.contains(Utils.ID, Tag.TAG_INT)) {
-            DankSavedData dankSavedData = DankSavedData.getDefault(level);
+            DankSavedData dankSavedData = DankStorage.instance.data;
             DankStats stats = Utils.getStats(dank);
             int next = dankSavedData.getNextID();
             dankSavedData.getOrCreateInventory(next,stats);
