@@ -32,7 +32,13 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         this.id = id;
     }
 
-    public void setDankStats(DankStats stats) {
+    public void upgradeTo(DankStats stats) {
+
+        //can't downgrade inventories
+        if (stats.ordinal() <= dankStats.ordinal()) {
+            return;
+        }
+
         this.dankStats = stats;
         setSize();
     }
@@ -147,7 +153,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
 
     public void read(CompoundTag nbt) {
         DankStats stats = DankStats.valueOf(nbt.getString("DankStats"));
-        setDankStats(stats);
+        upgradeTo(stats);
         ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
         locked_id = nbt.getBoolean("locked_id");
         for (int i = 0; i < tagList.size(); i++) {

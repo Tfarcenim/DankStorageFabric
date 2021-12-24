@@ -4,9 +4,11 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.tag.TagFactory;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -325,6 +327,10 @@ public class Utils {
         } else {
             return ItemStack.tagMatches(first, second);
         }
+    }
+
+    public static void warn(Player player, DankStats item, DankStats inventory) {
+        player.sendMessage(new TextComponent("Dank Item Level "+item.ordinal() +" cannot open Dank Inventory Level "+inventory.ordinal()), Util.NIL_UUID);
     }
 
     @Nullable

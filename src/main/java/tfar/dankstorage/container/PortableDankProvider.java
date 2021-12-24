@@ -1,6 +1,8 @@
 package tfar.dankstorage.container;
 
+import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,6 +16,7 @@ import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class PortableDankProvider implements MenuProvider {
 
@@ -31,6 +34,7 @@ public class PortableDankProvider implements MenuProvider {
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player player) {
+
         InteractionHand hand = Utils.getHandWithDank(player);
         if (hand == null) return null;
         ItemStack bag = player.getItemInHand(hand);
@@ -42,6 +46,9 @@ public class PortableDankProvider implements MenuProvider {
                 dankInventory = DankStorage.instance.data
                         .getOrCreateInventory(next,type);
                 Utils.getSettings(bag).putInt(Utils.ID,next);
+        } else if (dankInventory.dankStats != type) {
+            Utils.warn(player,type,dankInventory.dankStats);
+            return null;
         }
 
         return switch (type) {

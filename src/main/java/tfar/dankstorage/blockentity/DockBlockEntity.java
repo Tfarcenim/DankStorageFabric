@@ -1,9 +1,11 @@
 
 package tfar.dankstorage.blockentity;
 
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Container;
@@ -174,14 +176,24 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     @Nullable
     @Override
     public DockMenu createMenu(int syncId, Inventory inventory, Player player) {
+
+        int tier = getBlockState().getValue(DockBlock.TIER);
+
+        DankInventory dankInventory = getInventory();
+
+        if (dankInventory.dankStats != DankStats.values()[tier]) {
+            Utils.warn(player,DankStats.values()[tier],dankInventory.dankStats);
+            return null;
+        }
+
         return switch (getBlockState().getValue(DockBlock.TIER)) {
-            case 1 -> DockMenu.t1s(syncId, inventory, this.getInventory(),this);
-            case 2 -> DockMenu.t2s(syncId, inventory, this.getInventory(),this);
-            case 3 -> DockMenu.t3s(syncId, inventory, this.getInventory(),this);
-            case 4 -> DockMenu.t4s(syncId, inventory, this.getInventory(),this);
-            case 5 -> DockMenu.t5s(syncId, inventory, this.getInventory(),this);
-            case 6 -> DockMenu.t6s(syncId, inventory, this.getInventory(),this);
-            case 7 -> DockMenu.t7s(syncId, inventory, this.getInventory(),this);
+            case 1 -> DockMenu.t1s(syncId, inventory, dankInventory,this);
+            case 2 -> DockMenu.t2s(syncId, inventory, dankInventory,this);
+            case 3 -> DockMenu.t3s(syncId, inventory, dankInventory,this);
+            case 4 -> DockMenu.t4s(syncId, inventory, dankInventory,this);
+            case 5 -> DockMenu.t5s(syncId, inventory, dankInventory,this);
+            case 6 -> DockMenu.t6s(syncId, inventory, dankInventory,this);
+            case 7 -> DockMenu.t7s(syncId, inventory, dankInventory,this);
             default -> null;
         };
     }
@@ -193,8 +205,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     }
 
     public ItemStack removeDankWithoutItemSpawn() {
-        DankInventory inventory = getInventory();
-        int tier = inventory.dankStats.ordinal();
+        int tier = getBlockState().getValue(DockBlock.TIER);
 
         if (tier == 0) {
             throw new RuntimeException("tried to remove a null dank?");

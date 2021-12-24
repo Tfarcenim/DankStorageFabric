@@ -1,8 +1,5 @@
 package tfar.dankstorage.recipe;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.CraftingMenu;
@@ -14,7 +11,6 @@ import tfar.dankstorage.mixin.CraftingContainerAccess;
 import tfar.dankstorage.mixin.CraftingMenuAccess;
 import tfar.dankstorage.world.DankInventory;
 import tfar.dankstorage.utils.Utils;
-import tfar.dankstorage.world.DankSavedData;
 
 import javax.annotation.Nonnull;
 
@@ -37,7 +33,7 @@ public class UpgradeRecipe extends ShapedRecipe {
         if (menu instanceof CraftingMenu && id > -1) {
             if (!((CraftingMenuAccess) menu).getPlayer().level.isClientSide) {
                 DankInventory inventory = DankStorage.instance.data.getInventory(id);
-                inventory.setDankStats(Utils.getStats(newBag));
+                inventory.upgradeTo(Utils.getStats(newBag));
             } else {
                 System.out.println("Why is someone trying to craft items clientside, now they won't have the correct data.");
                 new RuntimeException().printStackTrace();

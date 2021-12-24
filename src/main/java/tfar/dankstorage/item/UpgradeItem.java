@@ -62,7 +62,7 @@ public class UpgradeItem extends Item {
         DockBlockEntity newBarrel = (DockBlockEntity) world.getBlockEntity(pos);
         DankInventory dankInventory = newBarrel.getInventory();
 
-        dankInventory.setDankStats(DankStats.values()[newTier]);
+        dankInventory.upgradeTo(DankStats.values()[newTier]);
         for (int i = 0; i < oldDankContents.size() && i < newBarrel.getContainerSize(); ++i)
             dankInventory.setItem(i, oldDankContents.get(i));
         if (!player.getAbilities().instabuild)
