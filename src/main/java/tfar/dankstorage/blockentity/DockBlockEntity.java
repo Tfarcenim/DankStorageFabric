@@ -6,14 +6,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,14 +22,13 @@ import tfar.dankstorage.world.DankInventory;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
-import tfar.dankstorage.world.DankSavedData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvider, Container {
 
-    private CompoundTag settings;
+    public CompoundTag settings;
 
     public int numPlayersUsing = 0;
     protected Component customName;
@@ -41,18 +38,21 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         super(DankStorage.dank_tile,blockPos, blockState);
     }
 
-    public static final DankInventory DUMMY = new DankInventory(DankStats.zero,null);
+    public static final DankInventory DUMMY = new DankInventory(DankStats.zero, -1);
 
     public DankInventory getInventory() {
         if (settings != null && settings.contains(Utils.ID)) {
             int id = settings.getInt(Utils.ID);
             DankInventory dankInventory = DankStorage.instance.data.getInventory(id);
 
+            //if the id is too high
             if (dankInventory == null) {
-                dankInventory = DankStorage.instance.data.setFreshInventory(id
-                        ,DankStats.values()[getBlockState().getValue(DockBlock.TIER)]);
-                System.out.println("Inventory was detected as null, attempting to fix ID "+id);
+                int next = DankStorage.instance.data.getNextID();
+                dankInventory = DankStorage.instance.data
+                        .getOrCreateInventory(next,DankStats.values()[getBlockState().getValue(DockBlock.TIER)]);
+                settings.putInt(Utils.ID,next);
             }
+
             return dankInventory;
         }
         return DUMMY;
@@ -175,13 +175,13 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     @Override
     public DockMenu createMenu(int syncId, Inventory inventory, Player player) {
         return switch (getBlockState().getValue(DockBlock.TIER)) {
-            case 1 -> DockMenu.t1s(syncId, inventory, this.getInventory());
-            case 2 -> DockMenu.t2s(syncId, inventory, this.getInventory());
-            case 3 -> DockMenu.t3s(syncId, inventory, this.getInventory());
-            case 4 -> DockMenu.t4s(syncId, inventory, this.getInventory());
-            case 5 -> DockMenu.t5s(syncId, inventory, this.getInventory());
-            case 6 -> DockMenu.t6s(syncId, inventory, this.getInventory());
-            case 7 -> DockMenu.t7s(syncId, inventory, this.getInventory());
+            case 1 -> DockMenu.t1s(syncId, inventory, this.getInventory(),this);
+            case 2 -> DockMenu.t2s(syncId, inventory, this.getInventory(),this);
+            case 3 -> DockMenu.t3s(syncId, inventory, this.getInventory(),this);
+            case 4 -> DockMenu.t4s(syncId, inventory, this.getInventory(),this);
+            case 5 -> DockMenu.t5s(syncId, inventory, this.getInventory(),this);
+            case 6 -> DockMenu.t6s(syncId, inventory, this.getInventory(),this);
+            case 7 -> DockMenu.t7s(syncId, inventory, this.getInventory(),this);
             default -> null;
         };
     }

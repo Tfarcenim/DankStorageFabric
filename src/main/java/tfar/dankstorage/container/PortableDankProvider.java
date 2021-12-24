@@ -7,6 +7,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import tfar.dankstorage.DankStorage;
+import tfar.dankstorage.block.DockBlock;
 import tfar.dankstorage.world.DankInventory;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
@@ -32,8 +34,15 @@ public class PortableDankProvider implements MenuProvider {
         InteractionHand hand = Utils.getHandWithDank(player);
         if (hand == null) return null;
         ItemStack bag = player.getItemInHand(hand);
-        DankInventory dankInventory = Utils.getOrCreateInventory(bag,player.level);
+        DankInventory dankInventory = Utils.getInventory(bag,player.level);
         DankStats type = Utils.getStats(bag);
+
+        if (dankInventory == null) {
+                int next = DankStorage.instance.data.getNextID();
+                dankInventory = DankStorage.instance.data
+                        .getOrCreateInventory(next,type);
+                Utils.getSettings(bag).putInt(Utils.ID,next);
+        }
 
         return switch (type) {
             default -> DankMenu.t1s(i, playerInventory, dankInventory);

@@ -325,7 +325,7 @@ public class DankItem extends Item {
         UseOnContext ctx2 = new ItemUseContextExt(ctx.getLevel(), ctx.getPlayer(), ctx.getHand(), toPlace, ((ItemUsageContextAccessor) ctx).getHitResult());
         InteractionResult actionResultType = toPlace.getItem().useOn(ctx2);//ctx2.getItem().onItemUse(ctx);
         if (!level.isClientSide) {
-            DankInventory dankInventory = Utils.getOrCreateInventory(bag,level);
+            DankInventory dankInventory = Utils.getInventory(bag,level);
             dankInventory.setItem(selectedSlot, ctx2.getItemInHand());
         }
         return actionResultType;
@@ -338,7 +338,7 @@ public class DankItem extends Item {
             ItemStack sel = Utils.getSelectedItem(bag,level);
             // do not waste packets sending empty items
             if (!sel.isEmpty()) {
-                DankPacketHandler.sendSelectedItem(player, Utils.getID(bag), sel, Utils.getUseType(bag));
+                DankPacketHandler.sendSelectedItem(player, sel, Utils.getUseType(bag));
             }
         }
     }

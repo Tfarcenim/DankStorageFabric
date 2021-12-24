@@ -33,11 +33,7 @@ public class UpgradeRecipe extends ShapedRecipe {
 
         AbstractContainerMenu menu = ((CraftingContainerAccess)inv).getMenu();
 
-
-        CompoundTag settings = oldBag.getTag().getCompound("settings");
-
-
-        int id = settings.contains(Utils.ID, Tag.TAG_INT) ? settings.getInt(Utils.ID) : -1;
+        int id = Utils.getID(oldBag);
         if (menu instanceof CraftingMenu && id > -1) {
             if (!((CraftingMenuAccess) menu).getPlayer().level.isClientSide) {
                 DankInventory inventory = DankStorage.instance.data.getInventory(id);

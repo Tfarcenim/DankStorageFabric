@@ -3,13 +3,16 @@ package tfar.dankstorage.client.screens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.LockIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -17,10 +20,11 @@ import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import tfar.dankstorage.client.button.SmallButton;
 import tfar.dankstorage.container.AbstractDankMenu;
-import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.inventory.DankSlot;
+import tfar.dankstorage.network.server.C2SMessageLockFrequency;
 import tfar.dankstorage.network.server.C2SMessageLockSlot;
 import tfar.dankstorage.network.server.C2SMessageSort;
+import tfar.dankstorage.network.server.C2SSetIDPacket;
 import tfar.dankstorage.utils.Utils;
 
 import java.util.List;
@@ -49,28 +53,50 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         }));
 
 
-        if (is7) {
-            this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
-            int i = (this.width - this.imageWidth) / 2;
-            int j = (this.height - this.imageHeight) / 2;
-            this.id = new EditBox(this.font, i + 100, j + 183, 103, 12, new TranslatableComponent("container.repair"));
-            this.id.setCanLoseFocus(false);
-            this.id.setTextColor(-1);
-            this.id.setTextColorUneditable(-1);
-            this.id.setBordered(false);
-            this.id.setMaxLength(10);
-            this.id.setResponder(this::onNameChanged);
-            this.id.setValue(menu.dankInventory.id + "");
-            this.addWidget(this.id);
-            this.setInitialFocus(this.id);
-        }
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
+        int i = (this.width - this.imageWidth) / 2;
+        int j = (this.height - this.imageHeight) / 2;
+        this.id = new EditBox(this.font, i + 92, j + inventoryLabelY, 56, 12, new TranslatableComponent("dank"));
+        this.id.setCanLoseFocus(false);
+        this.id.setTextColor(-1);
+        this.id.setTextColorUneditable(-1);
+        this.id.setBordered(false);
+        this.id.setMaxLength(10);
+        this.id.setResponder(this::onNameChanged);
+        this.id.setValue("");
+        this.id.setTextColor(0xff00ff00);
+        this.addWidget(this.id);
+        this.setInitialFocus(this.id);
+        this.addRenderableWidget(new SmallButton(leftPos + 157, j + inventoryLabelY - 2, 12, 12, new TextComponent("s"), b -> {
+            try {
+                if (menu.dankInventory.idLocked()) return;
+                int id1 = Integer.parseInt(id.getValue());
+                C2SSetIDPacket.send(id1, true);
+            } catch (NumberFormatException e) {
+
+            }
+        }));
+
+
+        this.addRenderableWidget(new SmallButton(leftPos + 129, topPos + 4, 12, 12, new TextComponent(""), button -> {
+            C2SMessageLockFrequency.send(true);
+        }) {
+            @Override
+            public Component getMessage() {
+                return menu.dankInventory.idLocked() ? new TextComponent("X").withStyle(ChatFormatting.RED) :
+                        new TextComponent("O");
+            }
+        });
     }
 
+
     private void onNameChanged(String string) {
-        if (string.isEmpty()) {
-            return;
+        try {
+            int i = Integer.parseInt(string);
+            C2SSetIDPacket.send(i, false);
+        } catch (NumberFormatException e) {
+            C2SSetIDPacket.send(-1, false);
         }
-        this.minecraft.player.connection.send(new ServerboundRenameItemPacket(string));
     }
 
     @Override
@@ -78,17 +104,16 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             this.minecraft.player.closeContainer();
         }
-        if (is7 && (this.id.keyPressed(keyCode, j, k) || this.id.canConsumeInput())) {
+        if (this.id.keyPressed(keyCode, j, k) || this.id.canConsumeInput()) {
             return true;
         }
         return super.keyPressed(keyCode, j, k);
     }
 
-
     @Override
     protected void renderBg(PoseStack stack, float partialTicks, int mouseX, int mouseY) {
 
-        RenderSystem.setShaderTexture(0,background);
+        RenderSystem.setShaderTexture(0, background);
         if (is7)
             blit(stack, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 512);
         else
@@ -111,10 +136,11 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(stack);
         super.render(stack, mouseX, mouseY, partialTicks);
-        if (is7) {
-            RenderSystem.disableBlend();
-            this.id.render(stack, mouseX, mouseY, partialTicks);
-        }
+        RenderSystem.disableBlend();
+
+        int color = menu.dankInventory.getTextColor();
+        this.id.setTextColor(color);
+        this.id.render(stack, mouseX, mouseY, partialTicks);
         this.renderTooltip(stack, mouseX, mouseY);
     }
 
@@ -150,9 +176,9 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     @Override
     protected void renderLabels(PoseStack poseStack, int i, int j) {
         super.renderLabels(poseStack, i, j);
-        int id = menu.dankInventory.id;//menu.dankInventory.get(menu.rows * 9);
+        int id = menu.dankInventory.getId();//menu.dankInventory.get(menu.rows * 9);
         int color = 0x008000;
-        this.font.draw(poseStack, "ID: " + id, 70, this.imageHeight - 94, color);
+        this.font.draw(poseStack, "ID: " + id, 66, inventoryLabelY, color);
     }
 
     @Override

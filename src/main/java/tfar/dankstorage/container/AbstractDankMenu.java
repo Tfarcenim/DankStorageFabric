@@ -18,8 +18,8 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
     public DankInventory dankInventory;
 
 
-    public AbstractDankMenu(MenuType<?> type, int p_i50105_2_, Inventory playerInventory, int rows, DankInventory dankInventory) {
-        super(type, p_i50105_2_);
+    public AbstractDankMenu(MenuType<?> type, int windowId, Inventory playerInventory, int rows, DankInventory dankInventory) {
+        super(type, windowId);
         this.rows = rows;
         this.playerInventory = playerInventory;
         this.dankInventory = dankInventory;
@@ -497,7 +497,5 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         this.sendAllDataToRemote();
     }
 
-    public void setID(String string2) {
-
-    }
+    public abstract void setID(int id);
 }

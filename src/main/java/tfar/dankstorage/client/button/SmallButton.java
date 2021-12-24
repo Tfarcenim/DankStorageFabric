@@ -20,42 +20,38 @@ public class SmallButton extends Button {
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
-        if (visible) {
-            RenderSystem.setShaderTexture(0,WIDGETS_LOCATION);
+    public void renderButton(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
+        RenderSystem.setShaderTexture(0,WIDGETS_LOCATION);
 
-            tint();
+        tint();
 
-            isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+        int c = getYImage(isHovered);
 
-            int i = getYImage(isHovered);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
+        RenderSystem.blendFunc(770, 771);
 
-            RenderSystem.enableBlend();
-            RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-            RenderSystem.blendFunc(770, 771);
+        int halfwidth1 = this.width / 2;
+        int halfwidth2 = this.width - halfwidth1;
+        int halfheight1 = this.height / 2;
+        int halfheight2 = this.height - halfheight1;
+        blit(matrices, x, y, 0,
+                46 + c * 20, halfwidth1, halfheight1);
+        blit(matrices, x + halfwidth1, y, 200 - halfwidth2,
+                46 + c * 20, halfwidth2, halfheight1);
 
-            int halfwidth1 = this.width / 2;
-            int halfwidth2 = this.width - halfwidth1;
-            int halfheight1 = this.height / 2;
-            int halfheight2 = this.height - halfheight1;
-            blit(stack, x, y, 0,
-                    46 + i * 20, halfwidth1, halfheight1);
-            blit(stack, x + halfwidth1, y, 200 - halfwidth2,
-                    46 + i * 20, halfwidth2, halfheight1);
-
-            blit(stack, x, y + halfheight1,
-                    0, 46 + i * 20 + 20 - halfheight2, halfwidth1, halfheight2);
-            blit(stack, x + halfwidth1, y + halfheight1,
-                    200 - halfwidth2, 46 + i * 20 + 20 - halfheight2, halfwidth2, halfheight2);
-            if (shouldDrawText()) drawText(stack, halfwidth2);
-        }
+        blit(matrices, x, y + halfheight1,
+                0, 46 + c * 20 + 20 - halfheight2, halfwidth1, halfheight2);
+        blit(matrices, x + halfwidth1, y + halfheight1,
+                200 - halfwidth2, 46 + c * 20 + 20 - halfheight2, halfwidth2, halfheight2);
+        if (shouldDrawText()) drawText(matrices, halfwidth2);
     }
 
     public void drawText(PoseStack stack, int halfwidth2) {
         int textColor = 0xe0e0e0;
 
         if (1 != 0) {
-            textColor = 1;
+            textColor = -1;
         } else if (!this.visible) {
             textColor = 0xa0a0a0;
         } else if (this.isHovered) {

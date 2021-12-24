@@ -1,8 +1,11 @@
 package tfar.dankstorage;
 
+import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -20,6 +23,7 @@ import net.minecraft.world.level.material.Material;
 import tfar.dankstorage.block.DankDispenserBehavior;
 import tfar.dankstorage.block.DockBlock;
 import tfar.dankstorage.client.Client;
+import tfar.dankstorage.command.DankCommands;
 import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.container.DockMenu;
 import tfar.dankstorage.item.DankItem;
@@ -33,7 +37,8 @@ import tfar.dankstorage.world.DankSavedData;
 
 import java.util.stream.IntStream;
 
-public class DankStorage implements ModInitializer, ClientModInitializer, ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.ServerStopped {
+public class DankStorage implements ModInitializer, ClientModInitializer,
+        ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.ServerStopped, CommandRegistrationCallback {
 
     public static final String MODID = "dankstorage";
 
@@ -101,6 +106,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer, Server
 
         ServerLifecycleEvents.SERVER_STARTED.register(this);
         ServerLifecycleEvents.SERVER_STOPPED.register(this);
+        CommandRegistrationCallback.EVENT.register(this);
     }
 
     @Override
@@ -118,6 +124,11 @@ public class DankStorage implements ModInitializer, ClientModInitializer, Server
     @Override
     public void onServerStopped(MinecraftServer server) {
         instance.data = null;
+    }
+
+    @Override
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
+        DankCommands.register(dispatcher);
     }
 
 

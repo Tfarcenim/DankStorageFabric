@@ -9,11 +9,9 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.ducks.SimpleInventoryAccessor;
 import tfar.dankstorage.utils.DankStats;
-import tfar.dankstorage.utils.PickupMode;
 import tfar.dankstorage.utils.Utils;
 
 import java.util.stream.IntStream;
@@ -21,16 +19,17 @@ import java.util.stream.IntStream;
 public class DankInventory extends SimpleContainer implements ContainerData {
 
     public DankStats dankStats;
-    public int[] lockedSlots;
-    public int id;
+    protected int[] lockedSlots;
+    protected int id;
+    public boolean locked_id;
 
-    public final Level level;
+    protected int textColor = -1;
 
-    public DankInventory(DankStats stats,Level level) {
+    public DankInventory(DankStats stats, int id) {
         super(stats.slots);
-        this.level = level;
         this.dankStats = stats;
         this.lockedSlots = new int[stats.slots];
+        this.id = id;
     }
 
     public void setDankStats(DankStats stats) {
@@ -98,11 +97,12 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     }
 
     public boolean isLocked(int slot) {
-        return lockedSlots[slot] == 1;
+        return get(slot) == 1;
     }
 
     public void toggleLock(int slot) {
-        lockedSlots[slot] = 1 - lockedSlots[slot];
+        boolean loc = get(slot) == 1;
+        set(slot, loc ? 0 : 1);
         setChanged();
     }
 
@@ -139,8 +139,9 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         CompoundTag nbt = new CompoundTag();
         nbt.put("Items", nbtTagList);
         nbt.putIntArray("LockedSlots", lockedSlots);
-        nbt.putString("DankStats",dankStats.name());
-        nbt.putInt(Utils.ID,id);
+        nbt.putString("DankStats", dankStats.name());
+        nbt.putInt(Utils.ID, id);
+        nbt.putBoolean("locked_id",locked_id);
         return nbt;
     }
 
@@ -148,6 +149,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         DankStats stats = DankStats.valueOf(nbt.getString("DankStats"));
         setDankStats(stats);
         ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
+        locked_id = nbt.getBoolean("locked_id");
         for (int i = 0; i < tagList.size(); i++) {
             CompoundTag itemTags = tagList.getCompound(i);
             int slot = itemTags.getInt("Slot");
@@ -181,7 +183,6 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         }
         int[] slots = nbt.getIntArray("LockedSlots");
         setLockedSlots(slots);
-        id = nbt.getInt(Utils.ID);
         validate();
     }
 
@@ -222,13 +223,31 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     @Override
     public void setChanged() {
         super.setChanged();
-        if (!level.isClientSide && DankStorage.instance.data != null) {
-            DankStorage.instance.data.saveToId(id, this);
+        if (DankStorage.instance.data != null) {
+            DankStorage.instance.data.setDirty();
         }
     }
 
-    protected int getIdSlot() {
+    public int getIdSlot() {
         return getContainerSize();
+    }
+
+    public int getTextColor() {
+        return get(getIdSlot() + 1);
+    }
+
+    public void setTextColor(int color) {
+        set(getIdSlot() + 1,color);
+    }
+
+    public boolean idLocked() {
+        return get(getIdSlot() + 2) == 1;
+    }
+
+    public void toggleIdLock() {
+        boolean loc = get(getIdSlot() + 2) == 1;
+
+        set(getIdSlot() + 2,loc ? 0 : 1);
     }
 
     @Override
@@ -237,8 +256,16 @@ public class DankInventory extends SimpleContainer implements ContainerData {
             return lockedSlots[slot];
         } else if (slot == getIdSlot()) {
             return id;
+        } else if (slot == getIdSlot() + 1) {
+            return textColor;
+        } else if (slot == getIdSlot() + 2) {
+            return locked_id ? 1 : 0;
         }
         return -999;
+    }
+
+    public int getId() {
+        return get(getIdSlot());
     }
 
     @Override
@@ -247,11 +274,18 @@ public class DankInventory extends SimpleContainer implements ContainerData {
             lockedSlots[slot] = value;
         } else if (slot == getIdSlot()) {
             id = value;
+        } else if (slot == getIdSlot() + 1){
+            textColor = value;
+        } else if (slot == getIdSlot() + 2) {
+            locked_id = value == 1;
         }
+        setChanged();
     }
+
+    //0 - 80 are locked slots, 81 is the id, 82 is text color, and 83 is global lock
 
     @Override
     public int getCount() {
-        return getContainerSize() + 1;
+        return getContainerSize() + 3;
     }
 }

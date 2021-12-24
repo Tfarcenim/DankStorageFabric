@@ -2,9 +2,7 @@ package tfar.dankstorage.container;
 
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.DankStorage;
@@ -18,12 +16,13 @@ public class DankMenu extends AbstractDankMenu {
 
     public ItemStack bag;
 
-    public DankMenu(MenuType<?> type, int id, Inventory inv, int rows) {
-        this(type, id, inv, rows, new DankInventory(Utils.getStatsfromRows(rows),inv.player.level));
+    //clientside
+    public DankMenu(MenuType<?> type, int windowId, Inventory inv, int rows) {
+        this(type, windowId, inv, rows, new DankInventory(Utils.getStatsfromRows(rows), -1));
     }
 
-    public DankMenu(MenuType<?> type, int id, Inventory inv, int rows, DankInventory dankInventory) {
-        super(type, id, inv, rows, dankInventory);
+    public DankMenu(MenuType<?> type, int windowId, Inventory inv, int rows, DankInventory dankInventory) {
+        super(type, windowId, inv, rows, dankInventory);
         Player player = inv.player;
         this.bag = player.getMainHandItem().getItem() instanceof DankItem ? player.getMainHandItem() : player.getOffhandItem();
         addDankSlots();
@@ -106,6 +105,11 @@ public class DankMenu extends AbstractDankMenu {
 
     @Override
     protected void addPlayerSlots(Inventory playerinventory) {
+    }
+
+    @Override
+    public void setID(int id) {
+        Utils.getOrCreateSettings(bag).putInt(Utils.ID,id);
     }
 
     protected void addPlayerSlots(Inventory playerinventory, int locked) {

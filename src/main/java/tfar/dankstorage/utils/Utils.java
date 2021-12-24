@@ -199,9 +199,9 @@ public class Utils {
     }
 
     public static void changeSelectedSlot(ItemStack bag, boolean right, ServerPlayer player) {
-        DankInventory handler = getOrCreateInventory(bag,player.getLevel());
+        DankInventory handler = getInventory(bag,player.getLevel());
         //don't change slot if empty
-        if (handler.noValidSlots()) return;
+        if (handler == null || handler.noValidSlots()) return;
         int selectedSlot = getSelectedSlot(bag);
         int size = handler.getContainerSize();
         //keep iterating until a valid slot is found (not empty and not blacklisted from usage)
@@ -226,7 +226,7 @@ public class Utils {
         }
         if (selectedSlot != -1) {
             setSelectedSlot(selectedSlot,bag);
-            DankPacketHandler.sendSelectedItem(player,getID(bag),selected,getUseType(bag));
+            DankPacketHandler.sendSelectedItem(player,selected,getUseType(bag));
         }
     }
 
