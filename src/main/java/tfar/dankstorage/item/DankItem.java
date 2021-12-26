@@ -336,10 +336,7 @@ public class DankItem extends Item {
         //there has to be a better way
         if (entity instanceof ServerPlayer player && equipped) {
             ItemStack sel = Utils.getSelectedItem(bag,level);
-            // do not waste packets sending empty items
-            if (!sel.isEmpty()) {
-                DankPacketHandler.sendSelectedItem(player, sel, Utils.getUseType(bag));
-            }
+            DankPacketHandler.sendSelectedItem(player, sel);
         }
     }
 

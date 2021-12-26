@@ -62,11 +62,9 @@ public class DankPacketHandler {
         ServerPlayNetworking.send(player, DankPacketHandler.sync_container, buf);
     }
 
-    public static void sendSelectedItem(ServerPlayer player, ItemStack stack, C2SMessageToggleUseType.UseType useType) {
+    public static void sendSelectedItem(ServerPlayer player, ItemStack stack) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         PacketBufferEX.writeExtendedItemStack(buf, stack);
-        buf.writeInt(useType.ordinal());
         ServerPlayNetworking.send(player, DankPacketHandler.sync_data, buf);
     }
-
 }

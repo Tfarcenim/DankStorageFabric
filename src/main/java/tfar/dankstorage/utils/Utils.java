@@ -228,7 +228,7 @@ public class Utils {
         }
         if (selectedSlot != -1) {
             setSelectedSlot(selectedSlot,bag);
-            DankPacketHandler.sendSelectedItem(player,selected,getUseType(bag));
+            DankPacketHandler.sendSelectedItem(player,selected);
         }
     }
 

@@ -5,7 +5,9 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -17,6 +19,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
@@ -32,6 +35,7 @@ import tfar.dankstorage.item.UpgradeItem;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.recipe.Serializer2;
 import tfar.dankstorage.blockentity.DockBlockEntity;
+import tfar.dankstorage.recipe.UpgradeRecipe;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.world.DankSavedData;
 
@@ -57,8 +61,8 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
     public static MenuType<DankMenu> portable_dank_5_container;
     public static MenuType<DankMenu> portable_dank_6_container;
     public static MenuType<DankMenu> portable_dank_7_container;
-    public static BlockEntityType<?> dank_tile;
-    public static RecipeSerializer<?> upgrade;
+    public static BlockEntityType<DockBlockEntity> dank_tile;
+    public static Serializer2 upgrade;
 
     public static DankStorage instance;
     public DankStorage() {
@@ -107,6 +111,8 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
         ServerLifecycleEvents.SERVER_STARTED.register(this);
         ServerLifecycleEvents.SERVER_STOPPED.register(this);
         CommandRegistrationCallback.EVENT.register(this);
+
+        ItemStorage.SIDED.registerForBlockEntity(DockBlockEntity::getStorage, dank_tile);
     }
 
     @Override

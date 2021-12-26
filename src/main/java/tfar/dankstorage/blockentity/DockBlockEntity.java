@@ -1,14 +1,16 @@
 
 package tfar.dankstorage.blockentity;
 
-import net.minecraft.Util;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -20,15 +22,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.block.DockBlock;
 import tfar.dankstorage.container.DockMenu;
-import tfar.dankstorage.world.DankInventory;
+import tfar.dankstorage.inventory.api.DankInventorySlotWrapper;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
+import tfar.dankstorage.world.DankInventory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvider, Container {
+public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvider {
 
     public CompoundTag settings;
 
@@ -37,7 +42,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     protected boolean originalName;
 
     public DockBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(DankStorage.dank_tile,blockPos, blockState);
+        super(DankStorage.dank_tile, blockPos, blockState);
     }
 
     public static final DankInventory DUMMY = new DankInventory(DankStats.zero, -1);
@@ -51,8 +56,8 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
             if (dankInventory == null) {
                 int next = DankStorage.instance.data.getNextID();
                 dankInventory = DankStorage.instance.data
-                        .getOrCreateInventory(next,DankStats.values()[getBlockState().getValue(DockBlock.TIER)]);
-                settings.putInt(Utils.ID,next);
+                        .getOrCreateInventory(next, DankStats.values()[getBlockState().getValue(DockBlock.TIER)]);
+                settings.putInt(Utils.ID, next);
             }
 
             return dankInventory;
@@ -107,48 +112,6 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    //Inventory nonsense
-
-    @Override
-    public int getContainerSize() {
-        return getInventory().getContainerSize();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return getInventory().isEmpty();
-    }
-
-    @Override
-    public ItemStack getItem(int slot) {
-        return getInventory().getItem(slot);
-    }
-
-    @Override
-    public ItemStack removeItem(int slot, int amount) {
-        return getInventory().removeItem(slot, amount);
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-        return getInventory().removeItemNoUpdate(slot);
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        getInventory().setItem(slot, stack);
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return getInventory().getMaxStackSize();
-    }
-
-    @Override
-    public boolean stillValid(Player player) {
-        return true;
-    }
-
     @Override
     public Component getName() {
         return customName != null ? customName : getDefaultName();
@@ -182,18 +145,18 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         DankInventory dankInventory = getInventory();
 
         if (dankInventory.dankStats != DankStats.values()[tier]) {
-            Utils.warn(player,DankStats.values()[tier],dankInventory.dankStats);
+            Utils.warn(player, DankStats.values()[tier], dankInventory.dankStats);
             return null;
         }
 
         return switch (getBlockState().getValue(DockBlock.TIER)) {
-            case 1 -> DockMenu.t1s(syncId, inventory, dankInventory,this);
-            case 2 -> DockMenu.t2s(syncId, inventory, dankInventory,this);
-            case 3 -> DockMenu.t3s(syncId, inventory, dankInventory,this);
-            case 4 -> DockMenu.t4s(syncId, inventory, dankInventory,this);
-            case 5 -> DockMenu.t5s(syncId, inventory, dankInventory,this);
-            case 6 -> DockMenu.t6s(syncId, inventory, dankInventory,this);
-            case 7 -> DockMenu.t7s(syncId, inventory, dankInventory,this);
+            case 1 -> DockMenu.t1s(syncId, inventory, dankInventory, this);
+            case 2 -> DockMenu.t2s(syncId, inventory, dankInventory, this);
+            case 3 -> DockMenu.t3s(syncId, inventory, dankInventory, this);
+            case 4 -> DockMenu.t4s(syncId, inventory, dankInventory, this);
+            case 5 -> DockMenu.t5s(syncId, inventory, dankInventory, this);
+            case 6 -> DockMenu.t6s(syncId, inventory, dankInventory, this);
+            case 7 -> DockMenu.t7s(syncId, inventory, dankInventory, this);
             default -> null;
         };
     }
@@ -215,7 +178,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         ItemStack stack = new ItemStack(Utils.getItemFromTier(tier));
 
         if (settings != null) {
-            stack.getOrCreateTag().put(Utils.SET,settings);
+            stack.getOrCreateTag().put(Utils.SET, settings);
         }
 
         settings = null;
@@ -244,15 +207,42 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
             } else {
                 this.settings = new CompoundTag();
                 int newId = DankStorage.instance.data.getNextID();
-                DankStorage.instance.data.getOrCreateInventory(newId,stats);
-                settings.putInt(Utils.ID,newId);
+                DankStorage.instance.data.getOrCreateInventory(newId, stats);
+                settings.putInt(Utils.ID, newId);
             }
             setChanged();
         }
     }
 
-    @Override
-    public void clearContent() {
+    //item api
 
+    private CombinedStorage<ItemVariant,DankInventorySlotWrapper> storage;
+
+    public CombinedStorage<ItemVariant,DankInventorySlotWrapper> getStorage(Direction direction) {
+
+        DankInventory dankInventory = getInventory();
+
+        if (storage != null && storage.parts.size() != dankInventory.getContainerSize()) {
+            storage = null;
+        }
+        if (storage == null) {
+            storage = create(dankInventory);
+        }
+        return storage;
     }
+
+
+    public static CombinedStorage<ItemVariant,DankInventorySlotWrapper> create(DankInventory dankInventory) {
+        int slots = dankInventory.getContainerSize();
+
+        List<DankInventorySlotWrapper> storages = new ArrayList<>();
+
+        for (int i = 0 ;i < slots;i++) {
+            DankInventorySlotWrapper storage = new DankInventorySlotWrapper(dankInventory,i);
+            storages.add(storage);
+        }
+
+        return new CombinedStorage<>(storages);
+    }
+
 }

@@ -11,8 +11,7 @@ public class ClientData {
     public static ItemStack selectedItem = ItemStack.EMPTY;
     public static C2SMessageToggleUseType.UseType useType;
 
-    public static void setData(ItemStack selected, C2SMessageToggleUseType.UseType useType) {
+    public static void setData(ItemStack selected) {
         selectedItem = selected;
-        ClientData.useType = useType;
     }
 }

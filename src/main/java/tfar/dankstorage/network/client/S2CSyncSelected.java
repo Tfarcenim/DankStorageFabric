@@ -14,17 +14,15 @@ import tfar.dankstorage.world.ClientData;
 
 public class S2CSyncSelected implements ClientPlayNetworking.PlayChannelHandler {
 
-    public void handle(@Nullable LocalPlayer player, ItemStack stack, C2SMessageToggleUseType.UseType useType) {
+    public void handle(@Nullable LocalPlayer player, ItemStack stack) {
         if (player != null) {
-            ClientData.setData(stack,useType);
+            ClientData.setData(stack);
         }
     }
 
     @Override
     public void receive(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
-      //  int windowId = buf.readInt();
         ItemStack stack = PacketBufferEX.readExtendedItemStack(buf);
-        C2SMessageToggleUseType.UseType useType = C2SMessageToggleUseType.UseType.values()[buf.readInt()];
-        client.execute(() -> handle(client.player, stack,useType));
+        client.execute(() -> handle(client.player, stack));
     }
 }

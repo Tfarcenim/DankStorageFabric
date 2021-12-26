@@ -63,7 +63,7 @@ public class UpgradeItem extends Item {
         DankInventory dankInventory = newBarrel.getInventory();
 
         dankInventory.upgradeTo(DankStats.values()[newTier]);
-        for (int i = 0; i < oldDankContents.size() && i < newBarrel.getContainerSize(); ++i)
+        for (int i = 0; i < oldDankContents.size() && i < dankInventory.getContainerSize(); ++i)
             dankInventory.setItem(i, oldDankContents.get(i));
         if (!player.getAbilities().instabuild)
             upgradeStack.shrink(1);
