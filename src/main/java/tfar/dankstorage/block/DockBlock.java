@@ -72,7 +72,7 @@ public class DockBlock extends Block implements EntityBlock {
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult p_225533_6_) {
         if (!world.isClientSide) {
             final BlockEntity tile = world.getBlockEntity(pos);
-            if (tile instanceof DockBlockEntity) {
+            if (tile instanceof DockBlockEntity dockBlockEntity) {
                 ItemStack held = player.getItemInHand(hand);
                 if (player.isCrouching() && held.is(Utils.WRENCHES)) {
                     world.destroyBlock(pos, true, player);
@@ -82,14 +82,14 @@ public class DockBlock extends Block implements EntityBlock {
                 if (held.getItem() instanceof DankItem) {
 
                     if (state.getValue(TIER) > 0) {
-                        ((DockBlockEntity) tile).removeTankWithItemSpawn();
+                        dockBlockEntity.giveToPlayer(player);
                     }
-                    ((DockBlockEntity) tile).addDank(held);
+                    dockBlockEntity.addDank(held);
                     return InteractionResult.SUCCESS;
                 }
 
-                if (held.isEmpty() && player.isShiftKeyDown() && state.getValue(TIER) > 0) {
-                    ((DockBlockEntity) tile).removeTankWithItemSpawn();
+                if (player.isShiftKeyDown() && state.getValue(TIER) > 0) {
+                    dockBlockEntity.giveToPlayer(player);
                     return InteractionResult.SUCCESS;
                 }
 

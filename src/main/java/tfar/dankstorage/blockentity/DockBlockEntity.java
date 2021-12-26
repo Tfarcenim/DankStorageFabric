@@ -161,7 +161,16 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         };
     }
 
-    public void removeTankWithItemSpawn() {
+    public void giveToPlayer(Player player) {
+        ItemStack dankInStack = removeDankWithoutItemSpawn();
+
+        if (!player.addItem(dankInStack)) {
+            ItemEntity entity = new ItemEntity(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), dankInStack);
+            level.addFreshEntity(entity);
+        }
+    }
+
+    public void removeDankWithItemSpawn() {
         ItemStack dankInStack = removeDankWithoutItemSpawn();
         ItemEntity entity = new ItemEntity(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), dankInStack);
         level.addFreshEntity(entity);

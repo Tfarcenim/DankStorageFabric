@@ -113,52 +113,53 @@ public class DankItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack bag = player.getItemInHand(hand);
-        if (!level.isClientSide) {
-
-            assignNextId(bag);
 
             if (Utils.getUseType(bag) == C2SMessageToggleUseType.UseType.bag) {
-                player.openMenu(new PortableDankProvider(bag));
-                return super.use(level, player, hand);
-            } else {
-                ItemStack toPlace = Utils.getItemStackInSelectedSlot(bag, (ServerLevel) level);
-                EquipmentSlot hand1 = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-                //handle empty
-                if (toPlace.isEmpty()) {
-                    return InteractionResultHolder.pass(bag);
+                if (!level.isClientSide) {
+                    assignNextId(bag);
+                    player.openMenu(new PortableDankProvider(bag));
                 }
+                return InteractionResultHolder.success(bag);
+            } else {
+                if (!level.isClientSide) {
+                    ItemStack toPlace = Utils.getItemStackInSelectedSlot(bag, (ServerLevel) level);
+                    EquipmentSlot hand1 = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+                    //handle empty
+                    if (toPlace.isEmpty()) {
+                        return InteractionResultHolder.pass(bag);
+                    }
 
-                //handle food
-                if (toPlace.getItem().isEdible()) {
-                    if (player.canEat(false)) {
+                    //handle food
+                    if (toPlace.getItem().isEdible()) {
+                        if (player.canEat(false)) {
+                            player.startUsingItem(hand);
+                            return InteractionResultHolder.consume(bag);
+                        }
+                    }
+                    //handle potion
+                    else if (toPlace.getItem() instanceof PotionItem) {
                         player.startUsingItem(hand);
-                        return InteractionResultHolder.consume(bag);
+                        return InteractionResultHolder.success(player.getItemInHand(hand));
+                    }
+
+                    //handle shield
+                    else if (toPlace.getItem() instanceof ShieldItem) {
+                        player.startUsingItem(hand);
+                        return InteractionResultHolder.success(player.getItemInHand(hand));
+                    }
+
+                    //todo support other items?
+                    else {
+                        ItemStack newBag = bag.copy();
+                        player.setItemSlot(hand1, toPlace);
+                        InteractionResultHolder<ItemStack> actionResult = toPlace.getItem().use(level, player, hand);
+                        DankInventory handler = Utils.getOrCreateInventory(newBag, level);
+                        handler.setItem(Utils.getSelectedSlot(newBag), actionResult.getObject());
+                        player.setItemSlot(hand1, newBag);
                     }
                 }
-                //handle potion
-                else if (toPlace.getItem() instanceof PotionItem) {
-                    player.startUsingItem(hand);
-                    return new InteractionResultHolder<>(InteractionResult.SUCCESS, player.getItemInHand(hand));
-                }
-
-                //handle shield
-                else if (toPlace.getItem() instanceof ShieldItem) {
-                    player.startUsingItem(hand);
-                    return new InteractionResultHolder<>(InteractionResult.SUCCESS, player.getItemInHand(hand));
-                }
-
-                //todo support other items?
-                else {
-                    ItemStack newBag = bag.copy();
-                    player.setItemSlot(hand1, toPlace);
-                    InteractionResultHolder<ItemStack> actionResult = toPlace.getItem().use(level, player, hand);
-                    DankInventory handler = Utils.getOrCreateInventory(newBag,level);
-                    handler.setItem(Utils.getSelectedSlot(newBag), actionResult.getObject());
-                    player.setItemSlot(hand1, newBag);
-                }
+                return new InteractionResultHolder<>(InteractionResult.PASS, player.getItemInHand(hand));
             }
-        }
-        return new InteractionResultHolder<>(InteractionResult.PASS, player.getItemInHand(hand));
     }
 
     //this is called on the client
