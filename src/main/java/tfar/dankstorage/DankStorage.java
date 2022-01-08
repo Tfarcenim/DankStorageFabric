@@ -23,6 +23,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tfar.dankstorage.block.DankDispenserBehavior;
 import tfar.dankstorage.block.DockBlock;
 import tfar.dankstorage.client.Client;
@@ -45,6 +47,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
         ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.ServerStopped, CommandRegistrationCallback {
 
     public static final String MODID = "dankstorage";
+    public static final Logger LOGGER = LogManager.getLogger(MODID);
 
     public static Block dock;
     public static MenuType<DockMenu> dank_1_container;

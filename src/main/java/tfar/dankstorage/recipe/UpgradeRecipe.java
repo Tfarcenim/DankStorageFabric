@@ -27,19 +27,6 @@ public class UpgradeRecipe extends ShapedRecipe {
         ItemStack oldBag = inv.getItem(4);
         //can't upgrade the backing inventory because there isn't one yet
         if (!oldBag.hasTag()) return newBag;
-
-        AbstractContainerMenu menu = ((CraftingContainerAccess)inv).getMenu();
-
-        int id = Utils.getFrequency(oldBag);
-        if (menu instanceof CraftingMenu && id > -1) {
-            if (!((CraftingMenuAccess) menu).getPlayer().level.isClientSide) {
-                DankInventory inventory = DankStorage.instance.data.getInventory(id);
-                inventory.upgradeTo(Utils.getStats(newBag));
-            } else {
-                System.out.println("Why is someone trying to craft items clientside, now they won't have the correct data.");
-                new RuntimeException().printStackTrace();
-            }
-        }
         newBag.setTag(oldBag.getTag());
         return newBag;
     }

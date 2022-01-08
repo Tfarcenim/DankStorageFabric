@@ -144,9 +144,13 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
 
         DankInventory dankInventory = getInventory();
 
-        if (dankInventory.dankStats != DankStats.values()[tier]) {
-            Utils.warn(player, DankStats.values()[tier], dankInventory.dankStats);
-            return null;
+        DankStats type = DankStats.values()[tier];
+        if (type != dankInventory.dankStats) {
+            if (type.ordinal() < dankInventory.dankStats.ordinal()) {
+                Utils.warn(player, type, dankInventory.dankStats);
+                return null;
+            }
+            dankInventory.upgradeTo(type);
         }
 
         return switch (getBlockState().getValue(DockBlock.TIER)) {
@@ -213,14 +217,20 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
             CompoundTag iSettings = Utils.getSettings(tank);
             tank.shrink(1);
 
+            DankInventory dankInventory;
             if (iSettings != null && iSettings.contains(Utils.ID)) {
                 this.settings = iSettings;
+                dankInventory = DankStorage.instance.data.getInventory(iSettings.getInt(Utils.ID));
             } else {
                 this.settings = new CompoundTag();
                 int newId = DankStorage.instance.data.getNextID();
-                DankStorage.instance.data.getOrCreateInventory(newId, stats);
+                dankInventory = DankStorage.instance.data.getOrCreateInventory(newId, stats);
                 settings.putInt(Utils.ID, newId);
             }
+            if (stats != dankInventory.dankStats) {
+                dankInventory.upgradeTo(stats);
+            }
+
             setChanged();
         }
     }

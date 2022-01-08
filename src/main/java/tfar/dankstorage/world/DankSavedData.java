@@ -6,6 +6,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
 
@@ -85,7 +86,7 @@ public class DankSavedData extends SavedData {
     @Override
     public void save(File file) {
         super.save(file);
-        System.out.println("Saving Dank Contents");
+        DankStorage.LOGGER.info("Saving Dank Contents");
     }
 
     public void clearAll() {
