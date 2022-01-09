@@ -5,6 +5,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.utils.ItemHandlerHelper;
@@ -43,7 +44,7 @@ public class MixinHooks {
         DankInventory inv = Utils.getInventory(dank,player.level);
 
         if (inv == null) {
-            System.out.println("That's odd, the player somehow got an unassigned dank to change pickup mode");
+            DankStorage.LOGGER.warn("That's odd, the player somehow got an unassigned dank to change pickup mode");
             return false;
         }
 

@@ -22,7 +22,6 @@ public class C2SMessageTogglePickup implements ServerPlayNetworking.PlayChannelH
 
     public void handle(ServerPlayer player) {
         ItemStack bag = player.getMainHandItem();
-        System.out.println(bag);
         if (!(bag.getItem() instanceof DankItem)) {
             bag = player.getOffhandItem();
             if (!(bag.getItem() instanceof DankItem)) return;
