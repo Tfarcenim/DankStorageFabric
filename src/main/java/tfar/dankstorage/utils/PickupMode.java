@@ -1,7 +1,7 @@
 package tfar.dankstorage.utils;
 
 public enum PickupMode {
-    normal(0xffffff), pickup_all(0x00ff00), filtered_pickup(0xffff00), void_pickup(0xff0000);
+    none(0xffffff), pickup_all(0x00ff00), filtered_pickup(0xffff00), void_pickup(0xff0000);
 
     public static final PickupMode[] PICKUP_MODES = values();
     private final int color;

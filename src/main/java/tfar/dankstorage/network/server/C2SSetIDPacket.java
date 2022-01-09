@@ -12,7 +12,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.network.DankPacketHandler;
-import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.world.DankInventory;
 
 public class C2SSetIDPacket implements ServerPlayNetworking.PlayChannelHandler {
@@ -37,9 +36,9 @@ public class C2SSetIDPacket implements ServerPlayNetworking.PlayChannelHandler {
                 if (targetInventory != null && targetInventory.dankStats == inventory.dankStats) {
 
                     if (targetInventory.locked_id) {
-                     textColor = 0xff0000ff;
+                     textColor = DankInventory.TxtColor.LOCKED.color;
                     } else {
-                        textColor = 0xff00ff00;
+                        textColor = DankInventory.TxtColor.GOOD.color;
                         if (set) {
                             dankMenu.setID(id);
                             player.closeContainer();
@@ -47,10 +46,10 @@ public class C2SSetIDPacket implements ServerPlayNetworking.PlayChannelHandler {
                     }
                 } else {
                     //orange if it doesn't exist, yellow if it does but wrong tier
-                    textColor = targetInventory == null ? 0xffff8000 : 0xffffff00;
+                    textColor = targetInventory == null ? DankInventory.TxtColor.TOO_HIGH.color : DankInventory.TxtColor.DIFFERENT_TIER.color;
                 }
             } else {
-                textColor = 0xffff0000;
+                textColor = DankInventory.TxtColor.INVALID.color;
             }
              inventory.setTextColor(textColor);
         }

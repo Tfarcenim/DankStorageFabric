@@ -39,7 +39,7 @@ public class MixinHooks {
     public static boolean onItemPickup(Player player, ItemStack pickup, ItemStack dank) {
 
         PickupMode pickupMode = Utils.getPickupMode(dank);
-        if (pickupMode == PickupMode.normal) return false;
+        if (pickupMode == PickupMode.none) return false;
         DankInventory inv = Utils.getInventory(dank,player.level);
 
         if (inv == null) {

@@ -11,20 +11,26 @@ import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.network.server.*;
 import tfar.dankstorage.utils.PacketBufferEX;
 
+import java.util.List;
+
 public class DankPacketHandler {
 
     public static final ResourceLocation toggle_pickup = new ResourceLocation(DankStorage.MODID, "toggle_pickup");
     public static final ResourceLocation tag_mode = new ResourceLocation(DankStorage.MODID, "tag_mode");
     public static final ResourceLocation sort = new ResourceLocation(DankStorage.MODID, "sort");
     public static final ResourceLocation lock_slot = new ResourceLocation(DankStorage.MODID, "lock_slot");
-    public static final ResourceLocation sync_slot = new ResourceLocation(DankStorage.MODID, "sync_slot");
-    public static final ResourceLocation sync_container = new ResourceLocation(DankStorage.MODID, "sync_container");
+
     public static final ResourceLocation pick_block = new ResourceLocation(DankStorage.MODID, "pick_block");
     public static final ResourceLocation toggle_use = new ResourceLocation(DankStorage.MODID, "toggle_use");
     public static final ResourceLocation scroll = new ResourceLocation(DankStorage.MODID, "scroll");
-    public static final ResourceLocation sync_data = new ResourceLocation(DankStorage.MODID, "sync_data");
     public static final ResourceLocation set_id = new ResourceLocation(DankStorage.MODID, "set_id");
     public static final ResourceLocation lock_id = new ResourceLocation(DankStorage.MODID, "lock_id");
+    public static final ResourceLocation request_contents = new ResourceLocation(DankStorage.MODID, "request_contents");
+
+    public static final ResourceLocation sync_slot = new ResourceLocation(DankStorage.MODID, "sync_slot");
+    public static final ResourceLocation sync_container = new ResourceLocation(DankStorage.MODID, "sync_container");
+    public static final ResourceLocation sync_data = new ResourceLocation(DankStorage.MODID, "sync_data");
+    public static final ResourceLocation sync_inventory = new ResourceLocation(DankStorage.MODID, "sync_inventory");
 
     public static void registerMessages() {
         ServerPlayNetworking.registerGlobalReceiver(scroll, new C2SMessageScrollSlot());
@@ -36,6 +42,7 @@ public class DankPacketHandler {
         ServerPlayNetworking.registerGlobalReceiver(pick_block, new C2SMessagePickBlock());
         ServerPlayNetworking.registerGlobalReceiver(set_id, new C2SSetIDPacket());
         ServerPlayNetworking.registerGlobalReceiver(lock_id,new C2SMessageLockFrequency());
+        ServerPlayNetworking.registerGlobalReceiver(request_contents,new C2SRequestContentsPacket());
     }
 
     public static void sendSyncSlot(ServerPlayer player, int id, int slot, ItemStack stack) {
@@ -66,5 +73,11 @@ public class DankPacketHandler {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         PacketBufferEX.writeExtendedItemStack(buf, stack);
         ServerPlayNetworking.send(player, DankPacketHandler.sync_data, buf);
+    }
+
+    public static void sendList(ServerPlayer player, List<ItemStack> stacks) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        PacketBufferEX.writeList(buf, stacks);
+        ServerPlayNetworking.send(player, DankPacketHandler.sync_inventory, buf);
     }
 }

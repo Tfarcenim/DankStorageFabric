@@ -1,5 +1,6 @@
 package tfar.dankstorage.item;
 
+import net.minecraft.ChatFormatting;
 import tfar.dankstorage.block.DockBlock;
 import tfar.dankstorage.blockentity.DockBlockEntity;
 
@@ -38,37 +39,23 @@ public class UpgradeItem extends Item {
         ItemStack upgradeStack = context.getItemInHand();
         BlockState state = world.getBlockState(pos);
 
-        if (player == null || !(state.getBlock() instanceof DockBlock) || !upgradeInfo.canUpgrade(state))
+        if (player == null || !(state.getBlock() instanceof DockBlock) || !upgradeInfo.canUpgrade(state)) {
             return InteractionResult.FAIL;
-        if (world.isClientSide)
-            return InteractionResult.PASS;
-
-        else {
-            player.displayClientMessage(new TranslatableComponent("dankstorage.in_use").setStyle(Style.EMPTY.withColor(TextColor.fromRgb(1))), true);
         }
+        //else {
+        //    player.displayClientMessage(new TranslatableComponent("dankstorage.in_use").withStyle(ChatFormatting.RED), true);
+        // }
 
         DockBlockEntity oldDank = (DockBlockEntity) world.getBlockEntity(pos);
 
-        //shortcut
-        assert oldDank != null;
-        final NonNullList<ItemStack> oldDankContents = oldDank.getInventory().getContents();
-
-        int newTier = upgradeInfo.end;
-
-        BlockState newState = state.setValue(DockBlock.TIER, newTier);
-
-        world.setBlock(pos, newState, 3);
-
-        DockBlockEntity newBarrel = (DockBlockEntity) world.getBlockEntity(pos);
-        DankInventory dankInventory = newBarrel.getInventory();
-
-        dankInventory.upgradeTo(DankStats.values()[newTier]);
-        for (int i = 0; i < oldDankContents.size() && i < dankInventory.getContainerSize(); ++i)
-            dankInventory.setItem(i, oldDankContents.get(i));
-        if (!player.getAbilities().instabuild)
-            upgradeStack.shrink(1);
-        player.displayClientMessage(new TranslatableComponent("dankstorage.upgrade_successful")
-                .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(1))), true);
+        if (!world.isClientSide) {
+            if (oldDank != null) {
+                oldDank.upgradeTo(DankStats.values()[upgradeInfo.end]);
+                if (!player.getAbilities().instabuild)
+                    upgradeStack.shrink(1);
+            }
+            player.displayClientMessage(new TranslatableComponent("text.dankstorage.upgrade_successful").withStyle(ChatFormatting.GREEN), true);
+        }
         return InteractionResult.SUCCESS;
     }
 }

@@ -1,17 +1,20 @@
 package tfar.dankstorage.world;
 
 import net.minecraft.world.item.ItemStack;
-import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class ClientData {
 
     public static ItemStack selectedItem = ItemStack.EMPTY;
-    public static C2SMessageToggleUseType.UseType useType;
+
+    public static List<ItemStack> cachedItems;
 
     public static void setData(ItemStack selected) {
         selectedItem = selected;
+    }
+
+    public static void setList(List<ItemStack> stacks) {
+        cachedItems = stacks;
     }
 }

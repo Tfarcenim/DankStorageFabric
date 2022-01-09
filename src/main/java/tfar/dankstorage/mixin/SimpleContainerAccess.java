@@ -1,4 +1,4 @@
-package tfar.dankstorage.ducks;
+package tfar.dankstorage.mixin;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.SimpleContainer;
@@ -7,12 +7,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-public interface SimpleInventoryAccessor {
+@Mixin(SimpleContainer.class)
+public interface SimpleContainerAccess {
 
-    NonNullList<ItemStack> getItems();
+    @Accessor NonNullList<ItemStack> getItems();
 
-    void setItems(NonNullList<ItemStack> stacks);
+    @Accessor @Mutable void setItems(NonNullList<ItemStack> stacks);
 
-    void setSize(int slots);
+    @Accessor @Mutable void setSize(int slots);
 
 }

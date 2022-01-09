@@ -14,8 +14,6 @@ import static tfar.dankstorage.client.screens.DockScreen.*;
 
 public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMenu> {
 
-    public static int max_nbt = 1048576;
-
     public PortableDankStorageScreen(DankMenu container, Inventory playerinventory, Component component, ResourceLocation background) {
         super(container, playerinventory, component, background);
     }
@@ -53,13 +51,16 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
         super.init();
         int start = this.titleLabelX;
         int namelength = font.width(title);
-        start += namelength;
+
+        int maxOffset = Math.min(70,namelength);
+
+        start += maxOffset;
         start-=10;
     //    this.addRenderableWidget(new RedGreenToggleButton(leftPos + (start += 8), topPos + 6, 8, 8, b -> {
      //       ((RedGreenToggleButton) b).toggle();
     //        C2SMessageTagMode.send();
     //    }, false));
-        this.addRenderableWidget(new TripleToggleButton(leftPos + (start += 30), topPos + 6, 8, 8, b -> {
+        this.addRenderableWidget(new TripleToggleButton(leftPos + (start += 12), topPos + 6, 8, 8, b -> {
             Utils.cyclePickupMode(menu.bag, Minecraft.getInstance().player);
             C2SMessageTogglePickup.send();
         },this));
@@ -69,10 +70,13 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     protected void renderLabels(PoseStack stack, int mouseX, int mouseY) {
         super.renderLabels(stack, mouseX, mouseY);
         int namelength = font.width(title);
-        int start = this.titleLabelX;
-        start += namelength;
-     //   this.font.draw(stack, "Tag", start += 18, 6, 0x404040);
-        this.font.draw(stack, "Pickup", start += 30, 6, 0x404040);
 
+        int maxOffset = Math.min(70,namelength);
+
+        int start = this.titleLabelX;
+        start += maxOffset;
+
+        //   this.font.draw(stack, "Tag", start += 18, 6, 0x404040);
+        this.font.draw(stack, "Pickup", start += 12, 6, 0x404040);
     }
 }

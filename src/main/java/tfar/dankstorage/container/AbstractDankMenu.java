@@ -76,31 +76,33 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 
+        boolean locked = slot instanceof DankSlot && dankInventory.isLocked(index);
+
         if (slot.hasItem()) {
-            ItemStack itemstack1 = slot.getItem();
-            itemstack = itemstack1.copy();
+            ItemStack slotStack = slot.getItem();
+            itemstack = slotStack.copy();
+
 
             if (index < rows * 9) {
-                if (!this.moveItemStackTo(itemstack1, rows * 9, this.slots.size(), true)) {
+                if (!this.moveItemStackTo(slotStack, rows * 9, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(itemstack1, 0, rows * 9, false)) {
+            } else if (!this.moveItemStackTo(slotStack, 0, rows * 9, false)) {
                 return ItemStack.EMPTY;
             }
 
-            if (itemstack1.isEmpty()) {
+            if (slotStack.isEmpty()) {
                 slot.set(ItemStack.EMPTY);
             } else {
                 slot.setChanged();
             }
         }
-
         return itemstack;
     }
 
     @Override
     public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
-        boolean locked = slotId >= 0 && slotId < (rows * 9) && dankInventory.get(slotId) == 1;
+        boolean locked = slotId >= 0 && slotId < rows * 9 && dankInventory.isLocked(slotId);
         ItemStack itemstack = ItemStack.EMPTY;
         Inventory inventory = player.getInventory();
 
@@ -419,76 +421,77 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         return true;
     }
 
+    //used by quick transfer, needs to respect locked slots
     @Override
-    protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
-        boolean flag = false;
+    protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverse) {
+        boolean didSomething = false;
         int i = startIndex;
 
-        if (reverseDirection) {
+        if (reverse) {
             i = endIndex - 1;
         }
 
         while (!stack.isEmpty()) {
-            if (reverseDirection) {
+            if (reverse) {
                 if (i < startIndex) break;
             } else {
                 if (i >= endIndex) break;
             }
 
             Slot slot = this.slots.get(i);
-            ItemStack itemstack = slot.getItem();
+            ItemStack slotStack = slot.getItem();
 
-            if (!itemstack.isEmpty() && itemstack.getItem() == stack.getItem() && ItemStack.tagMatches(stack, itemstack)) {
-                int j = itemstack.getCount() + stack.getCount();
-                int maxSize = slot.getMaxStackSize(itemstack);
+            if (!slotStack.isEmpty() && slotStack.getItem() == stack.getItem() && ItemStack.tagMatches(stack, slotStack)) {
+                int combinedCount = slotStack.getCount() + stack.getCount();
+                int maxSize = slot.getMaxStackSize(slotStack);
 
-                if (j <= maxSize) {
+                if (combinedCount <= maxSize) {
                     stack.setCount(0);
-                    itemstack.setCount(j);
+                    slotStack.setCount(combinedCount);
                     slot.setChanged();
-                    flag = true;
-                } else if (itemstack.getCount() < maxSize) {
-                    stack.shrink(maxSize - itemstack.getCount());
-                    itemstack.setCount(maxSize);
+                    didSomething = true;
+                } else if (slotStack.getCount() < maxSize) {
+                    stack.shrink(maxSize - slotStack.getCount());
+                    slotStack.setCount(maxSize);
                     slot.setChanged();
-                    flag = true;
+                    didSomething = true;
                 }
             }
 
-            i += (reverseDirection) ? -1 : 1;
+            i += reverse ? -1 : 1;
         }
 
         if (!stack.isEmpty()) {
-            if (reverseDirection) i = endIndex - 1;
+            if (reverse) i = endIndex - 1;
             else i = startIndex;
 
             while (true) {
-                if (reverseDirection) {
+                if (reverse) {
                     if (i < startIndex) break;
                 } else {
                     if (i >= endIndex) break;
                 }
 
-                Slot slot1 = this.slots.get(i);
-                ItemStack itemstack1 = slot1.getItem();
+                Slot slot = this.slots.get(i);
+                ItemStack itemstack1 = slot.getItem();
 
-                if (itemstack1.isEmpty() && slot1.mayPlace(stack)) {
-                    if (stack.getCount() > slot1.getMaxStackSize(stack)) {
-                        slot1.set(stack.split(slot1.getMaxStackSize(stack)));
+                if (itemstack1.isEmpty() && slot.mayPlace(stack)) {
+                    if (stack.getCount() > slot.getMaxStackSize(stack)) {
+                        slot.set(stack.split(slot.getMaxStackSize(stack)));
                     } else {
-                        slot1.set(stack.split(stack.getCount()));
+                        slot.set(stack.split(stack.getCount()));
                     }
 
-                    slot1.setChanged();
-                    flag = true;
+                    slot.setChanged();
+                    didSomething = true;
                     break;
                 }
 
-                i += reverseDirection ? -1 : 1;
+                i += reverse ? -1 : 1;
             }
         }
 
-        return flag;
+        return didSomething;
     }
 
     @Override

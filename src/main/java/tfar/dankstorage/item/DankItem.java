@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -27,8 +29,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.client.Client;
+import tfar.dankstorage.client.DankTooltip;
 import tfar.dankstorage.container.PortableDankProvider;
 import tfar.dankstorage.network.DankPacketHandler;
+import tfar.dankstorage.network.server.C2SRequestContentsPacket;
+import tfar.dankstorage.world.ClientData;
 import tfar.dankstorage.world.DankInventory;
 import tfar.dankstorage.mixin.ItemUsageContextAccessor;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
@@ -42,6 +47,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 public class DankItem extends Item {
     public final DankStats stats;
@@ -150,12 +156,12 @@ public class DankItem extends Item {
 
                     //todo support other items?
                     else {
-                        ItemStack newBag = bag.copy();
+                        ItemStack bagCopy = bag.copy();
                         player.setItemSlot(hand1, toPlace);
                         InteractionResultHolder<ItemStack> actionResult = toPlace.getItem().use(level, player, hand);
-                        DankInventory handler = Utils.getOrCreateInventory(newBag, level);
-                        handler.setItem(Utils.getSelectedSlot(newBag), actionResult.getObject());
-                        player.setItemSlot(hand1, newBag);
+                        DankInventory handler = Utils.getOrCreateInventory(bagCopy, level);
+                        handler.setItem(Utils.getSelectedSlot(bagCopy), actionResult.getObject());
+                        player.setItemSlot(hand1, bagCopy);
                     }
                 }
                 return new InteractionResultHolder<>(InteractionResult.PASS, player.getItemInHand(hand));
@@ -184,7 +190,7 @@ public class DankItem extends Item {
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.hasTag() && Utils.getPickupMode(stack) != PickupMode.normal;
+        return stack.hasTag() && Utils.getPickupMode(stack) != PickupMode.none;
     }
 
     @Override
@@ -220,20 +226,28 @@ public class DankItem extends Item {
             }
         }
 
-        int id = Utils.getID(bag);
+        int id = Utils.getFrequency(bag);
         tooltip.add(new TextComponent("ID: "+id));
 
         if (!Screen.hasShiftDown()) {
             tooltip.add(new TranslatableComponent("text.dankstorage.shift",
                     new TextComponent("Shift").withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
-        }
+        } else {
 
-        if (Screen.hasShiftDown()) {
-            tooltip.add(new TranslatableComponent("text.dankstorage.changemode", new TextComponent(Client.CONSTRUCTION.saveString()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
-            C2SMessageToggleUseType.UseType mode = Utils.getUseType(bag);
+            tooltip.add(new TranslatableComponent("text.dankstorage.change_pickup_mode", new TextComponent(Client.PICKUP_MODE.saveString())
+                    .withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
+            PickupMode pickupMode = Utils.getPickupMode(bag);
+            tooltip.add(
+                    new TranslatableComponent("text.dankstorage.current_pickup_mode", new TranslatableComponent(
+                            "dankstorage.mode." + pickupMode.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW))
+                            .withStyle(ChatFormatting.GRAY));
+
+
+            tooltip.add(new TranslatableComponent("text.dankstorage.changeusetype", new TextComponent(Client.CONSTRUCTION.saveString()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
+            C2SMessageToggleUseType.UseType useType = Utils.getUseType(bag);
             tooltip.add(
                     new TranslatableComponent("text.dankstorage.currentusetype", new TranslatableComponent(
-                            "dankstorage.usetype." + mode.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
+                            "dankstorage.usetype." + useType.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
             tooltip.add(
                     new TranslatableComponent("text.dankstorage.stacklimit", new TextComponent(stats.stacklimit + "").withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
 
@@ -293,7 +307,7 @@ public class DankItem extends Item {
     public int getGlintColor(ItemStack stack) {
         PickupMode pickupMode = Utils.getPickupMode(stack);
         switch (pickupMode) {
-            case normal:
+            case none:
             default:
                 return 0xffffffff;
             case pickup_all:
@@ -347,8 +361,8 @@ public class DankItem extends Item {
     }
 
     public static class ItemUseContextExt extends UseOnContext {
-        protected ItemUseContextExt(Level p_i50034_1_, @Nullable Player p_i50034_2_, InteractionHand p_i50034_3_, ItemStack p_i50034_4_, BlockHitResult p_i50034_5_) {
-            super(p_i50034_1_, p_i50034_2_, p_i50034_3_, p_i50034_4_, p_i50034_5_);
+        protected ItemUseContextExt(Level level, @Nullable Player player, InteractionHand hand, ItemStack stack, BlockHitResult result) {
+            super(level, player, hand, stack, result);
         }
     }
 
@@ -361,5 +375,28 @@ public class DankItem extends Item {
             dankSavedData.getOrCreateInventory(next,stats);
             Utils.getOrCreateSettings(dank).putInt(Utils.ID,next);
         }
+    }
+
+    private static final ThreadLocal<Integer> cache = ThreadLocal.withInitial(() -> -1);
+
+    @Override
+    public Optional<TooltipComponent> getTooltipImage(ItemStack itemStack) {
+
+        int id = Utils.getFrequency(itemStack);
+
+        if (id > -1) {
+            //don't spam the server with requests
+            if (cache.get() != id) {
+                C2SRequestContentsPacket.send(id);
+                cache.set(id);
+            }
+
+            if (ClientData.cachedItems != null) {
+                NonNullList<ItemStack> nonNullList = NonNullList.create();
+                nonNullList.addAll(ClientData.cachedItems);
+                return Optional.of(new DankTooltip(nonNullList,Utils.getSelectedSlot(itemStack)));
+            }
+        }
+        return Optional.empty();
     }
 }

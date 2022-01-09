@@ -206,8 +206,10 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         if (tank.getItem() instanceof DankItem) {
             DankStats stats = ((DankItem) tank.getItem()).stats;
             level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, stats.ordinal()));
-            setCustomName(tank.getHoverName());
             originalName = tank.hasCustomHoverName();
+            if (originalName) {
+                setCustomName(tank.getHoverName());
+            }
             CompoundTag iSettings = Utils.getSettings(tank);
             tank.shrink(1);
 
@@ -221,6 +223,12 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
             }
             setChanged();
         }
+    }
+
+    public void upgradeTo(DankStats stats) {
+        level.setBlockAndUpdate(worldPosition, getBlockState().setValue(DockBlock.TIER, stats.ordinal()));
+        DankInventory dankInventory = getInventory();
+        dankInventory.upgradeTo(stats);
     }
 
     //item api

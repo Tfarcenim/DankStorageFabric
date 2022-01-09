@@ -7,6 +7,10 @@ import net.minecraft.network.chat.Component;
 import tfar.dankstorage.client.Client;
 
 public class SmallButton extends Button {
+    public SmallButton(int x, int y, int widthIn, int heightIn, Component buttonText, OnPress callback, OnTooltip onTooltip) {
+        super(x, y, widthIn, heightIn, buttonText, callback,onTooltip);
+    }
+
     public SmallButton(int x, int y, int widthIn, int heightIn, Component buttonText, OnPress callback) {
         super(x, y, widthIn, heightIn, buttonText, callback);
     }
@@ -45,6 +49,10 @@ public class SmallButton extends Button {
         blit(matrices, x + halfwidth1, y + halfheight1,
                 200 - halfwidth2, 46 + c * 20 + 20 - halfheight2, halfwidth2, halfheight2);
         if (shouldDrawText()) drawText(matrices, halfwidth2);
+
+        if (this.isHoveredOrFocused()) {
+            this.renderToolTip(matrices,mouseX,mouseY);
+        }
     }
 
     public void drawText(PoseStack stack, int halfwidth2) {

@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PacketBufferEX {
 
@@ -53,6 +55,8 @@ public class PacketBufferEX {
         }
     }
 
+    static final long LIMIT = 2097152L * 4;
+
     public static CompoundTag readNBT(FriendlyByteBuf buf) {
         int i = buf.readerIndex();
         byte b0 = buf.readByte();
@@ -62,11 +66,28 @@ public class PacketBufferEX {
         } else {
             buf.readerIndex(i);
             try {
-                return NbtIo.read(new ByteBufInputStream(buf), new NbtAccounter(2097152L));
+                return NbtIo.read(new ByteBufInputStream(buf), new NbtAccounter(LIMIT));
             } catch (IOException ioexception) {
                 throw new EncoderException(ioexception);
             }
         }
+    }
+
+    public static void writeList(FriendlyByteBuf buf, List<ItemStack> stacks) {
+        buf.writeInt(stacks.size());
+        for (int i = 0; i < stacks.size();i++) {
+            writeExtendedItemStack(buf,stacks.get(i));
+        }
+    }
+
+    public static List<ItemStack> readList(FriendlyByteBuf buf) {
+        List<ItemStack> stacks = new ArrayList<>();
+        int size = buf.readInt();
+        for (int i = 0; i < size;i++) {
+            ItemStack stack = readExtendedItemStack(buf);
+            stacks.add(stack);
+        }
+        return stacks;
     }
 }
 

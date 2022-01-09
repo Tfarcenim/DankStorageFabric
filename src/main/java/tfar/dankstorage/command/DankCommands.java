@@ -21,6 +21,15 @@ public class DankCommands {
                         .then(Commands.argument("id", IntegerArgumentType.integer(0))
                                 .executes(DankCommands::clearID))
                 )
+
+                .then(Commands.literal("set_tier")
+                        .requires(commandSourceStack -> commandSourceStack.hasPermission(3))
+                        .then(Commands.argument("id", IntegerArgumentType.integer(0,7))
+                                .then(Commands.argument("tier", IntegerArgumentType.integer(1))
+                                        .executes(DankCommands::setTier)
+                                )
+                        )
+                )
         );
     }
 
@@ -30,13 +39,21 @@ public class DankCommands {
     }
 
     private static int clearID(CommandContext<CommandSourceStack> context) {
-        int id = IntegerArgumentType.getInteger(context,"id");
-         boolean success = DankStorage.instance.data.clearId(id);
+        int id = IntegerArgumentType.getInteger(context, "id");
+        boolean success = DankStorage.instance.data.clearId(id);
         if (!success) {
             throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.clear_id.invalid_id"));
         }
         return 1;
     }
 
-
+    private static int setTier(CommandContext<CommandSourceStack> context) {
+        int id = IntegerArgumentType.getInteger(context, "id");
+        int tier = IntegerArgumentType.getInteger(context, "tier");
+        boolean success = DankStorage.instance.data.setTier(id,tier);
+        if (!success) {
+            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.set_tier.invalid_id"));
+        }
+        return 1;
+    }
 }

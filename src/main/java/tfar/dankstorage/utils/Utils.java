@@ -2,7 +2,6 @@ package tfar.dankstorage.utils;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.tag.TagFactory;
-import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
@@ -69,7 +68,7 @@ public class Utils {
         if (tag != null) {
             return PickupMode.PICKUP_MODES[tag.getInt("mode")];
         }
-        return PickupMode.normal;
+        return PickupMode.none;
     }
 
     public static boolean isConstruction(ItemStack bag) {
@@ -126,7 +125,7 @@ public class Utils {
     //this can be 0 - 80
     public static int getSelectedSlot(ItemStack bag) {
         CompoundTag settings = Utils.getSettings(bag);
-        return settings != null ? settings.getInt("selectedSlot") : -1;
+        return settings != null && settings.contains("selectedSlot") ? settings.getInt("selectedSlot") : -1;
     }
 
     public static void setSelectedSlot(int slot,ItemStack bag) {
@@ -233,7 +232,7 @@ public class Utils {
     }
 
     //make sure to return an invalid ID for unassigned danks
-    public static int getID(ItemStack bag) {
+    public static int getFrequency(ItemStack bag) {
         CompoundTag settings = getSettings(bag);
         if (settings != null && settings.contains(ID)) {
             return settings.getInt(ID);
@@ -251,7 +250,7 @@ public class Utils {
 
     public static DankInventory getOrCreateInventory(ItemStack bag, Level level) {
         if (!level.isClientSide) {
-            int id = getID(bag);
+            int id = getFrequency(bag);
             return DankStorage.instance.data.getOrCreateInventory(id,getStats(bag));
         }
         throw new RuntimeException("Attempted to get inventory on client");
@@ -259,7 +258,7 @@ public class Utils {
 
     public static DankInventory getInventory(ItemStack bag, Level level) {
         if (!level.isClientSide) {
-            int id = getID(bag);
+            int id = getFrequency(bag);
             return DankStorage.instance.data.getInventory(id);
         }
         throw new RuntimeException("Attempted to get inventory on client");

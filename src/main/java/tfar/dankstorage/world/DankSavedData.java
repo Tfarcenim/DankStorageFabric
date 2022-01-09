@@ -101,4 +101,13 @@ public class DankSavedData extends SavedData {
         }
         return false;
     }
+
+    public boolean setTier(int id,int tier) {
+        if (id < getNextID()) {
+            DankInventory dankInventory = getInventory(id);
+            dankInventory.setTo(DankStats.values()[tier]);
+            return true;
+        }
+        return false;
+    }
 }

@@ -10,7 +10,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.DankStorage;
-import tfar.dankstorage.ducks.SimpleInventoryAccessor;
+import tfar.dankstorage.mixin.SimpleContainerAccess;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.Utils;
 
@@ -38,13 +38,17 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         if (stats.ordinal() <= dankStats.ordinal()) {
             return;
         }
-
-        this.dankStats = stats;
-        setSize();
+        setTo(stats);
     }
 
-    private void setSize() {
-        ((SimpleInventoryAccessor) this).setSize(dankStats.slots);
+    //like upgradeTo, but can go backwards, should only be used by commands
+    public void setTo(DankStats stats) {
+        this.dankStats = stats;
+        fixLockedSlots();
+    }
+
+    private void fixLockedSlots() {
+        ((SimpleContainerAccess) this).setSize(dankStats.slots);
 
         NonNullList<ItemStack> newStacks = NonNullList.withSize(dankStats.slots, ItemStack.EMPTY);
         int max = Math.min(lockedSlots.length, dankStats.slots);
@@ -53,7 +57,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
             newStacks.set(i, getContents().get(i));
         }
 
-        ((SimpleInventoryAccessor) this).setItems(newStacks);
+        ((SimpleContainerAccess) this).setItems(newStacks);
 
         int[] newLockedSlots = new int[dankStats.slots];
         if (max >= 0) System.arraycopy(lockedSlots, 0, newLockedSlots, 0, max);
@@ -93,7 +97,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     }
 
     public NonNullList<ItemStack> getContents() {
-        return ((SimpleInventoryAccessor) this).getItems();
+        return ((SimpleContainerAccess) this).getItems();
     }
 
     public boolean noValidSlots() {
@@ -286,6 +290,14 @@ public class DankInventory extends SimpleContainer implements ContainerData {
             locked_id = value == 1;
         }
         setChanged();
+    }
+
+    public enum TxtColor {
+        INVALID(0xffff0000),TOO_HIGH(0xffff8000),DIFFERENT_TIER(0xffffff00),GOOD(0xff00ff00),LOCKED(0xff0000ff);
+        public final int color;
+        TxtColor(int color) {
+            this.color = color;
+        }
     }
 
     //0 - 80 are locked slots, 81 is the id, 82 is text color, and 83 is global lock
