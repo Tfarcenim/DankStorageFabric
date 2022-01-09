@@ -234,7 +234,7 @@ public class DankItem extends Item {
                     new TextComponent("Shift").withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
         } else {
 
-            tooltip.add(new TranslatableComponent("text.dankstorage.change_pickup_mode", new TextComponent(Client.PICKUP_MODE.saveString())
+            tooltip.add(new TranslatableComponent("text.dankstorage.change_pickup_mode", Client.PICKUP_MODE.getTranslatedKeyMessage().copy()
                     .withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
             PickupMode pickupMode = Utils.getPickupMode(bag);
             tooltip.add(
@@ -243,7 +243,7 @@ public class DankItem extends Item {
                             .withStyle(ChatFormatting.GRAY));
 
 
-            tooltip.add(new TranslatableComponent("text.dankstorage.changeusetype", new TextComponent(Client.CONSTRUCTION.saveString()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
+            tooltip.add(new TranslatableComponent("text.dankstorage.changeusetype", Client.CONSTRUCTION.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
             C2SMessageToggleUseType.UseType useType = Utils.getUseType(bag);
             tooltip.add(
                     new TranslatableComponent("text.dankstorage.currentusetype", new TranslatableComponent(

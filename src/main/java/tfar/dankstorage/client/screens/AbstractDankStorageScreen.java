@@ -214,7 +214,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         }
         if (hoveredSlot instanceof DankSlot) {
             Component component1 = new TranslatableComponent("text.dankstorage.lock",
-                    new TextComponent("ctrl").withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY);
+                    Client.LOCK_SLOT.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY);
             tooltip.add(component1);
             if (stack.getCount() >= 1000) {
                 Component component2 = new TranslatableComponent(
@@ -229,6 +229,6 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         super.renderLabels(poseStack, i, j);
         int id = menu.dankInventory.getId();//menu.dankInventory.get(menu.rows * 9);
         int color = 0x008000;
-        this.font.draw(poseStack, "ID: " + id, 66, inventoryLabelY, color);
+        this.font.draw(poseStack, "ID: " + id, 62, inventoryLabelY, color);
     }
 }

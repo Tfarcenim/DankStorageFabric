@@ -1,16 +1,10 @@
 package tfar.dankstorage.recipe;
 
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import tfar.dankstorage.DankStorage;
-import tfar.dankstorage.mixin.CraftingContainerAccess;
-import tfar.dankstorage.mixin.CraftingMenuAccess;
-import tfar.dankstorage.world.DankInventory;
-import tfar.dankstorage.utils.Utils;
 
 import javax.annotation.Nonnull;
 
