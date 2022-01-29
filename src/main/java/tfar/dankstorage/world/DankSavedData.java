@@ -42,15 +42,6 @@ public class DankSavedData extends SavedData {
         return storage.size();
     }
 
-    private static DankSavedData get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent((CompoundTag compoundTag) -> DankSavedData.loadStatic(compoundTag),
-                DankSavedData::new, level.dimension().location().toString());
-    }
-
-    public static DankSavedData getDefault(ServerLevel level) {
-        return get(level.getServer().getLevel(Level.OVERWORLD));
-    }
-
     @Override
     public CompoundTag save(CompoundTag compoundTag) {
         ListTag listTag = new ListTag();
@@ -96,14 +87,14 @@ public class DankSavedData extends SavedData {
 
     public boolean clearId(int id) {
         if (id < getNextID()) {
-         DankInventory dankInventory = getInventory(id);
-         dankInventory.clearContent();
+            DankInventory dankInventory = getInventory(id);
+            dankInventory.clearContent();
             return true;
         }
         return false;
     }
 
-    public boolean setTier(int id,int tier) {
+    public boolean setTier(int id, int tier) {
         if (id < getNextID()) {
             DankInventory dankInventory = getInventory(id);
             dankInventory.setTo(DankStats.values()[tier]);

@@ -35,7 +35,7 @@ public class C2SSetIDPacket implements ServerPlayNetworking.PlayChannelHandler {
 
                 if (targetInventory != null && targetInventory.dankStats == inventory.dankStats) {
 
-                    if (targetInventory.locked_id) {
+                    if (targetInventory.locked) {
                      textColor = DankInventory.TxtColor.LOCKED.color;
                     } else {
                         textColor = DankInventory.TxtColor.GOOD.color;

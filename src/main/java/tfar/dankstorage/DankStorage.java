@@ -11,6 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -127,7 +128,8 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
 
     @Override
     public void onServerStarted(MinecraftServer server) {
-        instance.data = DankSavedData.getDefault(server.getLevel(Level.OVERWORLD));
+        instance.data = server.getLevel(Level.OVERWORLD).getDataStorage()
+                .computeIfAbsent(DankSavedData::loadStatic, DankSavedData::new,DankStorage.MODID);
     }
 
     @Override

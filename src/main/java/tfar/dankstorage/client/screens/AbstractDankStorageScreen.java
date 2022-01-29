@@ -3,17 +3,17 @@ package tfar.dankstorage.client.screens;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import tfar.dankstorage.client.Client;
+import tfar.dankstorage.client.NumberEditBox;
 import tfar.dankstorage.client.button.SmallButton;
 import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.inventory.DankSlot;
@@ -30,7 +30,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
     protected final boolean is7;
     final ResourceLocation background;//= new ResourceLocation("textures/gui/container/shulker_box.png");
-    private EditBox id;
+    private EditBox frequency;
 
 
     public AbstractDankStorageScreen(T container, Inventory playerinventory, Component component, ResourceLocation background) {
@@ -53,17 +53,18 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        this.id = new EditBox(this.font, i + 92, j + inventoryLabelY, 56, 12, new TranslatableComponent("dank"));
-        this.id.setCanLoseFocus(false);
-        this.id.setTextColor(-1);
-        this.id.setTextColorUneditable(-1);
-        this.id.setBordered(false);
-        this.id.setMaxLength(10);
-        this.id.setResponder(this::onNameChanged);
-        this.id.setValue("");
-        this.id.setTextColor(0xff00ff00);
-        this.addWidget(this.id);
-        this.setInitialFocus(this.id);
+        this.frequency = new NumberEditBox(this.font, i + 92, j + inventoryLabelY, 56, 12, new TranslatableComponent("dank"));
+        this.frequency.setCanLoseFocus(true);
+        this.frequency.setTextColor(-1);
+        this.frequency.setTextColorUneditable(-1);
+        this.frequency.setBordered(false);
+        this.frequency.setMaxLength(10);
+        this.frequency.setResponder(this::onNameChanged);
+        this.frequency.setValue("");
+        this.frequency.setTextColor(0xff00ff00);
+        this.addWidget(this.frequency);
+        this.setInitialFocus(this.frequency);
+        frequency.setFocus(false);
 
         Button.OnTooltip onTooltip2 = (button, poseStack, x, y) -> {
 //todo make this fancy
@@ -77,7 +78,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
                 new TextComponent("s"), b -> {
             try {
                 if (menu.dankInventory.idLocked()) return;
-                int id1 = Integer.parseInt(id.getValue());
+                int id1 = Integer.parseInt(frequency.getValue());
                 C2SSetIDPacket.send(id1, true);
             } catch (NumberFormatException e) {
 
@@ -140,22 +141,20 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE || Minecraft.getInstance().options.keyInventory.matches(keyCode,scanCode)) {
             this.minecraft.player.closeContainer();
         }
+
         //slot locking takes priority over frequency changing
         boolean match = Client.LOCK_SLOT.matches(keyCode,scanCode);
         if (match) {
-            id.setFocus(false);
             if (hoveredSlot instanceof DankSlot) {
                 C2SMessageLockSlot.send(hoveredSlot.index);
                 return true;
             }
-        } else {
-            id.setFocus(true);
         }
 
-        if (!match && (this.id.keyPressed(keyCode, scanCode, modifiers) || this.id.canConsumeInput())) {
+        if (!match && (this.frequency.keyPressed(keyCode, scanCode, modifiers) || this.frequency.canConsumeInput())) {
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -190,8 +189,8 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         RenderSystem.disableBlend();
 
         int color = menu.dankInventory.getTextColor();
-        this.id.setTextColor(color);
-        this.id.render(stack, mouseX, mouseY, partialTicks);
+        this.frequency.setTextColor(color);
+        this.frequency.render(stack, mouseX, mouseY, partialTicks);
         this.renderTooltip(stack, mouseX, mouseY);
     }
 
