@@ -46,6 +46,7 @@ public class Utils {
     public static final String ID = "dankstorage:id";
     public static final Set<ResourceLocation> taglist = new HashSet<>();
     public static boolean DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
+    public static final int INVALID = -1;
 
     public static final String SET = "settings";
 
@@ -125,11 +126,30 @@ public class Utils {
     //this can be 0 - 80
     public static int getSelectedSlot(ItemStack bag) {
         CompoundTag settings = Utils.getSettings(bag);
-        return settings != null && settings.contains("selectedSlot") ? settings.getInt("selectedSlot") : -1;
+        return settings != null && settings.contains("selectedSlot") ? settings.getInt("selectedSlot") : INVALID;
     }
 
-    public static void setSelectedSlot(int slot,ItemStack bag) {
+    public static void setSelectedSlot(ItemStack bag, int slot) {
         getOrCreateSettings(bag).putInt("selectedSlot",slot);
+    }
+
+    public static void setPickSlot(Level level,ItemStack bag, ItemStack stack) {
+
+        DankInventory dankInventory = getInventory(bag,level);
+
+        if (dankInventory != null) {
+            int slot = findSlotMatchingItem(dankInventory, stack);
+            if (slot != INVALID) setSelectedSlot(bag, slot);
+        }
+    }
+
+    public static int findSlotMatchingItem(DankInventory dankInventory,ItemStack itemStack) {
+        for (int i = 0; i < dankInventory.getContainerSize(); ++i) {
+            ItemStack stack = dankInventory.getItem(i);
+            if (stack.isEmpty() || !ItemStack.isSameItemSameTags(itemStack,stack)) continue;
+            return i;
+        }
+        return INVALID;
     }
 
     public static void sort(Player player) {
@@ -225,8 +245,8 @@ public class Utils {
             }
             selected = handler.getItem(selectedSlot);
         }
-        if (selectedSlot != -1) {
-            setSelectedSlot(selectedSlot,bag);
+        if (selectedSlot != INVALID) {
+            setSelectedSlot(bag, selectedSlot);
             DankPacketHandler.sendSelectedItem(player,selected);
         }
     }
@@ -237,7 +257,7 @@ public class Utils {
         if (settings != null && settings.contains(ID)) {
             return settings.getInt(ID);
         }
-        return -1;
+        return INVALID;
     }
 
     private static boolean hasSettings(ItemStack bag) {
@@ -280,7 +300,8 @@ public class Utils {
     }
 
     public static ItemStack getItemStackInSelectedSlot(ItemStack bag,ServerLevel level) {
-        DankInventory inv = getOrCreateInventory(bag,level);
+        DankInventory inv = getInventory(bag,level);
+        if (inv == null) return ItemStack.EMPTY;
         ItemStack stack = inv.getItem(Utils.getSelectedSlot(bag));
         return stack.is(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
     }

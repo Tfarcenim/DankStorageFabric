@@ -332,6 +332,11 @@ public class DankItem extends Item {
 
         int selectedSlot = Utils.getSelectedSlot(bag);
 
+        //invalid slot
+        if (selectedSlot == Utils.INVALID) {
+            return InteractionResult.PASS;
+        }
+
         ItemStack toPlace = Utils.getSelectedItem(bag,level);
         //todo: sync locked slots to client?
         if (/*toPlace.getCount() == 1 && handler.isLocked(selectedSlot)*/ false)
@@ -377,14 +382,14 @@ public class DankItem extends Item {
         }
     }
 
-    private static final ThreadLocal<Integer> cache = ThreadLocal.withInitial(() -> -1);
+    private static final ThreadLocal<Integer> cache = ThreadLocal.withInitial(() -> Utils.INVALID);
 
     @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack itemStack) {
 
         int id = Utils.getFrequency(itemStack);
 
-        if (id > -1) {
+        if (id > Utils.INVALID) {
             //don't spam the server with requests
             if (cache.get() != id) {
                 C2SRequestContentsPacket.send(id);
