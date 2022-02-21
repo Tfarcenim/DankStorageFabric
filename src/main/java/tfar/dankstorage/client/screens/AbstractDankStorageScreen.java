@@ -87,9 +87,11 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
         Button.OnTooltip onTooltip = (button, poseStack, x, y) -> {
 
+            boolean locked = menu.dankInventory.idLocked();
+
             this.renderTooltip(poseStack,
                     this.minecraft.font.split(
-                            new TranslatableComponent("text.dankstorage.lock_button"), Math.max(this.width / 2 - 43, 170)), x, y);
+                            new TranslatableComponent("text.dankstorage." + (locked ? "un" : "") + "lock_button"), Math.max(this.width / 2 - 43, 170)), x, y);
 
         };
 
@@ -122,7 +124,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
                         new TranslatableComponent("text.dankstorage.save_frequency_button.goodtxt")
                                 .withStyle(ChatFormatting.GRAY))
                         .withStyle(Style.EMPTY.withColor(DankInventory.TxtColor.GOOD.color))
-                ,                new TranslatableComponent("text.dankstorage.save_frequency_button.locked_frequency",
+                , new TranslatableComponent("text.dankstorage.save_frequency_button.locked_frequency",
                 new TranslatableComponent("text.dankstorage.save_frequency_button.locked_frequencytxt")
                         .withStyle(ChatFormatting.GRAY))
                 .withStyle(Style.EMPTY.withColor(DankInventory.TxtColor.LOCKED.color))
@@ -141,12 +143,12 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE || Minecraft.getInstance().options.keyInventory.matches(keyCode,scanCode)) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE || Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
             this.minecraft.player.closeContainer();
         }
 
         //slot locking takes priority over frequency changing
-        boolean match = Client.LOCK_SLOT.matches(keyCode,scanCode);
+        boolean match = Client.LOCK_SLOT.matches(keyCode, scanCode);
         if (match) {
             if (hoveredSlot instanceof DankSlot) {
                 C2SMessageLockSlot.send(hoveredSlot.index);

@@ -45,6 +45,7 @@
   "text.dankstorage.formatcontaineditems": "%s %s",
   "text.dankstorage.upgrade_successful": "Upgrade Successful",
   "text.dankstorage.lock_button" : "Press to lock frequency",
+  "text.dankstorage.unlock_button" : "Press to unlock frequency",
   "text.dankstorage.save_frequency_button" : "Save the new frequency \n%s \n%s \n%s \n%s \n%s",
   "text.dankstorage.save_frequency_button.invalid" : "Red: %s",
   "text.dankstorage.save_frequency_button.invalidtxt" : "This frequency is invalid",
