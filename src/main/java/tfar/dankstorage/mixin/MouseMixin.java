@@ -17,7 +17,8 @@ public class MouseMixin {
     @Final
     private Minecraft minecraft;
 
-    @Inject(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z"), cancellable = true)
+    @Inject(method = "onScroll",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getInventory()Lnet/minecraft/world/entity/player/Inventory;"), cancellable = true)
     private void onScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
         double delta = (this.minecraft.options.discreteMouseScroll ? Math.signum(horizontal) : vertical) * this.minecraft.options.mouseWheelSensitivity;
 
