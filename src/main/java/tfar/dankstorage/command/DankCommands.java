@@ -24,10 +24,25 @@ public class DankCommands {
 
                 .then(Commands.literal("set_tier")
                         .requires(commandSourceStack -> commandSourceStack.hasPermission(3))
-                        .then(Commands.argument("id", IntegerArgumentType.integer(0,7))
-                                .then(Commands.argument("tier", IntegerArgumentType.integer(1))
+                        .then(Commands.argument("id", IntegerArgumentType.integer(0))
+                                .then(Commands.argument("tier", IntegerArgumentType.integer(1,7))
                                         .executes(DankCommands::setTier)
                                 )
+                        )
+                )
+
+
+                .then(Commands.literal("lock")
+                        .requires(commandSourceStack -> commandSourceStack.hasPermission(3))
+                        .then(Commands.argument("id", IntegerArgumentType.integer(0))
+                                .executes(DankCommands::lock)
+                        )
+                )
+
+                .then(Commands.literal("unlock")
+                        .requires(commandSourceStack -> commandSourceStack.hasPermission(3))
+                        .then(Commands.argument("id", IntegerArgumentType.integer(0))
+                                .executes(DankCommands::unlock)
                         )
                 )
         );
@@ -50,9 +65,27 @@ public class DankCommands {
     private static int setTier(CommandContext<CommandSourceStack> context) {
         int id = IntegerArgumentType.getInteger(context, "id");
         int tier = IntegerArgumentType.getInteger(context, "tier");
-        boolean success = DankStorage.instance.data.setTier(id,tier);
+        boolean success = DankStorage.instance.data.setTier(id, tier);
         if (!success) {
             throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.set_tier.invalid_id"));
+        }
+        return 1;
+    }
+
+    private static int lock(CommandContext<CommandSourceStack> context) {
+        int id = IntegerArgumentType.getInteger(context, "id");
+        boolean success = DankStorage.instance.data.lock(id);
+        if (!success) {
+            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.lock.invalid_id"));
+        }
+        return 1;
+    }
+
+    private static int unlock(CommandContext<CommandSourceStack> context) {
+        int id = IntegerArgumentType.getInteger(context, "id");
+        boolean success = DankStorage.instance.data.unlock(id);
+        if (!success) {
+            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.unlock.invalid_id"));
         }
         return 1;
     }

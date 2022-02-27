@@ -77,7 +77,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         this.addRenderableWidget(new SmallButton(leftPos + 157, j + inventoryLabelY - 2, 12, 12,
                 new TextComponent("s"), b -> {
             try {
-                if (menu.dankInventory.idLocked()) return;
+                if (menu.dankInventory.frequencyLocked()) return;
                 int id1 = Integer.parseInt(frequency.getValue());
                 C2SSetIDPacket.send(id1, true);
             } catch (NumberFormatException e) {
@@ -87,7 +87,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
         Button.OnTooltip onTooltip = (button, poseStack, x, y) -> {
 
-            boolean locked = menu.dankInventory.idLocked();
+            boolean locked = menu.dankInventory.frequencyLocked();
 
             this.renderTooltip(poseStack,
                     this.minecraft.font.split(
@@ -100,7 +100,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
                 new TextComponent(""), button -> C2SMessageLockFrequency.send(true), onTooltip) {
             @Override
             public Component getMessage() {
-                return menu.dankInventory.idLocked() ? new TextComponent("X").withStyle(ChatFormatting.RED) :
+                return menu.dankInventory.frequencyLocked() ? new TextComponent("X").withStyle(ChatFormatting.RED) :
                         new TextComponent("O");
             }
         });

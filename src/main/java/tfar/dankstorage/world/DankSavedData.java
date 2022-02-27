@@ -3,8 +3,6 @@ package tfar.dankstorage.world;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.utils.DankStats;
@@ -98,6 +96,24 @@ public class DankSavedData extends SavedData {
         if (id < getNextID()) {
             DankInventory dankInventory = getInventory(id);
             dankInventory.setTo(DankStats.values()[tier]);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean lock(int frequency) {
+        if (frequency < getNextID()) {
+            DankInventory dankInventory = getInventory(frequency);
+            dankInventory.setFrequencyLock(true);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean unlock(int frequency) {
+        if (frequency < getNextID()) {
+            DankInventory dankInventory = getInventory(frequency);
+            dankInventory.setFrequencyLock(false);
             return true;
         }
         return false;

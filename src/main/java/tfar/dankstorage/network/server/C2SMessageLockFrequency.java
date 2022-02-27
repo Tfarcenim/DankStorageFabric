@@ -25,7 +25,7 @@ public class C2SMessageLockFrequency implements ServerPlayNetworking.PlayChannel
         AbstractContainerMenu container = player.containerMenu;
         if (container instanceof AbstractDankMenu dankMenu) {
             DankInventory inventory = dankMenu.dankInventory;
-            inventory.toggleIdLock();
+            inventory.toggleFrequencyLock();
         }
     }
 

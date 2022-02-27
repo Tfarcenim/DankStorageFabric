@@ -241,55 +241,58 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         }
     }
 
-    public int getIdSlot() {
+    public int getFrequencySlot() {
         return getContainerSize();
     }
 
     public int getTextColor() {
-        return get(getIdSlot() + 1);
+        return get(getFrequencySlot() + 1);
     }
 
     public void setTextColor(int color) {
-        set(getIdSlot() + 1, color);
+        set(getFrequencySlot() + 1, color);
     }
 
-    public boolean idLocked() {
-        return get(getIdSlot() + 2) == 1;
+    public boolean frequencyLocked() {
+        return get(getFrequencySlot() + 2) == 1;
     }
 
-    public void toggleIdLock() {
-        boolean loc = get(getIdSlot() + 2) == 1;
+    public void toggleFrequencyLock() {
+        boolean loc = get(getFrequencySlot() + 2) == 1;
+        setFrequencyLock(!loc);
+    }
 
-        set(getIdSlot() + 2, loc ? 0 : 1);
+    public void setFrequencyLock(boolean lock) {
+        set(getFrequencySlot()+ 2,lock ? 1 : 0);
     }
 
     @Override
     public int get(int slot) {
         if (slot < getContainerSize()) {
             return lockedSlots[slot];
-        } else if (slot == getIdSlot()) {
+        } else if (slot == getFrequencySlot()) {
             return id;
-        } else if (slot == getIdSlot() + 1) {
+        } else if (slot == getFrequencySlot() + 1) {
             return textColor;
-        } else if (slot == getIdSlot() + 2) {
+        } else if (slot == getFrequencySlot() + 2) {
             return locked ? 1 : 0;
         }
         return -999;
     }
 
     public int getId() {
-        return get(getIdSlot());
+        return get(getFrequencySlot());
     }
 
     @Override
     public void set(int slot, int value) {
         if (slot < getContainerSize()) {
             lockedSlots[slot] = value;
-        } else if (slot == getIdSlot()) {
+        } else if (slot == getFrequencySlot()) {
             id = value;
-        } else if (slot == getIdSlot() + 1) {
+        } else if (slot == getFrequencySlot() + 1) {
             textColor = value;
-        } else if (slot == getIdSlot() + 2) {
+        } else if (slot == getFrequencySlot() + 2) {
             locked = value == 1;
         }
         setChanged();
