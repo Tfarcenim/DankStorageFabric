@@ -125,7 +125,7 @@ public class MixinHooks {
             return;
         }
 
-        if (ItemHandlerHelper.canItemStacksStack(pickup, existing) || (oredict && Utils.areItemStacksConvertible(pickup, existing))) {
+        if (ItemHandlerHelper.canItemStacksStack(pickup, existing) || (oredict /*&& Utils.areItemStacksConvertible(pickup, existing)*/)) {
             int stackLimit = inv.dankStats.stacklimit;
             int total = pickup.getCount() + existing.getCount();
             int remainder = total - stackLimit;
@@ -174,7 +174,7 @@ public class MixinHooks {
     }
 
     public static boolean areItemStacksCompatible(ItemStack stackA, ItemStack stackB, boolean oredict) {
-        return oredict ? ItemStack.tagMatches(stackA, stackB) && ItemStack.isSame(stackA, stackB) || Utils.areItemStacksConvertible(stackA, stackB) :
+        return oredict ? ItemStack.tagMatches(stackA, stackB) && ItemStack.isSame(stackA, stackB) /*|| Utils.areItemStacksConvertible(stackA, stackB) */:
                 ItemStack.tagMatches(stackA, stackB) && ItemStack.isSame(stackA, stackB);
     }
 

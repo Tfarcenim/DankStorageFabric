@@ -161,18 +161,17 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
             } else {
                 this.resetQuickCraft();
             }
-        } else if (this.quickcraftStatus != 0) {
+        } else if (this.quickcraftStatus != QUICKCRAFT_HEADER_START) {
             this.resetQuickCraft();
         } else if ((clickTypeIn == ClickType.PICKUP || clickTypeIn == ClickType.QUICK_MOVE) && (dragType == 0 || dragType == 1)) {
-            if (slotId == -999) {
+            ClickAction k = dragType == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY;
+            if (slotId == SLOT_CLICKED_OUTSIDE) {
                 if (!getCarried().isEmpty()) {
-                    if (dragType == 0) {
+                    if (k == ClickAction.PRIMARY) {
                         player.drop(getCarried(), true);
                         setCarried(ItemStack.EMPTY);
-                    }
-
-                    if (dragType == 1) {
-                        player.drop(getCarried().split(1), true);
+                    } else {
+                        player.drop(this.getCarried().split(1), true);
                     }
                 }
             } else if (clickTypeIn == ClickType.QUICK_MOVE) {
@@ -193,11 +192,12 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                 if (slotId < 0) {
                     return;
                 }
-
+                //todo here
                 Slot slot6 = this.slots.get(slotId);
 
                 ItemStack slotStack = slot6.getItem();
                 ItemStack mouseStack = getCarried();
+                player.updateTutorialInventoryAction(mouseStack, slot6.getItem(), k);
 
                 //account for locked slots
                 if (!slotStack.isEmpty()) {

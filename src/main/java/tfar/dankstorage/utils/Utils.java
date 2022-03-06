@@ -1,7 +1,6 @@
 package tfar.dankstorage.utils;
 
 import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.tag.TagFactory;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
@@ -13,8 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
-import net.minecraft.tags.TagCollection;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -24,11 +22,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.container.AbstractDankMenu;
+import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.network.DankPacketHandler;
+import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 import tfar.dankstorage.world.ClientData;
 import tfar.dankstorage.world.DankInventory;
-import tfar.dankstorage.item.DankItem;
-import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -38,10 +36,14 @@ import static tfar.dankstorage.network.server.C2SMessageToggleUseType.useTypes;
 
 public class Utils {
 
-    public static final Tag<Item> BLACKLISTED_STORAGE = TagFactory.ITEM.create(new ResourceLocation(DankStorage.MODID, "blacklisted_storage"));
-    public static final Tag<Item> BLACKLISTED_USAGE = TagFactory.ITEM.create(new ResourceLocation(DankStorage.MODID, "blacklisted_usage"));
+    public static final TagKey<Item> BLACKLISTED_STORAGE = bind(new ResourceLocation(DankStorage.MODID, "blacklisted_storage"));
+    public static final TagKey<Item> BLACKLISTED_USAGE = bind(new ResourceLocation(DankStorage.MODID, "blacklisted_usage"));
 
-    public static final Tag<Item> WRENCHES = TagFactory.ITEM.create(new ResourceLocation("forge", "wrenches"));
+    public static final TagKey<Item> WRENCHES = bind(new ResourceLocation("forge", "wrenches"));
+
+    private static TagKey<Item> bind(ResourceLocation string) {
+        return TagKey.create(Registry.ITEM_REGISTRY, string);
+    }
 
     public static final String ID = "dankstorage:id";
     public static final Set<ResourceLocation> taglist = new HashSet<>();
@@ -260,6 +262,10 @@ public class Utils {
         return INVALID;
     }
 
+    public static void setFrequency(ItemStack bag,int frequency) {
+        getOrCreateSettings(bag).putInt(ID,frequency);
+    }
+
     private static boolean hasSettings(ItemStack bag) {
         return bag.hasTag() && bag.getTag().contains(SET);
     }
@@ -306,7 +312,7 @@ public class Utils {
         return stack.is(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
     }
 
-    public static boolean areItemStacksConvertible(final ItemStack stack1, final ItemStack stack2) {
+    /*public static boolean areItemStacksConvertible(final ItemStack stack1, final ItemStack stack2) {
         if (stack1.hasTag() || stack2.hasTag()) return false;
         Collection<ResourceLocation> taglistofstack1 = getTags(stack1.getItem());
         Collection<ResourceLocation> taglistofstack2 = getTags(stack2.getItem());
@@ -317,18 +323,18 @@ public class Utils {
         return !commontags.isEmpty();
     }
 
-    public static Collection<ResourceLocation> getTags(Item item) {
+    private static Collection<ResourceLocation> getTags(Item item) {
         return getTagsFor(ItemTags.getAllTags(), item);
     }
 
     /**
      * can't use TagGroup#getTagsFor because it's client only
-     */
-    public static Collection<ResourceLocation> getTagsFor(TagCollection<Item> tagGroup, Item item) {
+
+    private static Collection<ResourceLocation> getTagsFor(TagCollection<Item> tagGroup, Item item) {
         return tagGroup.getAllTags().entrySet().stream()
                 .filter(identifierTagEntry -> identifierTagEntry.getValue().contains(item))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
-    }
+    }*/
 
     public static boolean isHoldingDank(Player player) {
         ItemStack stack = player.getMainHandItem();

@@ -38,9 +38,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         if (stats.ordinal() <= dankStats.ordinal()) {
             return;
         }
-        if (stats != dankStats) {
-            DankStorage.LOGGER.debug("Upgrading dank #{} from tier {} to {}", id, dankStats.name(), stats.name());
-        }
+        DankStorage.LOGGER.debug("Upgrading dank #{} from tier {} to {}", id, dankStats.name(), stats.name());
         setTo(stats);
     }
 

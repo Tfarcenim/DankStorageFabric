@@ -33,6 +33,7 @@ import tfar.dankstorage.command.DankCommands;
 import tfar.dankstorage.container.DankMenu;
 import tfar.dankstorage.container.DockMenu;
 import tfar.dankstorage.item.DankItem;
+import tfar.dankstorage.item.RedprintItem;
 import tfar.dankstorage.item.UpgradeInfo;
 import tfar.dankstorage.item.UpgradeItem;
 import tfar.dankstorage.network.DankPacketHandler;
@@ -51,6 +52,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
     public static final Logger LOGGER = LogManager.getLogger(MODID);
 
     public static Block dock;
+    public static Item red_print;
     public static MenuType<DockMenu> dank_1_container;
     public static MenuType<DockMenu> dank_2_container;
     public static MenuType<DockMenu> dank_3_container;
@@ -78,6 +80,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
         Item.Properties properties = new Item.Properties().tab(CreativeModeTab.TAB_DECORATIONS);
         Registry.register(Registry.BLOCK, new ResourceLocation(MODID, "dock"), dock = new DockBlock(BlockBehaviour.Properties.of(Material.METAL).strength(1, 30)));
         Registry.register(Registry.ITEM, new ResourceLocation(MODID, "dock"), new BlockItem(dock, properties));
+        Registry.register(Registry.ITEM, new ResourceLocation(MODID, "red_print"), new RedprintItem(properties));
         Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation(MODID, "dank_tile"), dank_tile = BlockEntityType.Builder.of(DockBlockEntity::new, dock).build(null));
 
         IntStream.range(1, 8).forEach(i -> {
