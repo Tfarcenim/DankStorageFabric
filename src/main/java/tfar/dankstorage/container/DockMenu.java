@@ -24,8 +24,8 @@ public class DockMenu extends AbstractDankMenu {
     }
 
     @Override
-    public void setID(int id) {
-        dock.settings.putInt(Utils.ID,id);
+    public void setFrequency(int freq) {
+        dock.settings.putInt(Utils.ID, freq);
         dock.setChanged();
     }
 

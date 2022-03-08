@@ -14,7 +14,7 @@ import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.world.DankInventory;
 
-public class C2SSetIDPacket implements ServerPlayNetworking.PlayChannelHandler {
+public class C2SSetFrequencyPacket implements ServerPlayNetworking.PlayChannelHandler {
 
     public static void send(int id,boolean set) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
@@ -40,7 +40,7 @@ public class C2SSetIDPacket implements ServerPlayNetworking.PlayChannelHandler {
                     } else {
                         textColor = DankInventory.TxtColor.GOOD.color;
                         if (set) {
-                            dankMenu.setID(id);
+                            dankMenu.setFrequency(id);
                             player.closeContainer();
                         }
                     }

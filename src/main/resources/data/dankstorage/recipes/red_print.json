@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "rrr",
+    "rbr",
+    "rrr"
+  ],
+  "key": {
+    "r": {
+      "item": "minecraft:red_dye"
+    },
+    "b": {
+      "item": "minecraft:paper"
+    }
+  },
+  "result": {
+    "item": "dankstorage:red_print"
+  }
+}

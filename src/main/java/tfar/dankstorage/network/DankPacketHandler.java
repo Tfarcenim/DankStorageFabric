@@ -40,7 +40,7 @@ public class DankPacketHandler {
         ServerPlayNetworking.registerGlobalReceiver(toggle_pickup, new C2SMessageTogglePickup());
         ServerPlayNetworking.registerGlobalReceiver(toggle_use, new C2SMessageToggleUseType());
         ServerPlayNetworking.registerGlobalReceiver(pick_block, new C2SMessagePickBlock());
-        ServerPlayNetworking.registerGlobalReceiver(set_id, new C2SSetIDPacket());
+        ServerPlayNetworking.registerGlobalReceiver(set_id, new C2SSetFrequencyPacket());
         ServerPlayNetworking.registerGlobalReceiver(lock_id,new C2SMessageLockFrequency());
         ServerPlayNetworking.registerGlobalReceiver(request_contents,new C2SRequestContentsPacket());
     }

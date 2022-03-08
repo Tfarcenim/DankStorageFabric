@@ -1,9 +1,7 @@
 
 package tfar.dankstorage.blockentity;
 
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -45,7 +43,15 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
         super(DankStorage.dank_tile, blockPos, blockState);
     }
 
-    public static final DankInventory DUMMY = new DankInventory(DankStats.zero, -1);
+    public void setFrequency(int freq) {
+        if (settings == null) {
+
+        } else {
+            settings.putInt(Utils.ID,freq);
+        }
+    }
+
+    public static final DankInventory DUMMY = new DankInventory(DankStats.zero, Utils.INVALID);
 
     public DankInventory getInventory() {
         if (settings != null && settings.contains(Utils.ID)) {

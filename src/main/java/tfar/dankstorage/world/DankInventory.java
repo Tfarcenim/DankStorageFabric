@@ -21,7 +21,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     public DankStats dankStats;
     protected int[] lockedSlots;
     protected int id;
-    public boolean locked;
+    public boolean locked = true;
 
     protected int textColor = -1;
 
@@ -278,7 +278,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         return -999;
     }
 
-    public int getId() {
+    public int getFrequency() {
         return get(getFrequencySlot());
     }
 

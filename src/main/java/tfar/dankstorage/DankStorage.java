@@ -80,7 +80,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
         Item.Properties properties = new Item.Properties().tab(CreativeModeTab.TAB_DECORATIONS);
         Registry.register(Registry.BLOCK, new ResourceLocation(MODID, "dock"), dock = new DockBlock(BlockBehaviour.Properties.of(Material.METAL).strength(1, 30)));
         Registry.register(Registry.ITEM, new ResourceLocation(MODID, "dock"), new BlockItem(dock, properties));
-        Registry.register(Registry.ITEM, new ResourceLocation(MODID, "red_print"), new RedprintItem(properties));
+        Registry.register(Registry.ITEM, new ResourceLocation(MODID, "red_print"), red_print = new RedprintItem(properties));
         Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation(MODID, "dank_tile"), dank_tile = BlockEntityType.Builder.of(DockBlockEntity::new, dock).build(null));
 
         IntStream.range(1, 8).forEach(i -> {

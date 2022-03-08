@@ -20,7 +20,7 @@ import tfar.dankstorage.inventory.DankSlot;
 import tfar.dankstorage.network.server.C2SMessageLockFrequency;
 import tfar.dankstorage.network.server.C2SMessageLockSlot;
 import tfar.dankstorage.network.server.C2SMessageSort;
-import tfar.dankstorage.network.server.C2SSetIDPacket;
+import tfar.dankstorage.network.server.C2SSetFrequencyPacket;
 import tfar.dankstorage.utils.Utils;
 import tfar.dankstorage.world.DankInventory;
 
@@ -79,7 +79,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
             try {
                 if (menu.dankInventory.frequencyLocked()) return;
                 int id1 = Integer.parseInt(frequency.getValue());
-                C2SSetIDPacket.send(id1, true);
+                C2SSetFrequencyPacket.send(id1, true);
             } catch (NumberFormatException e) {
 
             }
@@ -135,9 +135,9 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     private void onNameChanged(String string) {
         try {
             int i = Integer.parseInt(string);
-            C2SSetIDPacket.send(i, false);
+            C2SSetFrequencyPacket.send(i, false);
         } catch (NumberFormatException e) {
-            C2SSetIDPacket.send(-1, false);
+            C2SSetFrequencyPacket.send(-1, false);
         }
     }
 
@@ -228,7 +228,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     @Override
     protected void renderLabels(PoseStack poseStack, int i, int j) {
         super.renderLabels(poseStack, i, j);
-        int id = menu.dankInventory.getId();//menu.dankInventory.get(menu.rows * 9);
+        int id = menu.dankInventory.getFrequency();//menu.dankInventory.get(menu.rows * 9);
         int color = 0x008000;
         this.font.draw(poseStack, "ID: " + id, 62, inventoryLabelY, color);
     }

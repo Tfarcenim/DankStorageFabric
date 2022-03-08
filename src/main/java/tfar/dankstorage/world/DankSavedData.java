@@ -22,7 +22,7 @@ public class DankSavedData extends SavedData {
 
     @Nullable
     public DankInventory getInventory(int id) {
-        return (id < storage.size() && id > -1) ? storage.get(id) : null;
+        return (id < storage.size() && id > Utils.INVALID) ? storage.get(id) : null;
     }
 
     public DankInventory getOrCreateInventory(int id, DankStats stats) {
@@ -87,6 +87,7 @@ public class DankSavedData extends SavedData {
         if (id < getNextID()) {
             DankInventory dankInventory = getInventory(id);
             dankInventory.clearContent();
+            setDirty();
             return true;
         }
         return false;
@@ -96,6 +97,7 @@ public class DankSavedData extends SavedData {
         if (id < getNextID()) {
             DankInventory dankInventory = getInventory(id);
             dankInventory.setTo(DankStats.values()[tier]);
+            setDirty();
             return true;
         }
         return false;
@@ -105,6 +107,7 @@ public class DankSavedData extends SavedData {
         if (frequency < getNextID()) {
             DankInventory dankInventory = getInventory(frequency);
             dankInventory.setFrequencyLock(true);
+            setDirty();
             return true;
         }
         return false;
@@ -114,6 +117,7 @@ public class DankSavedData extends SavedData {
         if (frequency < getNextID()) {
             DankInventory dankInventory = getInventory(frequency);
             dankInventory.setFrequencyLock(false);
+            setDirty();
             return true;
         }
         return false;
