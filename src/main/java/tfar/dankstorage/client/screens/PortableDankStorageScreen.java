@@ -2,7 +2,10 @@ package tfar.dankstorage.client.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import tfar.dankstorage.client.button.TripleToggleButton;
@@ -49,34 +52,29 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     @Override
     protected void init() {
         super.init();
-        int start = this.titleLabelX;
-        int namelength = font.width(title);
 
-        int maxOffset = Math.min(70,namelength);
-
-        start += maxOffset;
-        start-=10;
-    //    this.addRenderableWidget(new RedGreenToggleButton(leftPos + (start += 8), topPos + 6, 8, 8, b -> {
+        //    this.addRenderableWidget(new RedGreenToggleButton(leftPos + (start += 8), topPos + 6, 8, 8, b -> {
      //       ((RedGreenToggleButton) b).toggle();
     //        C2SMessageTagMode.send();
     //    }, false));
-        this.addRenderableWidget(new TripleToggleButton(leftPos + (start += 12), topPos + 6, 8, 8, b -> {
+
+        Button.OnTooltip onTooltip = (button, poseStack, x, y) -> {
+
+            this.renderTooltip(poseStack,
+                    this.minecraft.font.split(
+                            new TextComponent("Pickup"), Math.max(this.width / 2 - 43, 170)), x, y);
+
+        };
+
+        this.addRenderableWidget(new TripleToggleButton(leftPos + 101, topPos + 4, 12, 12,new TextComponent("P"), b -> {
             Utils.cyclePickupMode(menu.bag, Minecraft.getInstance().player);
             C2SMessageTogglePickup.send();
-        },this));
+        },onTooltip,this));
     }
 
     @Override
     protected void renderLabels(PoseStack stack, int mouseX, int mouseY) {
         super.renderLabels(stack, mouseX, mouseY);
-        int namelength = font.width(title);
 
-        int maxOffset = Math.min(70,namelength);
-
-        int start = this.titleLabelX;
-        start += maxOffset;
-
-        //   this.font.draw(stack, "Tag", start += 18, 6, 0x404040);
-        this.font.draw(stack, "Pickup", start += 12, 6, 0x404040);
     }
 }

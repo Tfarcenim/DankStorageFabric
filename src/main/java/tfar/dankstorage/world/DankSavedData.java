@@ -75,7 +75,7 @@ public class DankSavedData extends SavedData {
     @Override
     public void save(File file) {
         super.save(file);
-        DankStorage.LOGGER.info("Saving Dank Contents");
+        DankStorage.LOGGER.debug("Saving Dank Contents");
     }
 
     public void clearAll() {

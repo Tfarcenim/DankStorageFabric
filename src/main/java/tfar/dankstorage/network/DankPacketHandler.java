@@ -31,6 +31,7 @@ public class DankPacketHandler {
     public static final ResourceLocation sync_container = new ResourceLocation(DankStorage.MODID, "sync_container");
     public static final ResourceLocation sync_data = new ResourceLocation(DankStorage.MODID, "sync_data");
     public static final ResourceLocation sync_inventory = new ResourceLocation(DankStorage.MODID, "sync_inventory");
+    public static final ResourceLocation compress = new ResourceLocation(DankStorage.MODID, "compress");
 
     public static void registerMessages() {
         ServerPlayNetworking.registerGlobalReceiver(scroll, new C2SMessageScrollSlot());
@@ -43,6 +44,7 @@ public class DankPacketHandler {
         ServerPlayNetworking.registerGlobalReceiver(set_id, new C2SSetFrequencyPacket());
         ServerPlayNetworking.registerGlobalReceiver(lock_id,new C2SMessageLockFrequency());
         ServerPlayNetworking.registerGlobalReceiver(request_contents,new C2SRequestContentsPacket());
+        ServerPlayNetworking.registerGlobalReceiver(compress,new C2SMessageCompress());
     }
 
     public static void sendSyncSlot(ServerPlayer player, int id, int slot, ItemStack stack) {

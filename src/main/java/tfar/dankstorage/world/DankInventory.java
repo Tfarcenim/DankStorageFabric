@@ -1,19 +1,27 @@
 package tfar.dankstorage.world;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.lwjgl.system.CallbackI;
 import tfar.dankstorage.DankStorage;
+import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.mixin.SimpleContainerAccess;
 import tfar.dankstorage.utils.DankStats;
+import tfar.dankstorage.utils.ItemStackWrapper;
 import tfar.dankstorage.utils.Utils;
 
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class DankInventory extends SimpleContainer implements ContainerData {
@@ -261,7 +269,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     }
 
     public void setFrequencyLock(boolean lock) {
-        set(getFrequencySlot()+ 2,lock ? 1 : 0);
+        set(getFrequencySlot() + 2, lock ? 1 : 0);
     }
 
     @Override
@@ -294,6 +302,122 @@ public class DankInventory extends SimpleContainer implements ContainerData {
             locked = value == 1;
         }
         setChanged();
+    }
+
+    public void compress(ServerLevel level) {
+        sort();
+        int freeSlots = 0;
+
+        Map<Item, Pair<Integer, Integer>> groups = new HashMap<>();
+
+        for (int i = 0; i < getContainerSize(); i++) {
+            ItemStack stack = getItem(i);
+            if (!stack.isEmpty()) {
+
+                if (Utils.canCompress(level, stack)) {
+
+                    Item item = stack.getItem();
+                    Pair<Integer, Integer> pair;
+                    if (groups.containsKey(item)) {
+                        pair = Pair.of(groups.get(item).getFirst(), i);
+                    } else {
+                        pair = Pair.of(i, i);
+                    }
+                    groups.put(item, pair);
+                }
+            } else {
+                freeSlots = getContainerSize() - i;
+                break;
+            }
+        }
+
+        List<Item> unsafeSlots = new ArrayList<>();
+        for (Map.Entry<Item, Pair<Integer, Integer>> entry : groups.entrySet()) {
+            Item item = entry.getKey();
+            Pair<Integer, Integer> pair = entry.getValue();
+            Pair<ItemStack, Integer> stackIntegerPair = Utils.compressable(level, new ItemStack(item));
+            int count = 0;
+
+            for (int i = pair.getFirst(); i < pair.getSecond() + 1; i++) {
+                count += getItem(i).getCount();
+            }
+            if (count <= getMaxStackSize() && count % stackIntegerPair.getSecond() != 0) {
+                unsafeSlots.add(item);
+            } else {
+                ItemStack compressionResult = stackIntegerPair.getFirst();
+                int compressedCount = count / stackIntegerPair.getSecond();
+                int remainder = count % stackIntegerPair.getSecond();
+
+
+                //clear out old items
+                for (int i = pair.getFirst(); i < pair.getSecond() + 1; i++) {
+                    removeItem(i, getMaxStackSize());
+                }
+                int fullStacks = compressedCount / getMaxStackSize();
+
+                int partialStack = compressedCount % getMaxStackSize();
+
+                //set max stacksize items
+                for (int i = pair.getFirst(); i < pair.getFirst() + fullStacks; i++) {
+                    setItem(i, new ItemStack(compressionResult.getItem(), getMaxStackSize()));
+                }
+
+                //set partial stack of compressed items
+                if (partialStack > 0) {
+                    setItem(pair.getFirst() + fullStacks, new ItemStack(compressionResult.getItem(), partialStack));
+                }
+
+                if (remainder > 0) {
+                    setItem(pair.getFirst() + fullStacks + 1, new ItemStack(item, partialStack));
+                }
+            }
+        }
+        sort();
+
+
+        for (Item item : unsafeSlots) {
+            if (freeSlots <= 0) {
+                break;
+            } else {
+                for (int i = 0; i < getContainerSize(); i++) {
+                    ItemStack stack = getItem(i);
+                    if (stack.getItem() == item) {
+
+                        Pair<ItemStack, Integer> stackIntegerPair = Utils.compressable(level, new ItemStack(item));
+
+                        ItemStack compressionResult = stackIntegerPair.getFirst();
+                        int compressedCount = stack.getCount() / stackIntegerPair.getSecond();
+                        int remainder = stack.getCount() % stackIntegerPair.getSecond();
+
+                        setItem(i, new ItemStack(compressionResult.getItem(), compressedCount));
+                        setItem(getContainerSize() - freeSlots, new ItemStack(item, remainder));
+                        freeSlots--;
+                        break;
+                    }
+                }
+            }
+        }
+        sort();
+    }
+
+    public void sort() {
+        List<ItemStack> stacks = new ArrayList<>();
+
+        for (ItemStack stack : getContents()) {
+            if (!stack.isEmpty()) {
+                Utils.merge(stacks, stack.copy(), dankStats.stacklimit);
+            }
+        }
+
+        List<ItemStackWrapper> wrappers = Utils.wrap(stacks);
+
+        Collections.sort(wrappers);
+
+        clearContent();
+        for (int i = 0; i < wrappers.size(); i++) {
+            ItemStack stack = wrappers.get(i).stack;
+            setItem(i, stack);
+        }
     }
 
     public enum TxtColor {

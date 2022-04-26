@@ -15,13 +15,12 @@ import tfar.dankstorage.world.DankInventory;
 
 public class C2SMessageLockFrequency implements ServerPlayNetworking.PlayChannelHandler {
 
-    public static void send(boolean slot) {
+    public static void send() {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-        buf.writeBoolean(slot);
         ClientPlayNetworking.send(DankPacketHandler.lock_id, buf);
     }
 
-    public void handle(ServerPlayer player, boolean slot) {
+    public void handle(ServerPlayer player) {
         AbstractContainerMenu container = player.containerMenu;
         if (container instanceof AbstractDankMenu dankMenu) {
             DankInventory inventory = dankMenu.dankInventory;
@@ -31,8 +30,7 @@ public class C2SMessageLockFrequency implements ServerPlayNetworking.PlayChannel
 
     @Override
     public void receive(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) {
-        boolean slot = buf.readBoolean();
-        server.execute(() -> handle(player, slot));
+        server.execute(() -> handle(player));
     }
 }
 

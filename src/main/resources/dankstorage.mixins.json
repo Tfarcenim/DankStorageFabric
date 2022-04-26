@@ -4,11 +4,10 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "CraftingContainerAccess",
-    "CraftingMenuAccess",
     "ItemEntityMixin",
     "ItemUsageContextAccessor",
-    "MixinBlock",
     "PlayerInventoryMixin",
+    "RecipeManagerMixin",
     "SimpleContainerAccess"
   ],
   "client": [

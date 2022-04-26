@@ -1,6 +1,7 @@
 package tfar.dankstorage.client.button;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import tfar.dankstorage.client.screens.PortableDankStorageScreen;
 import tfar.dankstorage.utils.PickupMode;
@@ -10,8 +11,8 @@ public class TripleToggleButton extends SmallButton {
 
     protected PortableDankStorageScreen screen;
 
-    public TripleToggleButton(int x, int y, int widthIn, int heightIn, OnPress callback, PortableDankStorageScreen screen) {
-        super(x, y, widthIn, heightIn, new TextComponent(""), callback);
+    public TripleToggleButton(int x, int y, int widthIn, int heightIn, Component component, OnPress callback, OnTooltip tooltip, PortableDankStorageScreen screen) {
+        super(x, y, widthIn, heightIn,component, callback,tooltip);
         this.screen = screen;
     }
 

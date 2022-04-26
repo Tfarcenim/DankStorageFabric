@@ -391,7 +391,7 @@ public class DankItem extends Item {
 
         if (id > Utils.INVALID) {
             //don't spam the server with requests
-            if (cache.get() != id) {
+            if (cache.get() != id || true) {
                 C2SRequestContentsPacket.send(id);
                 cache.set(id);
             }

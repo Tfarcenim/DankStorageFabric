@@ -194,35 +194,37 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
 
                 Slot slot7 = this.slots.get(slotId);
                 ItemStack itemstack10 = slot7.getItem();
-                ItemStack itemstack11 = this.getCarried();
-                player.updateTutorialInventoryAction(itemstack11, slot7.getItem(), clickaction);
-                if (!itemstack11.overrideStackedOnOther(slot7, clickaction, player) && !itemstack10.overrideOtherStackedOnMe(itemstack11, slot7, clickaction, player, this.createCarriedSlotAccess())) {
+                ItemStack carried = this.getCarried();
+                player.updateTutorialInventoryAction(carried, slot7.getItem(), clickaction);
+                if (!carried.overrideStackedOnOther(slot7, clickaction, player) && !itemstack10.overrideOtherStackedOnMe(carried, slot7, clickaction, player, this.createCarriedSlotAccess())) {
                     if (itemstack10.isEmpty()) {
-                        if (!itemstack11.isEmpty()) {
-                            int l2 = clickaction == ClickAction.PRIMARY ? itemstack11.getCount() : 1;
-                            this.setCarried(slot7.safeInsert(itemstack11, l2));
+                        if (!carried.isEmpty()) {
+                            int l2 = clickaction == ClickAction.PRIMARY ? carried.getCount() : 1;
+                            this.setCarried(slot7.safeInsert(carried, l2));
                         }
                     } else if (slot7.mayPickup(player)) {
-                        if (itemstack11.isEmpty()) {
-                            int i3 = clickaction == ClickAction.PRIMARY ? itemstack10.getCount() : (itemstack10.getCount() + 1) / 2;
+                        if (carried.isEmpty()) {
+                            int max = itemstack10.getMaxStackSize();
+                            int i3 = clickaction == ClickAction.PRIMARY ? max : (max + 1) / 2;//restrict extraction to max stack size
                             Optional<ItemStack> optional1 = slot7.tryRemove(i3, Integer.MAX_VALUE, player);
-                            optional1.ifPresent((p_150421_) -> {
-                                this.setCarried(p_150421_);
-                                slot7.onTake(player, p_150421_);
+                            optional1.ifPresent(stack -> {
+                                this.setCarried(stack);
+                                slot7.onTake(player, stack);
                             });
-                        } else if (slot7.mayPlace(itemstack11)) {
-                            if (ItemStack.isSameItemSameTags(itemstack10, itemstack11)) {
-                                int j3 = clickaction == ClickAction.PRIMARY ? itemstack11.getCount() : 1;
-                                this.setCarried(slot7.safeInsert(itemstack11, j3));
-                            } else if (itemstack11.getCount() <= slot7.getMaxStackSize(itemstack11)) {
-                                slot7.set(itemstack11);
+
+                        } else if (slot7.mayPlace(carried)) {
+                            if (ItemStack.isSameItemSameTags(itemstack10, carried)) {
+                                int j3 = clickaction == ClickAction.PRIMARY ? carried.getCount() : 1;
+                                this.setCarried(slot7.safeInsert(carried, j3));
+                            } else if (carried.getCount() <= slot7.getMaxStackSize(carried)) {
+                                slot7.set(carried);
                                 this.setCarried(itemstack10);
                             }
-                        } else if (ItemStack.isSameItemSameTags(itemstack10, itemstack11)) {
-                            Optional<ItemStack> optional = slot7.tryRemove(itemstack10.getCount(), itemstack11.getMaxStackSize() - itemstack11.getCount(), player);
-                            optional.ifPresent((p_150428_) -> {
-                                itemstack11.grow(p_150428_.getCount());
-                                slot7.onTake(player, p_150428_);
+                        } else if (ItemStack.isSameItemSameTags(itemstack10, carried)) {
+                            Optional<ItemStack> optional = slot7.tryRemove(itemstack10.getCount(), carried.getMaxStackSize() - carried.getCount(), player);
+                            optional.ifPresent(stack -> {
+                                carried.grow(stack.getCount());
+                                slot7.onTake(player, stack);
                             });
                         }
                     }

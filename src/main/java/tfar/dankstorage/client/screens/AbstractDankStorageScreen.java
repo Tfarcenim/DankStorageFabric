@@ -17,10 +17,7 @@ import tfar.dankstorage.client.NumberEditBox;
 import tfar.dankstorage.client.button.SmallButton;
 import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.inventory.DankSlot;
-import tfar.dankstorage.network.server.C2SMessageLockFrequency;
-import tfar.dankstorage.network.server.C2SMessageLockSlot;
-import tfar.dankstorage.network.server.C2SMessageSort;
-import tfar.dankstorage.network.server.C2SSetFrequencyPacket;
+import tfar.dankstorage.network.server.*;
 import tfar.dankstorage.utils.Utils;
 import tfar.dankstorage.world.DankInventory;
 
@@ -66,26 +63,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         this.setInitialFocus(this.frequency);
         frequency.setFocus(false);
 
-        Button.OnTooltip onTooltip2 = (button, poseStack, x, y) -> {
-//todo make this fancy
-            this.renderTooltip(poseStack,
-                    this.minecraft.font.split(buildSaveComponent()
-                            , Math.max(this.width / 2 - 43, 170)), x, y);
-
-        };
-
-        this.addRenderableWidget(new SmallButton(leftPos + 157, j + inventoryLabelY - 2, 12, 12,
-                new TextComponent("s"), b -> {
-            try {
-                if (menu.dankInventory.frequencyLocked()) return;
-                int id1 = Integer.parseInt(frequency.getValue());
-                C2SSetFrequencyPacket.send(id1, true);
-            } catch (NumberFormatException e) {
-
-            }
-        }, onTooltip2));
-
-        Button.OnTooltip onTooltip = (button, poseStack, x, y) -> {
+        Button.OnTooltip freqTooltip = (button, poseStack, x, y) -> {
 
             boolean locked = menu.dankInventory.frequencyLocked();
 
@@ -96,14 +74,49 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         };
 
 
-        this.addRenderableWidget(new SmallButton(leftPos + 129, topPos + 4, 12, 12,
-                new TextComponent(""), button -> C2SMessageLockFrequency.send(true), onTooltip) {
+        this.addRenderableWidget(new SmallButton(leftPos + 115, topPos + 4, 12, 12,
+                new TextComponent(""), button -> C2SMessageLockFrequency.send(), freqTooltip) {
             @Override
             public Component getMessage() {
                 return menu.dankInventory.frequencyLocked() ? new TextComponent("X").withStyle(ChatFormatting.RED) :
                         new TextComponent("O");
             }
         });
+
+        Button.OnTooltip saveTooltip = (button, poseStack, x, y) -> {
+//todo make this fancy
+            this.renderTooltip(poseStack,
+                    this.minecraft.font.split(buildSaveComponent()
+                            , Math.max(this.width / 2 - 43, 170)), x, y);
+
+        };
+
+        this.addRenderableWidget(new SmallButton(leftPos + 155, j + inventoryLabelY - 2, 12, 12,
+                new TextComponent("s"), b -> {
+            try {
+                if (menu.dankInventory.frequencyLocked()) return;
+                int id1 = Integer.parseInt(frequency.getValue());
+                C2SSetFrequencyPacket.send(id1, true);
+            } catch (NumberFormatException e) {
+
+            }
+        }, saveTooltip));
+
+
+
+
+        Button.OnTooltip compressTooltip = (button, poseStack, x, y) -> {
+
+
+            this.renderTooltip(poseStack,
+                    this.minecraft.font.split(
+                            new TranslatableComponent("Compresses reversible 3x3 recipes"), Math.max(this.width / 2 - 43, 170)), x, y);
+
+        };
+
+
+        this.addRenderableWidget(new SmallButton(leftPos + 129, topPos + 4, 12, 12,
+                new TextComponent("C"), button -> C2SMessageCompress.send(), compressTooltip));
     }
 
     private static MutableComponent buildSaveComponent() {
