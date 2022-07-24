@@ -176,10 +176,10 @@ public class Utils {
         return ItemStack.EMPTY;
     }
 
-    public static void merge(List<ItemStack> stacks, ItemStack toMerge, int limit) {
+    public static void merge(List<ItemStack> stacks, ItemStack toMerge) {
         for (ItemStack stack : stacks) {
             if (ItemHandlerHelper.canItemStacksStack(stack, toMerge)) {
-                int grow = Math.min(limit - stack.getCount(), toMerge.getCount());
+                int grow = Math.min(Integer.MAX_VALUE - stack.getCount(), toMerge.getCount());
                 if (grow > 0) {
                     stack.grow(grow);
                     toMerge.shrink(grow);

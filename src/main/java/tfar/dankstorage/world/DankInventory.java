@@ -18,6 +18,7 @@ import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.mixin.SimpleContainerAccess;
 import tfar.dankstorage.utils.DankStats;
+import tfar.dankstorage.utils.ItemHandlerHelper;
 import tfar.dankstorage.utils.ItemStackWrapper;
 import tfar.dankstorage.utils.Utils;
 
@@ -405,7 +406,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
 
         for (ItemStack stack : getContents()) {
             if (!stack.isEmpty()) {
-                Utils.merge(stacks, stack.copy(), dankStats.stacklimit);
+                Utils.merge(stacks, stack.copy());
             }
         }
 
@@ -414,9 +415,32 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         Collections.sort(wrappers);
 
         clearContent();
+
+
+        //split up the stacks and add them to the slot
+
+        int slotId = 0;
+
         for (int i = 0; i < wrappers.size(); i++) {
             ItemStack stack = wrappers.get(i).stack;
-            setItem(i, stack);
+            int count = stack.getCount();
+            if (count > dankStats.stacklimit) {
+                int fullStacks = count / dankStats.stacklimit;
+                int partialStack = count - fullStacks * dankStats.stacklimit;
+
+                for (int j = 0; j < fullStacks;j++) {
+                    setItem(slotId, ItemHandlerHelper.copyStackWithSize(stack, dankStats.stacklimit));
+                    slotId++;
+                }
+                if (partialStack > 0) {
+                    setItem(slotId,  ItemHandlerHelper.copyStackWithSize(stack, partialStack));
+                    slotId++;
+                }
+            } else {
+                setItem(slotId,stack);
+                slotId++;
+            }
+            //setItem(i, stack);
         }
     }
 
