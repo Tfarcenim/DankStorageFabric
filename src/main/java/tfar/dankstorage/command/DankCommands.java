@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import tfar.dankstorage.DankStorage;
 
 public class DankCommands {
@@ -57,7 +57,7 @@ public class DankCommands {
         int id = IntegerArgumentType.getInteger(context, "id");
         boolean success = DankStorage.instance.data.clearId(id);
         if (!success) {
-            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.clear_id.invalid_id"));
+            throw new CommandRuntimeException(Component.translatable("dankstorage.command.clear_id.invalid_id"));
         }
         return 1;
     }
@@ -67,7 +67,7 @@ public class DankCommands {
         int tier = IntegerArgumentType.getInteger(context, "tier");
         boolean success = DankStorage.instance.data.setTier(id, tier);
         if (!success) {
-            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.set_tier.invalid_id"));
+            throw new CommandRuntimeException(Component.translatable("dankstorage.command.set_tier.invalid_id"));
         }
         return 1;
     }
@@ -76,7 +76,7 @@ public class DankCommands {
         int id = IntegerArgumentType.getInteger(context, "id");
         boolean success = DankStorage.instance.data.lock(id);
         if (!success) {
-            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.lock.invalid_id"));
+            throw new CommandRuntimeException(Component.translatable("dankstorage.command.lock.invalid_id"));
         }
         return 1;
     }
@@ -85,7 +85,7 @@ public class DankCommands {
         int id = IntegerArgumentType.getInteger(context, "id");
         boolean success = DankStorage.instance.data.unlock(id);
         if (!success) {
-            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.unlock.invalid_id"));
+            throw new CommandRuntimeException(Component.translatable("dankstorage.command.unlock.invalid_id"));
         }
         return 1;
     }

@@ -7,7 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +44,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     @Override
     protected void init() {
         super.init();
-        this.addRenderableWidget(new SmallButton(leftPos + 143, topPos + 4, 26, 12, new TextComponent("Sort"), b -> {
+        this.addRenderableWidget(new SmallButton(leftPos + 143, topPos + 4, 26, 12, Component.literal("Sort"), b -> {
             C2SMessageSort.send();
         }));
 
@@ -50,7 +52,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        this.frequency = new NumberEditBox(this.font, i + 92, j + inventoryLabelY, 56, 12, new TranslatableComponent("dank"));
+        this.frequency = new NumberEditBox(this.font, i + 92, j + inventoryLabelY, 56, 12, Component.translatable("dank"));
         this.frequency.setCanLoseFocus(true);
         this.frequency.setTextColor(-1);
         this.frequency.setTextColorUneditable(-1);
@@ -69,17 +71,17 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
             this.renderTooltip(poseStack,
                     this.minecraft.font.split(
-                            new TranslatableComponent("text.dankstorage." + (locked ? "un" : "") + "lock_button"), Math.max(this.width / 2 - 43, 170)), x, y);
+                            Component.translatable("text.dankstorage." + (locked ? "un" : "") + "lock_button"), Math.max(this.width / 2 - 43, 170)), x, y);
 
         };
 
 
         this.addRenderableWidget(new SmallButton(leftPos + 115, topPos + 4, 12, 12,
-                new TextComponent(""), button -> C2SMessageLockFrequency.send(), freqTooltip) {
+                Component.literal(""), button -> C2SMessageLockFrequency.send(), freqTooltip) {
             @Override
             public Component getMessage() {
-                return menu.dankInventory.frequencyLocked() ? new TextComponent("X").withStyle(ChatFormatting.RED) :
-                        new TextComponent("O");
+                return menu.dankInventory.frequencyLocked() ? Component.literal("X").withStyle(ChatFormatting.RED) :
+                        Component.literal("O");
             }
         });
 
@@ -92,7 +94,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         };
 
         this.addRenderableWidget(new SmallButton(leftPos + 155, j + inventoryLabelY - 2, 12, 12,
-                new TextComponent("s"), b -> {
+                Component.literal("s"), b -> {
             try {
                 if (menu.dankInventory.frequencyLocked()) return;
                 int id1 = Integer.parseInt(frequency.getValue());
@@ -110,35 +112,35 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
             this.renderTooltip(poseStack,
                     this.minecraft.font.split(
-                            new TranslatableComponent("Compresses reversible 3x3 recipes"), Math.max(this.width / 2 - 43, 170)), x, y);
+                            Component.translatable("Compresses reversible 3x3 recipes"), Math.max(this.width / 2 - 43, 170)), x, y);
 
         };
 
 
         this.addRenderableWidget(new SmallButton(leftPos + 129, topPos + 4, 12, 12,
-                new TextComponent("C"), button -> C2SMessageCompress.send(), compressTooltip));
+                Component.literal("C"), button -> C2SMessageCompress.send(), compressTooltip));
     }
 
     private static MutableComponent buildSaveComponent() {
-        return new TranslatableComponent("text.dankstorage.save_frequency_button",
-                new TranslatableComponent("text.dankstorage.save_frequency_button.invalid",
-                        new TranslatableComponent("text.dankstorage.save_frequency_button.invalidtxt")
+        return Component.translatable("text.dankstorage.save_frequency_button",
+                Component.translatable("text.dankstorage.save_frequency_button.invalid",
+                        Component.translatable("text.dankstorage.save_frequency_button.invalidtxt")
                                 .withStyle(ChatFormatting.GRAY))
                         .withStyle(Style.EMPTY.withColor(DankInventory.TxtColor.INVALID.color)),
-                new TranslatableComponent("text.dankstorage.save_frequency_button.too_high",
-                        new TranslatableComponent("text.dankstorage.save_frequency_button.too_hightxt")
+                Component.translatable("text.dankstorage.save_frequency_button.too_high",
+                        Component.translatable("text.dankstorage.save_frequency_button.too_hightxt")
                                 .withStyle(ChatFormatting.GRAY))
                         .withStyle(Style.EMPTY.withColor(DankInventory.TxtColor.TOO_HIGH.color)),
-                new TranslatableComponent("text.dankstorage.save_frequency_button.different_tier",
-                        new TranslatableComponent("text.dankstorage.save_frequency_button.different_tiertxt")
+                Component.translatable("text.dankstorage.save_frequency_button.different_tier",
+                        Component.translatable("text.dankstorage.save_frequency_button.different_tiertxt")
                                 .withStyle(ChatFormatting.GRAY))
                         .withStyle(Style.EMPTY.withColor(DankInventory.TxtColor.DIFFERENT_TIER.color)),
-                new TranslatableComponent("text.dankstorage.save_frequency_button.good",
-                        new TranslatableComponent("text.dankstorage.save_frequency_button.goodtxt")
+                Component.translatable("text.dankstorage.save_frequency_button.good",
+                        Component.translatable("text.dankstorage.save_frequency_button.goodtxt")
                                 .withStyle(ChatFormatting.GRAY))
                         .withStyle(Style.EMPTY.withColor(DankInventory.TxtColor.GOOD.color))
-                , new TranslatableComponent("text.dankstorage.save_frequency_button.locked_frequency",
-                new TranslatableComponent("text.dankstorage.save_frequency_button.locked_frequencytxt")
+                , Component.translatable("text.dankstorage.save_frequency_button.locked_frequency",
+                Component.translatable("text.dankstorage.save_frequency_button.locked_frequencytxt")
                         .withStyle(ChatFormatting.GRAY))
                 .withStyle(Style.EMPTY.withColor(DankInventory.TxtColor.LOCKED.color))
         );
@@ -218,21 +220,21 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
 
     public void appendDankInfo(List<Component> tooltip, ItemStack stack) {
         if (stack.is(Utils.BLACKLISTED_STORAGE)) {
-            Component component = new TranslatableComponent("text.dankstorage.blacklisted_storage").withStyle(ChatFormatting.DARK_RED);
+            Component component = Component.translatable("text.dankstorage.blacklisted_storage").withStyle(ChatFormatting.DARK_RED);
             tooltip.add(component);
         }
         if (stack.is(Utils.BLACKLISTED_USAGE)) {
-            Component component = new TranslatableComponent("text.dankstorage.blacklisted_usage").
+            Component component = Component.translatable("text.dankstorage.blacklisted_usage").
                     withStyle(ChatFormatting.DARK_RED);
             tooltip.add(component);
         }
         if (hoveredSlot instanceof DankSlot) {
-            Component component1 = new TranslatableComponent("text.dankstorage.lock",
+            Component component1 = Component.translatable("text.dankstorage.lock",
                     Client.LOCK_SLOT.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY);
             tooltip.add(component1);
             if (stack.getCount() >= 1000) {
-                Component component2 = new TranslatableComponent(
-                        "text.dankstorage.exact", new TextComponent(Integer.toString(stack.getCount())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY);
+                Component component2 = Component.translatable(
+                        "text.dankstorage.exact", Component.literal(Integer.toString(stack.getCount())).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY);
                 tooltip.add(component2);
             }
         }
