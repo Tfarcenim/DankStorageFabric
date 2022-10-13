@@ -9,8 +9,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -221,41 +219,41 @@ public class DankItem extends Item {
                     bits.add(s1);
                 }
 
-                bits.forEach(s1 -> tooltip.add(new TextComponent(s1)));
+                bits.forEach(s1 -> tooltip.add(Component.literal(s1)));
 
             }
         }
 
         int id = Utils.getFrequency(bag);
-        tooltip.add(new TextComponent("ID: "+id));
+        tooltip.add(Component.literal("ID: "+id));
 
         if (!Screen.hasShiftDown()) {
-            tooltip.add(new TranslatableComponent("text.dankstorage.shift",
-                    new TextComponent("Shift").withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("text.dankstorage.shift",
+                    Component.literal("Shift").withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
         } else {
 
-            tooltip.add(new TranslatableComponent("text.dankstorage.change_pickup_mode", Client.PICKUP_MODE.getTranslatedKeyMessage().copy()
+            tooltip.add(Component.translatable("text.dankstorage.change_pickup_mode", Client.PICKUP_MODE.getTranslatedKeyMessage().copy()
                     .withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
             PickupMode pickupMode = Utils.getPickupMode(bag);
             tooltip.add(
-                    new TranslatableComponent("text.dankstorage.current_pickup_mode", new TranslatableComponent(
+                    Component.translatable("text.dankstorage.current_pickup_mode", Component.translatable(
                             "dankstorage.mode." + pickupMode.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW))
                             .withStyle(ChatFormatting.GRAY));
 
 
-            tooltip.add(new TranslatableComponent("text.dankstorage.changeusetype", Client.CONSTRUCTION.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("text.dankstorage.changeusetype", Client.CONSTRUCTION.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
             C2SMessageToggleUseType.UseType useType = Utils.getUseType(bag);
             tooltip.add(
-                    new TranslatableComponent("text.dankstorage.currentusetype", new TranslatableComponent(
+                    Component.translatable("text.dankstorage.currentusetype", Component.translatable(
                             "dankstorage.usetype." + useType.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
             tooltip.add(
-                    new TranslatableComponent("text.dankstorage.stacklimit", new TextComponent(stats.stacklimit + "").withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
+                    Component.translatable("text.dankstorage.stacklimit", Component.literal(stats.stacklimit + "").withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
 
           /*  DankInventory handler = Utils.getHandler(bag);
 
             if (handler.isEmpty()) {
                 tooltip.add(
-                        new TranslatableComponent("text.dankstorage.empty").withStyle(ChatFormatting.ITALIC));
+                        Component.translatable("text.dankstorage.empty").withStyle(ChatFormatting.ITALIC));
                 return;
             }
             int count1 = 0;
@@ -263,8 +261,8 @@ public class DankItem extends Item {
                 if (count1 > 10) break;
                 ItemStack item = handler.getItem(i);
                 if (item.isEmpty()) continue;
-                Component count = new TextComponent(Integer.toString(item.getCount())).withStyle(ChatFormatting.AQUA);
-                //tooltip.add(new TranslationTextComponent("text.dankstorage.formatcontaineditems", count, item.getDisplayName().(item.getRarity().color)));
+                Component count = Component.literal(Integer.toString(item.getCount())).withStyle(ChatFormatting.AQUA);
+                //tooltip.add(new TranslationComponent.literal("text.dankstorage.formatcontaineditems", count, item.getDisplayName().(item.getRarity().color)));
                 count1++;
             }*/
         }

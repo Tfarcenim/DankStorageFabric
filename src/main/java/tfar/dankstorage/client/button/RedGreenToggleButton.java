@@ -1,14 +1,14 @@
 package tfar.dankstorage.client.button;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 public class RedGreenToggleButton extends SmallButton {
 
     protected boolean toggled;
 
     public RedGreenToggleButton(int x, int y, int widthIn, int heightIn, OnPress callback, boolean toggled) {
-        super(x, y, widthIn, heightIn, new TextComponent(""), callback);
+        super(x, y, widthIn, heightIn, Component.literal(""), callback);
         this.toggled = toggled;
     }
 

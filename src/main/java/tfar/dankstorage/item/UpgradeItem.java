@@ -8,9 +8,9 @@ import javax.annotation.Nonnull;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -43,7 +43,7 @@ public class UpgradeItem extends Item {
             return InteractionResult.FAIL;
         }
         //else {
-        //    player.displayClientMessage(new TranslatableComponent("dankstorage.in_use").withStyle(ChatFormatting.RED), true);
+        //    player.displayClientMessage(Component.translatable("dankstorage.in_use").withStyle(ChatFormatting.RED), true);
         // }
 
         DockBlockEntity oldDank = (DockBlockEntity) world.getBlockEntity(pos);
@@ -54,7 +54,7 @@ public class UpgradeItem extends Item {
                 if (!player.getAbilities().instabuild)
                     upgradeStack.shrink(1);
             }
-            player.displayClientMessage(new TranslatableComponent("text.dankstorage.upgrade_successful").withStyle(ChatFormatting.GREEN), true);
+            player.displayClientMessage(Component.translatable("text.dankstorage.upgrade_successful").withStyle(ChatFormatting.GREEN), true);
         }
         return InteractionResult.SUCCESS;
     }
