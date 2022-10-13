@@ -8,7 +8,6 @@ import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.DankStorage;
@@ -90,7 +89,7 @@ public class DankCommands {
             dank.setTag(null);
             return 1;
         } else {
-            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.reset_frequency.not_a_dank"));
+            throw new CommandRuntimeException(Component.translatable("dankstorage.command.reset_frequency.not_a_dank"));
         }
     }
 
