@@ -59,5 +59,7 @@
   "text.dankstorage.save_frequency_button.locked_frequency" : "Blue: %s",
   "text.dankstorage.save_frequency_button.locked_frequencytxt" : "This frequency is locked",
   "text.dankstorage.red_print.tooltip0" : "Copies frequency to other danks",
-  "text.dankstorage.red_print.tooltip1" : "Only works on same tier"
+  "text.dankstorage.red_print.tooltip1" : "Only works on same tier",
+  "dankstorage.command.reset_frequency.not_a_dank": "Not a Dank",
+  "dankstorage.command.set_tier.invalid_id" : "The frequency does not exist"
 }
