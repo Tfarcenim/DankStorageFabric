@@ -20,7 +20,7 @@ public class MouseMixin {
     @Inject(method = "onScroll",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getInventory()Lnet/minecraft/world/entity/player/Inventory;"), cancellable = true)
     private void onScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
-        double delta = (this.minecraft.options.discreteMouseScroll().get() ? Math.signum(horizontal) : vertical) * this.minecraft.options.mouseWheelSensitivity().get();
+        double delta = (this.minecraft.options.discreteMouseScroll ? Math.signum(horizontal) : vertical) * this.minecraft.options.mouseWheelSensitivity;
 
         if (ClientMixinEvents.onScroll((MouseHandler) (Object) this, window, horizontal, vertical, delta)) ci.cancel();
     }

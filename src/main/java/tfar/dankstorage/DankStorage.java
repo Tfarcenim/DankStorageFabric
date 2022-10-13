@@ -3,12 +3,10 @@ package tfar.dankstorage;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.Commands.CommandSelection;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -145,7 +143,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
     }
 
     @Override
-    public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandbuildcontext, CommandSelection commandselection) {
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
         DankCommands.register(dispatcher);
     }
 

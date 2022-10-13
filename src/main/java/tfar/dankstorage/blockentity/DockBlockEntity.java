@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
@@ -123,7 +124,7 @@ public class DockBlockEntity extends BlockEntity implements Nameable, MenuProvid
     }
 
     public Component getDefaultName() {
-        return Component.translatable("container.dankstorage.dank_" + getBlockState().getValue(DockBlock.TIER));
+        return new TranslatableComponent("container.dankstorage.dank_" + getBlockState().getValue(DockBlock.TIER));
     }
 
     @Override

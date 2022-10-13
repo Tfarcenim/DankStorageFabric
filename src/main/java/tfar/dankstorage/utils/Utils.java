@@ -7,7 +7,8 @@ import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -110,7 +111,7 @@ public class Utils {
         if (ordinal > PickupMode.PICKUP_MODES.length - 1) ordinal = 0;
         getOrCreateSettings(bag).putInt("mode", ordinal);
         player.displayClientMessage(
-                Component.translatable("dankstorage.mode." + PickupMode.PICKUP_MODES[ordinal].name()), true);
+                new TranslatableComponent("dankstorage.mode." + PickupMode.PICKUP_MODES[ordinal].name()), true);
     }
 
     public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag) {
@@ -126,7 +127,7 @@ public class Utils {
         if (ordinal >= useTypes.length) ordinal = 0;
         tag.putInt("construction", ordinal);
         player.displayClientMessage(
-                Component.translatable("dankstorage.usetype." + useTypes[ordinal].name()), true);
+                new TranslatableComponent("dankstorage.usetype." + useTypes[ordinal].name()), true);
     }
 
     //this can be 0 - 80
@@ -334,7 +335,7 @@ public class Utils {
     }
 
     public static void warn(Player player, DankStats item, DankStats inventory) {
-        player.sendSystemMessage(Component.literal("Dank Item Level "+item.ordinal() +" cannot open Dank Inventory Level "+inventory.ordinal()));
+        player.sendMessage(new TextComponent("Dank Item Level "+item.ordinal() +" cannot open Dank Inventory Level "+inventory.ordinal()), Util.NIL_UUID);
     }
 
     @Nullable

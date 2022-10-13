@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import tfar.dankstorage.client.button.TripleToggleButton;
@@ -60,11 +62,11 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
 
             this.renderTooltip(poseStack,
                     this.minecraft.font.split(
-                            Component.literal("Pickup"), Math.max(this.width / 2 - 43, 170)), x, y);
+                            new TextComponent("Pickup"), Math.max(this.width / 2 - 43, 170)), x, y);
 
         };
 
-        this.addRenderableWidget(new TripleToggleButton(leftPos + 101, topPos + 4, 12, 12,Component.literal("P"), b -> {
+        this.addRenderableWidget(new TripleToggleButton(leftPos + 101, topPos + 4, 12, 12,new TextComponent("P"), b -> {
             Utils.cyclePickupMode(menu.bag, Minecraft.getInstance().player);
             C2SMessageTogglePickup.send();
         },onTooltip,this));

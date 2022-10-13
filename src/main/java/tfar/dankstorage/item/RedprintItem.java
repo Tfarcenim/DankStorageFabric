@@ -2,7 +2,8 @@ package tfar.dankstorage.item;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
@@ -27,12 +28,12 @@ public class RedprintItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
-        list.add(Component.translatable("text.dankstorage.red_print.tooltip0"));
-        list.add(Component.translatable("text.dankstorage.red_print.tooltip1"));
+        list.add(new TranslatableComponent("text.dankstorage.red_print.tooltip0"));
+        list.add(new TranslatableComponent("text.dankstorage.red_print.tooltip1"));
 
       //  int frequency = getFrequency(stack);
 
-      //  list.add(Component.literal("ID: "+frequency));
+      //  list.add(new TextComponent("ID: "+frequency));
 
     }
 
@@ -95,10 +96,10 @@ public class RedprintItem extends Item {
 
     @Override
     public Component getName(ItemStack itemStack) {
-        MutableComponent component = Component.literal(super.getName(itemStack).getString());
+        TranslatableComponent component = (TranslatableComponent) super.getName(itemStack);
         if (itemStack.hasTag() && itemStack.getTag().contains("frequency")) {
             component.append(" ("+itemStack.getTag().getInt("frequency")+")");
         }
-        return (Component) component;
+        return component;
     }
 }
