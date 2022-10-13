@@ -85,6 +85,8 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
         Registry.register(Registry.ITEM, new ResourceLocation(MODID, "red_print"), red_print = new RedprintItem(properties));
         Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation(MODID, "dank_tile"), dank_tile = BlockEntityType.Builder.of(DockBlockEntity::new, dock).build(null));
 
+        properties.stacksTo(1);
+
         IntStream.range(1, 8).forEach(i -> {
             DankItem dankItem = new DankItem(properties, DankStats.values()[i]);
             DispenserBlock.registerBehavior(dankItem, new DankDispenserBehavior());

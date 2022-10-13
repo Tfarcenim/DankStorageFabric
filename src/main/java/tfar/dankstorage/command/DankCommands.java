@@ -3,11 +3,16 @@ package tfar.dankstorage.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.DankStorage;
+import tfar.dankstorage.item.DankItem;
 
 public class DankCommands {
 
@@ -45,6 +50,9 @@ public class DankCommands {
                                 .executes(DankCommands::unlock)
                         )
                 )
+                .then(Commands.literal("reset_frequency")
+                        .executes(DankCommands::resetFrequency)
+                )
         );
     }
 
@@ -70,6 +78,20 @@ public class DankCommands {
             throw new CommandRuntimeException(Component.translatable("dankstorage.command.set_tier.invalid_id"));
         }
         return 1;
+    }
+
+    private static int resetFrequency(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack sourceStack = context.getSource();
+        Player player = sourceStack.getPlayerOrException();
+
+        ItemStack dank = player.getMainHandItem();
+
+        if (dank.getItem() instanceof DankItem) {
+            dank.setTag(null);
+            return 1;
+        } else {
+            throw new CommandRuntimeException(new TranslatableComponent("dankstorage.command.reset_frequency.not_a_dank"));
+        }
     }
 
     private static int lock(CommandContext<CommandSourceStack> context) {
