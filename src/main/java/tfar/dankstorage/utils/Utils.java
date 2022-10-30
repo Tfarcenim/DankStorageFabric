@@ -3,7 +3,6 @@ package tfar.dankstorage.utils;
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,8 +14,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
@@ -26,7 +23,6 @@ import net.minecraft.world.level.Level;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.mixin.CraftingContainerAccess;
-import tfar.dankstorage.mixin.SimpleContainerAccess;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 import tfar.dankstorage.world.ClientData;
@@ -185,7 +181,6 @@ public class Utils {
                 }
             }
         }
-
         if (!toMerge.isEmpty()) {
             stacks.add(toMerge);
         }
@@ -345,22 +340,24 @@ public class Utils {
     }
 
     private static List<CraftingRecipe> REVERSIBLE3x3 = new ArrayList<>();
-
+    private static List<CraftingRecipe> REVERSIBLE2x2 = new ArrayList<>();
     private static boolean cached = false;
 
     public static void uncacheRecipes(RecipeManager manager) {
         cached = false;
     }
 
-    public static Pair<ItemStack,Integer> compressable(ServerLevel level, ItemStack stack) {
-        if (!cached) {
-            REVERSIBLE3x3 = findReversible3x3s(level);
-            cached = true;
-        }
+    public static Pair<ItemStack,Integer> compress(ServerLevel level, ItemStack stack) {
 
         for (CraftingRecipe recipe : REVERSIBLE3x3) {
             if (recipe.getIngredients().get(0).test(stack)) {
                 return Pair.of(recipe.getResultItem(),9);
+            }
+        }
+
+        for (CraftingRecipe recipe : REVERSIBLE2x2) {
+            if (recipe.getIngredients().get(0).test(stack)) {
+                return Pair.of(recipe.getResultItem(),4);
             }
         }
 
@@ -369,7 +366,8 @@ public class Utils {
 
     public static boolean canCompress(ServerLevel level, ItemStack stack) {
         if (!cached) {
-            REVERSIBLE3x3 = findReversible3x3s(level);
+            REVERSIBLE3x3 = findReversibles(level,3);
+            REVERSIBLE2x2 = findReversibles(level,2);
             cached = true;
         }
 
@@ -379,10 +377,15 @@ public class Utils {
             }
         }
 
+        for (CraftingRecipe recipe : REVERSIBLE2x2) {
+            if (recipe.getIngredients().get(0).test(stack)) {
+                return true;
+            }
+        }
+
         return false;
     }
-
-    public static List<CraftingRecipe> findReversible3x3s(ServerLevel level) {
+    public static List<CraftingRecipe> findReversibles(ServerLevel level,int size) {
         List<CraftingRecipe> compactingRecipes = new ArrayList<>();
         List<CraftingRecipe> recipes = level.getRecipeManager().getAllRecipesFor(RecipeType.CRAFTING);
 
@@ -390,7 +393,7 @@ public class Utils {
             if (recipe instanceof ShapedRecipe shapedRecipe) {
                 int x = shapedRecipe.getWidth();
                 int y = shapedRecipe.getHeight();
-                if (x == 3 && x == y) {
+                if (x == size && x == y) {
 
                     List<Ingredient> inputs = shapedRecipe.getIngredients();
 
@@ -404,20 +407,19 @@ public class Utils {
                                 break;
                             }
                         }
-                        if (same) {
+                        if (same && shapedRecipe.getResultItem().getCount() == 1) {
                             DUMMY.setItem(0,shapedRecipe.getResultItem());
 
-                            CraftingRecipe rrecipe = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING,DUMMY,level).orElse(null);
-
-                            if (rrecipe != null) {
-                                compactingRecipes.add(shapedRecipe);
-                            }
+                            level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, DUMMY, level).ifPresent(rrecipe -> {
+                                if (rrecipe.getResultItem().getCount() == size * size) {
+                                    compactingRecipes.add(shapedRecipe);
+                                }
+                            });
                         }
                     }
                 }
             }
         }
-
         return compactingRecipes;
     }
 

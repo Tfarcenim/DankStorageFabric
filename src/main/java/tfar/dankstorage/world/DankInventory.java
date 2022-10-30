@@ -9,13 +9,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.lwjgl.system.CallbackI;
 import tfar.dankstorage.DankStorage;
-import tfar.dankstorage.container.AbstractDankMenu;
 import tfar.dankstorage.mixin.SimpleContainerAccess;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.utils.ItemHandlerHelper;
@@ -336,7 +333,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         for (Map.Entry<Item, Pair<Integer, Integer>> entry : groups.entrySet()) {
             Item item = entry.getKey();
             Pair<Integer, Integer> pair = entry.getValue();
-            Pair<ItemStack, Integer> stackIntegerPair = Utils.compressable(level, new ItemStack(item));
+            Pair<ItemStack, Integer> stackIntegerPair = Utils.compress(level, new ItemStack(item));
             int count = 0;
 
             for (int i = pair.getFirst(); i < pair.getSecond() + 1; i++) {
@@ -384,7 +381,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
                     ItemStack stack = getItem(i);
                     if (stack.getItem() == item) {
 
-                        Pair<ItemStack, Integer> stackIntegerPair = Utils.compressable(level, new ItemStack(item));
+                        Pair<ItemStack, Integer> stackIntegerPair = Utils.compress(level, new ItemStack(item));
 
                         ItemStack compressionResult = stackIntegerPair.getFirst();
                         int compressedCount = stack.getCount() / stackIntegerPair.getSecond();
