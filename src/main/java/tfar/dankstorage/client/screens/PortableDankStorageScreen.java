@@ -69,10 +69,4 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
             C2SMessageTogglePickup.send();
         },onTooltip,this));
     }
-
-    @Override
-    protected void renderLabels(PoseStack stack, int mouseX, int mouseY) {
-        super.renderLabels(stack, mouseX, mouseY);
-
-    }
 }
