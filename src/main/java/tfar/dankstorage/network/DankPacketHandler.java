@@ -28,6 +28,7 @@ public class DankPacketHandler {
     public static final ResourceLocation request_contents = new ResourceLocation(DankStorage.MODID, "request_contents");
 
     public static final ResourceLocation sync_slot = new ResourceLocation(DankStorage.MODID, "sync_slot");
+    public static final ResourceLocation sync_ghost = new ResourceLocation(DankStorage.MODID, "sync_ghost");
     public static final ResourceLocation sync_container = new ResourceLocation(DankStorage.MODID, "sync_container");
     public static final ResourceLocation sync_data = new ResourceLocation(DankStorage.MODID, "sync_data");
     public static final ResourceLocation sync_inventory = new ResourceLocation(DankStorage.MODID, "sync_inventory");
@@ -53,6 +54,14 @@ public class DankPacketHandler {
         buf.writeInt(slot);
         PacketBufferEX.writeExtendedItemStack(buf, stack);
         ServerPlayNetworking.send(player, DankPacketHandler.sync_slot, buf);
+    }
+
+    public static void sendGhostItem(ServerPlayer player, int id, int slot, ItemStack stack) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        buf.writeInt(id);
+        buf.writeInt(slot);
+        PacketBufferEX.writeExtendedItemStack(buf, stack);
+        ServerPlayNetworking.send(player, DankPacketHandler.sync_ghost, buf);
     }
 
     public static void sendSyncContainer(ServerPlayer player,int stateID, int containerID, NonNullList<ItemStack> stacks,ItemStack carried) {
