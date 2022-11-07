@@ -23,10 +23,9 @@ public class C2SMessageLockSlot implements ServerPlayNetworking.PlayChannelHandl
 
     public void handle(ServerPlayer player, int slot) {
         AbstractContainerMenu container = player.containerMenu;
-        if (container instanceof AbstractDankMenu) {
-            AbstractDankMenu dankContainer = (AbstractDankMenu) container;
+        if (container instanceof AbstractDankMenu dankContainer) {
             DankInventory inventory = dankContainer.dankInventory;
-            inventory.toggleLock(slot);
+            inventory.toggleGhostItem(slot);
         }
     }
 

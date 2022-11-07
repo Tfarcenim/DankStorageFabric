@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -12,6 +13,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import tfar.dankstorage.client.Client;
@@ -104,15 +106,11 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
             }
         }, saveTooltip));
 
-
-
-
         Button.OnTooltip compressTooltip = (button, poseStack, x, y) -> {
-
 
             this.renderTooltip(poseStack,
                     this.minecraft.font.split(
-                            Component.translatable("Compresses reversible 3x3 recipes"), Math.max(this.width / 2 - 43, 170)), x, y);
+                            Component.translatable("text.dankstorage.compress_button"), Math.max(this.width / 2 - 43, 170)), x, y);
 
         };
 
@@ -156,6 +154,18 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         }
     }
 
+    public void renderSlot(PoseStack pPoseStack, Slot pSlot) {
+        super.renderSlot(pPoseStack, pSlot);
+        int i = pSlot.x;
+        int j = pSlot.y;
+        if (pSlot.index < menu.dankInventory.getContainerSize() && !pSlot.hasItem() && menu.dankInventory.hasGhostItem(pSlot.index)) {
+            itemRenderer.renderAndDecorateFakeItem(menu.dankInventory.getGhostItem(pSlot.index), i, j);
+            RenderSystem.depthFunc(516);
+            GuiComponent.fill(pPoseStack, i, j, i + 16, j + 16, 0x40ffffff);
+            RenderSystem.depthFunc(515);
+        }
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE || Minecraft.getInstance().options.keyInventory.matches(keyCode, scanCode)) {
@@ -192,7 +202,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
             int k = i / 9;
             int offsetx = 8;
             int offsety = 18;
-            if (this.menu.dankInventory.get(i) == 1) {
+            if (this.menu.dankInventory.hasGhostItem(i)) {
                 fill(stack, leftPos + j * 18 + offsetx, topPos + k * 18 + offsety,
                         leftPos + j * 18 + offsetx + 16, topPos + k * 18 + offsety + 16, 0xFFFF0000);
             }

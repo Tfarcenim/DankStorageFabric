@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.inventory.DankSlot;
+import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.world.DankInventory;
 
 import javax.annotation.Nonnull;
@@ -27,7 +28,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         this.dankInventory = dankInventory;
         addDataSlots(dankInventory);
         if (!playerInventory.player.level.isClientSide) {
-            synchronizer = new CustomSync((ServerPlayer) playerInventory.player);
+            setSynchronizer(new CustomSync((ServerPlayer) playerInventory.player));
         }
     }
 
@@ -77,8 +78,6 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
     public ItemStack quickMoveStack(Player playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
-
-        boolean locked = slot instanceof DankSlot && dankInventory.isLocked(index);
 
         if (slot.hasItem()) {
             ItemStack slotStack = slot.getItem();
@@ -399,9 +398,12 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public void setSynchronizer(ContainerSynchronizer containerSynchronizer) {
-        //super.setSynchronizer(containerSynchronizer);no
-        this.sendAllDataToRemote();
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        //the remote inventory needs to know about locked slots
+        for (int i = 0; i < dankInventory.dankStats.slots;i++) {
+            DankPacketHandler.sendGhostItem((ServerPlayer) playerInventory.player,containerId,i,dankInventory.getGhostItem(i));
+        }
     }
 
     public abstract void setFrequency(int freq);

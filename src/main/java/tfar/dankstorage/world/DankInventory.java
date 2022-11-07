@@ -7,8 +7,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 public class DankInventory extends SimpleContainer implements ContainerData {
 
     public DankStats dankStats;
-    protected int[] lockedSlots;
+    protected NonNullList<ItemStack> ghostItems;
     protected int id;
     public boolean locked = true;
 
@@ -34,7 +34,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     public DankInventory(DankStats stats, int id) {
         super(stats.slots);
         this.dankStats = stats;
-        this.lockedSlots = new int[stats.slots];
+        this.ghostItems = NonNullList.withSize(stats.slots, ItemStack.EMPTY);
         this.id = id;
     }
 
@@ -51,51 +51,46 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     //like upgradeTo, but can go backwards, should only be used by commands
     public void setTo(DankStats stats) {
         this.dankStats = stats;
-        fixLockedSlots();
+        copyItems();
     }
 
-    private void fixLockedSlots() {
-        ((SimpleContainerAccess) this).setSize(dankStats.slots);
+    private void copyItems() {
 
         NonNullList<ItemStack> newStacks = NonNullList.withSize(dankStats.slots, ItemStack.EMPTY);
-        int max = Math.min(lockedSlots.length, dankStats.slots);
+        NonNullList<ItemStack> newGhostStacks = NonNullList.withSize(dankStats.slots, ItemStack.EMPTY);
 
+        //don't copy nonexistent items
+        int oldSlots = getContainerSize();
+        int max = Math.min(oldSlots, dankStats.slots);
         for (int i = 0; i < max; i++) {
-            newStacks.set(i, getContents().get(i));
+            ItemStack oldStack = getItem(i);
+            ItemStack oldGhost = getGhostItem(i);
+            newStacks.set(i, oldStack);
+            newGhostStacks.set(i, oldGhost);
         }
 
-        ((SimpleContainerAccess) this).setItems(newStacks);
+        //caution, will void all current items
+        $setSize(dankStats.slots);
 
-        int[] newLockedSlots = new int[dankStats.slots];
-        if (max >= 0) System.arraycopy(lockedSlots, 0, newLockedSlots, 0, max);
-        lockedSlots = newLockedSlots;
+        ((SimpleContainerAccess) this).setItems(newStacks);
+        setGhostItems(newGhostStacks);
         setChanged();
     }
 
-    @Override
-    public ItemStack removeItem(int slot, int amount) {
-        if (!isLocked(slot)) {
-            return super.removeItem(slot, amount);
-        }
+    protected void setGhostItems(NonNullList<ItemStack> newGhosts) {
+        ghostItems = newGhosts;
+    }
 
-        int amountInSlot = getItem(slot).getCount();
+    //distinguish from the mixin accessor
+    public void $setSize(int size) {
+        ((SimpleContainerAccess)this).setSize(size);
+        ((SimpleContainerAccess) this).setItems(NonNullList.withSize(size, ItemStack.EMPTY));
+        setGhostItems(NonNullList.withSize(size, ItemStack.EMPTY));
+    }
 
-        if (amountInSlot < amount) {
-            return super.removeItem(slot, amount);
-        }
-
-        amount = Math.min(amount, amountInSlot - 1);
-
-        if (amount == 0) {
-            return ItemStack.EMPTY;
-        }
-
-        ItemStack itemStack = ContainerHelper.removeItem(getContents(), slot, amount);
-        if (!itemStack.isEmpty()) {
-            this.setChanged();
-        }
-
-        return itemStack;
+    public void setDankStats(DankStats dankStats) {
+        this.dankStats = dankStats;
+        $setSize(dankStats.slots);
     }
 
     @Override
@@ -113,23 +108,18 @@ public class DankInventory extends SimpleContainer implements ContainerData {
                 .allMatch(stack -> stack.isEmpty() || stack.is(Utils.BLACKLISTED_USAGE));
     }
 
-    public boolean isLocked(int slot) {
-        return get(slot) == 1;
-    }
-
-    public void toggleLock(int slot) {
-        boolean loc = get(slot) == 1;
-        set(slot, loc ? 0 : 1);
-        setChanged();
-    }
-
     @Override
-    public boolean canPlaceItem(int i, ItemStack itemStack) {
-        return !itemStack.is(Utils.BLACKLISTED_STORAGE);
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        boolean checkGhostItem = !hasGhostItem(slot) || getGhostItem(slot).getItem() == stack.getItem();
+        return !stack.is(Utils.BLACKLISTED_STORAGE)
+                && checkGhostItem;
     }
 
     //paranoia
+    /*
     @Override
+
+
     public boolean canAddItem(ItemStack stack) {
         return !stack.is(Utils.BLACKLISTED_STORAGE) && super.canAddItem(stack);
     }
@@ -138,7 +128,10 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     @Override
     public ItemStack addItem(ItemStack itemStack) {
         return itemStack.is(Utils.BLACKLISTED_STORAGE) ? itemStack : super.addItem(itemStack);
-    }
+    }*/
+
+    static final String GHOST = "GhostItems";
+
 
     public CompoundTag save() {
         ListTag nbtTagList = new ListTag();
@@ -153,9 +146,21 @@ public class DankInventory extends SimpleContainer implements ContainerData {
             }
         }
 
+
+        ListTag ghostItemNBT = new ListTag();
+        for (int i = 0; i < this.getContents().size(); i++) {
+            if (!ghostItems.get(i).isEmpty()) {
+                CompoundTag itemTag = new CompoundTag();
+                itemTag.putInt("Slot", i);
+                ghostItems.get(i).save(itemTag);
+                ghostItemNBT.add(itemTag);
+            }
+        }
+
+
         CompoundTag nbt = new CompoundTag();
         nbt.put("Items", nbtTagList);
-        nbt.putIntArray("LockedSlots", lockedSlots);
+        nbt.put(GHOST, ghostItemNBT);
         nbt.putString("DankStats", dankStats.name());
         nbt.putInt(Utils.ID, id);
         nbt.putBoolean("locked", locked);
@@ -164,11 +169,18 @@ public class DankInventory extends SimpleContainer implements ContainerData {
 
     public void read(CompoundTag nbt) {
         DankStats stats = DankStats.valueOf(nbt.getString("DankStats"));
-        upgradeTo(stats);
+        setDankStats(stats);
         ListTag tagList = nbt.getList("Items", Tag.TAG_COMPOUND);
+        readItems(tagList);
+        ListTag ghostItemList = nbt.getList(GHOST, Tag.TAG_COMPOUND);
+        readGhostItems(ghostItemList);
         locked = nbt.getBoolean("locked");
-        for (int i = 0; i < tagList.size(); i++) {
-            CompoundTag itemTags = tagList.getCompound(i);
+        validate();
+    }
+
+    protected void readItems(ListTag listTag) {
+        for (int i = 0; i < listTag.size(); i++) {
+            CompoundTag itemTags = listTag.getCompound(i);
             int slot = itemTags.getInt("Slot");
             if (slot >= 0 && slot < getContainerSize()) {
                 if (itemTags.contains("StackList", Tag.TAG_LIST)) {
@@ -198,14 +210,35 @@ public class DankInventory extends SimpleContainer implements ContainerData {
                 }
             }
         }
-        int[] slots = nbt.getIntArray("LockedSlots");
-        setLockedSlots(slots);
-        validate();
     }
 
-    protected void setLockedSlots(int[] slots) {
-        System.arraycopy(slots, 0, this.lockedSlots, 0, slots.length);
+    protected void readGhostItems(ListTag listTag) {
+        for (int i = 0; i < listTag.size(); i++) {
+            CompoundTag itemTags = listTag.getCompound(i);
+            int slot = itemTags.getInt("Slot");
+            if (slot >= 0 && slot < getContainerSize()) {
+                if (itemTags.contains("StackList", Tag.TAG_LIST)) {
+                    ItemStack stack = ItemStack.EMPTY;
+                    ListTag stackTagList = itemTags.getList("StackList", Tag.TAG_COMPOUND);
+                    for (int j = 0; j < stackTagList.size(); j++) {
+                        CompoundTag itemTag = stackTagList.getCompound(j);
+                        ItemStack temp = ItemStack.of(itemTag);
+                        if (!temp.isEmpty()) {
+                            if (stack.isEmpty()) stack = temp;
+                            else stack.grow(temp.getCount());
+                        }
+                    }
+                    if (!stack.isEmpty()) {
+                        this.ghostItems.set(slot, stack);
+                    }
+                } else {
+                    ItemStack stack = ItemStack.of(itemTags);
+                    this.ghostItems.set(slot, stack);
+                }
+            }
+        }
     }
+
 
     protected void validate() {
         if (dankStats == DankStats.zero) {
@@ -213,7 +246,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         } else if (getContainerSize() == 0) {
             throw new RuntimeException("dank is empty?");
         } else {
-            if (lockedSlots.length != getContainerSize()) {
+            if (ghostItems.size() != getContainerSize()) {
                 throw new RuntimeException("inequal size");
             }
         }
@@ -250,54 +283,46 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     }
 
     public int getTextColor() {
-        return get(getFrequencySlot() + 1);
+        return get(1);
     }
 
     public void setTextColor(int color) {
-        set(getFrequencySlot() + 1, color);
+        set(1, color);
     }
 
     public boolean frequencyLocked() {
-        return get(getFrequencySlot() + 2) == 1;
+        return get(2) == 1;
     }
 
     public void toggleFrequencyLock() {
-        boolean loc = get(getFrequencySlot() + 2) == 1;
+        boolean loc = get(2) == 1;
         setFrequencyLock(!loc);
     }
 
     public void setFrequencyLock(boolean lock) {
-        set(getFrequencySlot() + 2, lock ? 1 : 0);
+        set(2, lock ? 1 : 0);
+    }
+
+    public int getFrequency() {
+        return get(0);
     }
 
     @Override
     public int get(int slot) {
-        if (slot < getContainerSize()) {
-            return lockedSlots[slot];
-        } else if (slot == getFrequencySlot()) {
-            return id;
-        } else if (slot == getFrequencySlot() + 1) {
-            return textColor;
-        } else if (slot == getFrequencySlot() + 2) {
-            return locked ? 1 : 0;
-        }
-        return -999;
-    }
-
-    public int getFrequency() {
-        return get(getFrequencySlot());
+        return switch (slot) {
+            case 0 -> id;
+            case 1 -> textColor;
+            case 2 -> locked ? 1 : 0;
+            default -> AbstractContainerMenu.SLOT_CLICKED_OUTSIDE;
+        };
     }
 
     @Override
     public void set(int slot, int value) {
-        if (slot < getContainerSize()) {
-            lockedSlots[slot] = value;
-        } else if (slot == getFrequencySlot()) {
-            id = value;
-        } else if (slot == getFrequencySlot() + 1) {
-            textColor = value;
-        } else if (slot == getFrequencySlot() + 2) {
-            locked = value == 1;
+        switch (slot) {
+            case 0 -> id = value;
+            case 1 -> textColor = value;
+            case 2 -> locked = value == 1;
         }
         setChanged();
     }
@@ -425,20 +450,42 @@ public class DankInventory extends SimpleContainer implements ContainerData {
                 int fullStacks = count / dankStats.stacklimit;
                 int partialStack = count - fullStacks * dankStats.stacklimit;
 
-                for (int j = 0; j < fullStacks;j++) {
+                for (int j = 0; j < fullStacks; j++) {
                     setItem(slotId, ItemHandlerHelper.copyStackWithSize(stack, dankStats.stacklimit));
                     slotId++;
                 }
                 if (partialStack > 0) {
-                    setItem(slotId,  ItemHandlerHelper.copyStackWithSize(stack, partialStack));
+                    setItem(slotId, ItemHandlerHelper.copyStackWithSize(stack, partialStack));
                     slotId++;
                 }
             } else {
-                setItem(slotId,stack);
+                setItem(slotId, stack);
                 slotId++;
             }
             //setItem(i, stack);
         }
+    }
+
+    public boolean hasGhostItem(int slot) {
+        return !ghostItems.get(slot).isEmpty();
+    }
+
+    public ItemStack getGhostItem(int slot) {
+        return ghostItems.get(slot);
+    }
+
+    public void setGhostItem(int slot, Item item) {
+        ghostItems.set(slot, new ItemStack(item));
+    }
+
+    public void toggleGhostItem(int slot) {
+        boolean loc = !ghostItems.get(slot).isEmpty();
+        if (!loc) {
+            ghostItems.set(slot, ItemHandlerHelper.copyStackWithSize(getItem(slot), 1));
+        } else {
+            ghostItems.set(slot, ItemStack.EMPTY);
+        }
+        setChanged();
     }
 
     public enum TxtColor {
