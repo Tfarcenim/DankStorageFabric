@@ -76,36 +76,6 @@
                   "condition": "minecraft:block_state_property",
                   "block": "dankstorage:dock",
                   "properties": {
-                    "tier": "7"
-                  }
-                }
-              ],
-              "name": "dankstorage:dank_7"
-            },
-            {
-              "type": "minecraft:item",
-              "functions": [
-                {
-                  "function": "minecraft:copy_name",
-                  "source": "block_entity"
-                },
-                {
-                  "function": "minecraft:copy_nbt",
-                  "source": "block_entity",
-                  "ops": [
-                    {
-                      "source": "settings",
-                      "target": "settings",
-                      "op": "replace"
-                    }
-                  ]
-                }
-              ],
-              "conditions": [
-                {
-                  "condition": "minecraft:block_state_property",
-                  "block": "dankstorage:dock",
-                  "properties": {
                     "tier": "6"
                   }
                 }
