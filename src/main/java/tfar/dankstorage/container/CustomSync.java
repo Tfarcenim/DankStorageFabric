@@ -23,7 +23,6 @@ public class CustomSync implements ContainerSynchronizer {
         for(int i = 0; i < is.length; ++i) {
             this.broadcastDataValue(abstractContainerMenu, i, is[i]);
         }
-
     }
 
     @Override

@@ -8,6 +8,7 @@
     "ItemUsageContextAccessor",
     "PlayerInventoryMixin",
     "RecipeManagerMixin",
+    "ServerPlayerMixin",
     "SimpleContainerAccess"
   ],
   "client": [
