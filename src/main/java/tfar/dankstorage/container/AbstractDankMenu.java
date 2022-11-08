@@ -27,9 +27,6 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         this.playerInventory = playerInventory;
         this.dankInventory = dankInventory;
         addDataSlots(dankInventory);
-        if (!playerInventory.player.level.isClientSide) {
-            setSynchronizer(new CustomSync((ServerPlayer) playerInventory.player));
-        }
     }
 
     public static boolean canItemQuickReplace(@Nullable Slot slot, @Nonnull ItemStack stack, boolean stackSizeMatters) {
