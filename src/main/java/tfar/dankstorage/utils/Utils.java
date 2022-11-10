@@ -16,8 +16,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
@@ -27,7 +25,6 @@ import net.minecraft.world.level.Level;
 import tfar.dankstorage.DankStorage;
 import tfar.dankstorage.item.DankItem;
 import tfar.dankstorage.mixin.CraftingContainerAccess;
-import tfar.dankstorage.mixin.SimpleContainerAccess;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 import tfar.dankstorage.world.ClientData;
@@ -76,7 +73,7 @@ public class Utils {
         if (tag != null) {
             return PickupMode.PICKUP_MODES[tag.getInt("mode")];
         }
-        return PickupMode.none;
+        return PickupMode.NONE;
     }
 
     public static boolean isConstruction(ItemStack bag) {
