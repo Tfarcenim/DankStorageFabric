@@ -188,7 +188,7 @@ public class DankItem extends Item {
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.hasTag() && Utils.getPickupMode(stack) != PickupMode.none;
+        return stack.hasTag() && Utils.getPickupMode(stack) != PickupMode.NONE;
     }
 
     @Override
@@ -305,14 +305,14 @@ public class DankItem extends Item {
     public int getGlintColor(ItemStack stack) {
         PickupMode pickupMode = Utils.getPickupMode(stack);
         switch (pickupMode) {
-            case none:
+            case NONE:
             default:
                 return 0xffffffff;
-            case pickup_all:
+            case ALL:
                 return 0xff00ff00;
-            case filtered_pickup:
+            case FILTERED:
                 return 0xffffff00;
-            case void_pickup:
+            case VOID:
                 return 0xffff0000;
         }
     }

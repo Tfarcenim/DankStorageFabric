@@ -71,7 +71,7 @@ public class Utils {
         if (tag != null) {
             return PickupMode.PICKUP_MODES[tag.getInt("mode")];
         }
-        return PickupMode.none;
+        return PickupMode.NONE;
     }
 
     public static boolean isConstruction(ItemStack bag) {
