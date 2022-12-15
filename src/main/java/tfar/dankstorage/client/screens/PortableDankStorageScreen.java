@@ -3,6 +3,7 @@ package tfar.dankstorage.client.screens;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -56,17 +57,15 @@ public class PortableDankStorageScreen extends AbstractDankStorageScreen<DankMen
     //        C2SMessageTagMode.send();
     //    }, false));
 
-        Button.OnTooltip onTooltip = (button, poseStack, x, y) -> {
+        Tooltip onTooltip = Tooltip.create(Component.literal("Pickup"));
 
-            this.renderTooltip(poseStack,
-                    this.minecraft.font.split(
-                            Component.literal("Pickup"), Math.max(this.width / 2 - 43, 170)), x, y);
-
-        };
-
-        this.addRenderableWidget(new TripleToggleButton(leftPos + 101, topPos + 4, 12, 12,Component.literal("P"), b -> {
+        TripleToggleButton toggleButton = new TripleToggleButton(leftPos + 101, topPos + 4, 12, 12,Component.literal("P"), b -> {
             Utils.cyclePickupMode(menu.bag, Minecraft.getInstance().player);
             C2SMessageTogglePickup.send();
-        },onTooltip,this));
+        },this);
+
+        toggleButton.setTooltip(onTooltip);
+
+        this.addRenderableWidget(toggleButton);
     }
 }

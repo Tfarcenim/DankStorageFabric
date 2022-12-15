@@ -5,24 +5,23 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands.CommandSelection;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
@@ -30,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import tfar.dankstorage.block.DankDispenserBehavior;
 import tfar.dankstorage.block.DockBlock;
+import tfar.dankstorage.blockentity.DockBlockEntity;
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.command.DankCommands;
 import tfar.dankstorage.container.DankMenu;
@@ -40,8 +40,6 @@ import tfar.dankstorage.item.UpgradeInfo;
 import tfar.dankstorage.item.UpgradeItem;
 import tfar.dankstorage.network.DankPacketHandler;
 import tfar.dankstorage.recipe.Serializer2;
-import tfar.dankstorage.blockentity.DockBlockEntity;
-import tfar.dankstorage.recipe.UpgradeRecipe;
 import tfar.dankstorage.utils.DankStats;
 import tfar.dankstorage.world.DankSavedData;
 
@@ -79,42 +77,47 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
 
     @Override
     public void onInitialize() {
-        Item.Properties properties = new Item.Properties().tab(CreativeModeTab.TAB_DECORATIONS);
-        Registry.register(Registry.BLOCK, new ResourceLocation(MODID, "dock"), dock = new DockBlock(BlockBehaviour.Properties.of(Material.METAL).strength(1, 30)));
-        Registry.register(Registry.ITEM, new ResourceLocation(MODID, "dock"), new BlockItem(dock, properties));
-        Registry.register(Registry.ITEM, new ResourceLocation(MODID, "red_print"), red_print = new RedprintItem(properties));
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation(MODID, "dank_tile"), dank_tile = BlockEntityType.Builder.of(DockBlockEntity::new, dock).build(null));
+        Item.Properties properties = new Item.Properties();
+
+        Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(MODID, "dock"), dock = new DockBlock(BlockBehaviour.Properties.of(Material.METAL).strength(1, 30)));
+        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MODID, "dock"), new BlockItem(dock, properties));
+
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS).register(entries -> entries.accept(dock));
+
+
+        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MODID, "red_print"), red_print = new RedprintItem(properties));
+        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, new ResourceLocation(MODID, "dank_tile"), dank_tile = BlockEntityType.Builder.of(DockBlockEntity::new, dock).build(null));
 
         properties.stacksTo(1);
 
         IntStream.range(1, 8).forEach(i -> {
             DankItem dankItem = new DankItem(properties, DankStats.values()[i]);
             DispenserBlock.registerBehavior(dankItem, new DankDispenserBehavior());
-            Registry.register(Registry.ITEM, new ResourceLocation(MODID, "dank_" + i), dankItem);
+            Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MODID, "dank_" + i), dankItem);
         });
-        IntStream.range(1, 7).forEach(i -> Registry.register(Registry.ITEM, new ResourceLocation(MODID, i + "_to_" + (i + 1)), new UpgradeItem(properties, new UpgradeInfo(i, i + 1))));
-        Registry.register(Registry.RECIPE_SERIALIZER, new ResourceLocation(MODID, "upgrade"), upgrade = new Serializer2());
+        IntStream.range(1, 7).forEach(i -> Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MODID, i + "_to_" + (i + 1)), new UpgradeItem(properties, new UpgradeInfo(i, i + 1))));
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, new ResourceLocation(MODID, "upgrade"), upgrade = new Serializer2());
 
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "dank_1"), dank_1_container = new MenuType<>(DockMenu::t1));
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "portable_dank_1"), portable_dank_1_container = new MenuType<>(DankMenu::t1));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_1"), dank_1_container = new MenuType<>(DockMenu::t1));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_1"), portable_dank_1_container = new MenuType<>(DankMenu::t1));
 
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "dank_2"), dank_2_container = new MenuType<>(DockMenu::t2));
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "portable_dank_2"), portable_dank_2_container = new MenuType<>(DankMenu::t2));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_2"), dank_2_container = new MenuType<>(DockMenu::t2));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_2"), portable_dank_2_container = new MenuType<>(DankMenu::t2));
 
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "dank_3"), dank_3_container = new MenuType<>(DockMenu::t3));
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "portable_dank_3"), portable_dank_3_container = new MenuType<>(DankMenu::t3));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_3"), dank_3_container = new MenuType<>(DockMenu::t3));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_3"), portable_dank_3_container = new MenuType<>(DankMenu::t3));
 
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "dank_4"), dank_4_container = new MenuType<>(DockMenu::t4));
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "portable_dank_4"), portable_dank_4_container = new MenuType<>(DankMenu::t4));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_4"), dank_4_container = new MenuType<>(DockMenu::t4));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_4"), portable_dank_4_container = new MenuType<>(DankMenu::t4));
 
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "dank_5"), dank_5_container = new MenuType<>(DockMenu::t5));
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "portable_dank_5"), portable_dank_5_container = new MenuType<>(DankMenu::t5));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_5"), dank_5_container = new MenuType<>(DockMenu::t5));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_5"), portable_dank_5_container = new MenuType<>(DankMenu::t5));
 
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "dank_6"), dank_6_container = new MenuType<>(DockMenu::t6));
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "portable_dank_6"), portable_dank_6_container = new MenuType<>(DankMenu::t6));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_6"), dank_6_container = new MenuType<>(DockMenu::t6));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_6"), portable_dank_6_container = new MenuType<>(DankMenu::t6));
 
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "dank_7"), dank_7_container = new MenuType<>(DockMenu::t7));
-        Registry.register(Registry.MENU, new ResourceLocation(MODID, "portable_dank_7"), portable_dank_7_container = new MenuType<>(DankMenu::t7));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_7"), dank_7_container = new MenuType<>(DockMenu::t7));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_7"), portable_dank_7_container = new MenuType<>(DankMenu::t7));
 
 
         DankPacketHandler.registerMessages();

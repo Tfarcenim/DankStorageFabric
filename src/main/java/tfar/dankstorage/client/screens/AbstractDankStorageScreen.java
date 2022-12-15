@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -16,7 +17,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
+import tfar.dankstorage.client.BigItemRenderer;
 import tfar.dankstorage.client.Client;
+import tfar.dankstorage.client.DualTooltip;
 import tfar.dankstorage.client.NumberEditBox;
 import tfar.dankstorage.client.button.SmallButton;
 import tfar.dankstorage.container.AbstractDankMenu;
@@ -25,6 +28,7 @@ import tfar.dankstorage.network.server.*;
 import tfar.dankstorage.utils.Utils;
 import tfar.dankstorage.world.DankInventory;
 
+import javax.tools.Tool;
 import java.util.List;
 
 public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> extends AbstractContainerScreen<T> {
@@ -50,8 +54,6 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
             C2SMessageSort.send();
         }));
 
-
-        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
         this.frequency = new NumberEditBox(this.font, i + 92, j + inventoryLabelY, 56, 12, Component.translatable("dank"));
@@ -67,35 +69,26 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         this.setInitialFocus(this.frequency);
         frequency.setFocus(false);
 
-        Button.OnTooltip freqTooltip = (button, poseStack, x, y) -> {
+        Tooltip freqTooltip = new DualTooltip(
+                Component.translatable("text.dankstorage.unlock_button"),
+                Component.translatable("text.dankstorage.lock_button"),null,this);
 
-            boolean locked = menu.dankInventory.frequencyLocked();
-
-            this.renderTooltip(poseStack,
-                    this.minecraft.font.split(
-                            Component.translatable("text.dankstorage." + (locked ? "un" : "") + "lock_button"), Math.max(this.width / 2 - 43, 170)), x, y);
-
-        };
-
-
-        this.addRenderableWidget(new SmallButton(leftPos + 115, topPos + 4, 12, 12,
-                Component.literal(""), button -> C2SMessageLockFrequency.send(), freqTooltip) {
+        SmallButton l = new SmallButton(leftPos + 115, topPos + 4, 12, 12,
+                Component.literal(""), button -> C2SMessageLockFrequency.send()) {
             @Override
             public Component getMessage() {
                 return menu.dankInventory.frequencyLocked() ? Component.literal("X").withStyle(ChatFormatting.RED) :
                         Component.literal("O");
             }
-        });
-
-        Button.OnTooltip saveTooltip = (button, poseStack, x, y) -> {
-//todo make this fancy
-            this.renderTooltip(poseStack,
-                    this.minecraft.font.split(buildSaveComponent()
-                            , Math.max(this.width / 2 - 43, 170)), x, y);
-
         };
 
-        this.addRenderableWidget(new SmallButton(leftPos + 155, j + inventoryLabelY - 2, 12, 12,
+        l.setTooltip(freqTooltip);
+
+        this.addRenderableWidget(l);
+
+        Tooltip saveTooltip = Tooltip.create(buildSaveComponent());
+
+        SmallButton s = new SmallButton(leftPos + 155, j + inventoryLabelY - 2, 12, 12,
                 Component.literal("s"), b -> {
             try {
                 if (menu.dankInventory.frequencyLocked()) return;
@@ -104,19 +97,19 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
             } catch (NumberFormatException e) {
 
             }
-        }, saveTooltip));
+        });
 
-        Button.OnTooltip compressTooltip = (button, poseStack, x, y) -> {
+        s.setTooltip(saveTooltip);
 
-            this.renderTooltip(poseStack,
-                    this.minecraft.font.split(
-                            Component.translatable("text.dankstorage.compress_button"), Math.max(this.width / 2 - 43, 170)), x, y);
+        this.addRenderableWidget(s);
 
-        };
+        Tooltip compressTooltip = Tooltip.create(Component.translatable("text.dankstorage.compress_button"));
 
+        SmallButton c = new SmallButton(leftPos + 129, topPos + 4, 12, 12,
+                Component.literal("C"), button -> C2SMessageCompress.send());
+        c.setTooltip(compressTooltip);
 
-        this.addRenderableWidget(new SmallButton(leftPos + 129, topPos + 4, 12, 12,
-                Component.literal("C"), button -> C2SMessageCompress.send(), compressTooltip));
+        this.addRenderableWidget(c);
     }
 
     private static MutableComponent buildSaveComponent() {
@@ -155,7 +148,11 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     public void renderSlot(PoseStack pPoseStack, Slot pSlot) {
+        if (pSlot instanceof DankSlot) {
+            itemRenderer = BigItemRenderer.INSTANCE;
+        }
         super.renderSlot(pPoseStack, pSlot);
+        itemRenderer = minecraft.getItemRenderer();
         int i = pSlot.x;
         int j = pSlot.y;
         if (pSlot.index < menu.dankInventory.getContainerSize() && !pSlot.hasItem() && menu.dankInventory.hasGhostItem(pSlot.index)) {

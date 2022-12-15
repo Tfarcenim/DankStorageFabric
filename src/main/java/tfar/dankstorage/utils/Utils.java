@@ -3,7 +3,8 @@ package tfar.dankstorage.utils;
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,6 +30,7 @@ import tfar.dankstorage.world.ClientData;
 import tfar.dankstorage.world.DankInventory;
 
 import javax.annotation.Nullable;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +44,7 @@ public class Utils {
     public static final TagKey<Item> WRENCHES = bind(new ResourceLocation("forge", "wrenches"));
 
     private static TagKey<Item> bind(ResourceLocation string) {
-        return TagKey.create(Registry.ITEM_REGISTRY, string);
+        return TagKey.create(Registries.ITEM, string);
     }
 
     public static final String ID = "dankstorage:id";
@@ -268,7 +270,7 @@ public class Utils {
     }
 
     public static DankItem getItemFromTier(int tier) {
-        return (DankItem) Registry.ITEM.get(new ResourceLocation(DankStorage.MODID, "dank_" + tier));
+        return (DankItem) BuiltInRegistries.ITEM.get(new ResourceLocation(DankStorage.MODID, "dank_" + tier));
     }
 
     public static int getNbtSize(@Nullable CompoundTag nbt) {
@@ -435,5 +437,16 @@ public class Utils {
             return ContainerHelper.removeItem(((CraftingContainerAccess)this).getItems(), i, j);
         }
     };
+
+    private static final DecimalFormat decimalFormat = new DecimalFormat("0.##");
+
+    public static String formatLargeNumber(int number) {
+
+        if (number >= 1000000000) return decimalFormat.format(number / 1000000000f) + "b";
+        if (number >= 1000000) return decimalFormat.format(number / 1000000f) + "m";
+        if (number >= 1000) return decimalFormat.format(number / 1000f) + "k";
+
+        return Float.toString(number).replaceAll("\\.?0*$", "");
+    }
 
 }

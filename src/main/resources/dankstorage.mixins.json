@@ -12,7 +12,6 @@
     "SimpleContainerAccess"
   ],
   "client": [
-    "AbstractContainerScreenMixin",
     "ItemRendererAccessor",
     "MinecraftClientAccessor",
     "MinecraftClientMixin",

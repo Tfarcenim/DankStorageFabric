@@ -35,7 +35,7 @@ public class C2SSetFrequencyPacket implements ServerPlayNetworking.PlayChannelHa
 
                 if (targetInventory != null && targetInventory.dankStats == inventory.dankStats) {
 
-                    if (targetInventory.locked) {
+                    if (targetInventory.frequencyLocked) {
                      textColor = DankInventory.TxtColor.LOCKED.color;
                     } else {
                         textColor = DankInventory.TxtColor.GOOD.color;

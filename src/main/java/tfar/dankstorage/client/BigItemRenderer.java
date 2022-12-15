@@ -14,9 +14,11 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import tfar.dankstorage.mixin.ItemRendererAccessor;
 import tfar.dankstorage.mixin.MinecraftClientAccessor;
+import tfar.dankstorage.utils.Utils;
 
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
@@ -25,10 +27,14 @@ public class BigItemRenderer extends ItemRenderer {
 
     public static final BigItemRenderer INSTANCE = new BigItemRenderer(Minecraft.getInstance().getTextureManager(), Minecraft.getInstance().getModelManager()
             , ((MinecraftClientAccessor) Minecraft.getInstance()).getItemColors(),((ItemRendererAccessor)Minecraft.getInstance().getItemRenderer()).getBlockEntityRenderer());
-    private static final DecimalFormat decimalFormat = new DecimalFormat("0.#");
 
     protected BigItemRenderer(TextureManager textureManagerIn, ModelManager modelManagerIn, ItemColors itemColorsIn, BlockEntityWithoutLevelRenderer blockEntityWithoutLevelRenderer) {
         super(textureManagerIn, modelManagerIn, itemColorsIn,blockEntityWithoutLevelRenderer);
+    }
+
+    @Override
+    public void renderAndDecorateItem(LivingEntity livingEntity, ItemStack itemStack, int i, int j, int k) {
+        Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(livingEntity, itemStack, i, j, k);//needed or else the game complains about missing models
     }
 
     @Override
@@ -37,7 +43,7 @@ public class BigItemRenderer extends ItemRenderer {
             PoseStack matrixstack = new PoseStack();
 
             if (stack.getCount() != 1 || text != null) {
-                String s = text == null ? getStringFromInt(stack.getCount()) : text;
+                String s = text == null ? Utils.formatLargeNumber(stack.getCount()) : text;
                 matrixstack.translate(0.0D, 0.0D, this.blitOffset + 200.0F);
                 MultiBufferSource.BufferSource irendertypebuffer$impl = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
@@ -86,14 +92,5 @@ public class BigItemRenderer extends ItemRenderer {
                 RenderSystem.enableDepthTest();
             }
         }
-    }
-
-    public String getStringFromInt(int number) {
-
-        if (number >= 1000000000) return decimalFormat.format(number / 1000000000f) + "b";
-        if (number >= 1000000) return decimalFormat.format(number / 1000000f) + "m";
-        if (number >= 1000) return decimalFormat.format(number / 1000f) + "k";
-
-        return Float.toString(number).replaceAll("\\.?0*$", "");
     }
 }

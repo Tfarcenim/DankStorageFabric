@@ -10,8 +10,8 @@ public class TripleToggleButton extends SmallButton {
 
     protected PortableDankStorageScreen screen;
 
-    public TripleToggleButton(int x, int y, int widthIn, int heightIn, Component component, OnPress callback, OnTooltip tooltip, PortableDankStorageScreen screen) {
-        super(x, y, widthIn, heightIn,component, callback,tooltip);
+    public TripleToggleButton(int x, int y, int widthIn, int heightIn, Component component, OnPress callback, PortableDankStorageScreen screen) {
+        super(x, y, widthIn, heightIn,component, callback);
         this.screen = screen;
     }
 

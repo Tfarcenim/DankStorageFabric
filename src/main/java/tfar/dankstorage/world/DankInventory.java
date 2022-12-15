@@ -27,7 +27,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
     public DankStats dankStats;
     protected NonNullList<ItemStack> ghostItems;
     protected int id;
-    public boolean locked = true;
+    public boolean frequencyLocked = true;
 
     protected int textColor = -1;
 
@@ -163,7 +163,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         nbt.put(GHOST, ghostItemNBT);
         nbt.putString("DankStats", dankStats.name());
         nbt.putInt(Utils.ID, id);
-        nbt.putBoolean("locked", locked);
+        nbt.putBoolean("locked", frequencyLocked);
         return nbt;
     }
 
@@ -174,7 +174,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         readItems(tagList);
         ListTag ghostItemList = nbt.getList(GHOST, Tag.TAG_COMPOUND);
         readGhostItems(ghostItemList);
-        locked = nbt.getBoolean("locked");
+        frequencyLocked = nbt.getBoolean("locked");
         validate();
     }
 
@@ -312,7 +312,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         return switch (slot) {
             case 0 -> id;
             case 1 -> textColor;
-            case 2 -> locked ? 1 : 0;
+            case 2 -> frequencyLocked ? 1 : 0;
             default -> AbstractContainerMenu.SLOT_CLICKED_OUTSIDE;
         };
     }
@@ -322,7 +322,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         switch (slot) {
             case 0 -> id = value;
             case 1 -> textColor = value;
-            case 2 -> locked = value == 1;
+            case 2 -> frequencyLocked = value == 1;
         }
         setChanged();
     }
