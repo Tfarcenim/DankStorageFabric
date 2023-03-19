@@ -14,6 +14,9 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.flag.FeatureFlag;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -98,26 +101,26 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
         IntStream.range(1, 7).forEach(i -> Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MODID, i + "_to_" + (i + 1)), new UpgradeItem(properties, new UpgradeInfo(i, i + 1))));
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, new ResourceLocation(MODID, "upgrade"), upgrade = new Serializer2());
 
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_1"), dank_1_container = new MenuType<>(DockMenu::t1));
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_1"), portable_dank_1_container = new MenuType<>(DankMenu::t1));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_1"), dank_1_container = new MenuType<>(DockMenu::t1, FeatureFlagSet.of(FeatureFlags.VANILLA)));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_1"), portable_dank_1_container = new MenuType<>(DankMenu::t1, FeatureFlagSet.of(FeatureFlags.VANILLA)));
 
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_2"), dank_2_container = new MenuType<>(DockMenu::t2));
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_2"), portable_dank_2_container = new MenuType<>(DankMenu::t2));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_2"), dank_2_container = new MenuType<>(DockMenu::t2, FeatureFlagSet.of(FeatureFlags.VANILLA)));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_2"), portable_dank_2_container = new MenuType<>(DankMenu::t2, FeatureFlagSet.of(FeatureFlags.VANILLA)));
 
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_3"), dank_3_container = new MenuType<>(DockMenu::t3));
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_3"), portable_dank_3_container = new MenuType<>(DankMenu::t3));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_3"), dank_3_container = new MenuType<>(DockMenu::t3, FeatureFlagSet.of(FeatureFlags.VANILLA)));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_3"), portable_dank_3_container = new MenuType<>(DankMenu::t3, FeatureFlagSet.of(FeatureFlags.VANILLA)));
 
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_4"), dank_4_container = new MenuType<>(DockMenu::t4));
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_4"), portable_dank_4_container = new MenuType<>(DankMenu::t4));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_4"), dank_4_container = new MenuType<>(DockMenu::t4, FeatureFlagSet.of(FeatureFlags.VANILLA)));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_4"), portable_dank_4_container = new MenuType<>(DankMenu::t4, FeatureFlagSet.of(FeatureFlags.VANILLA)));
 
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_5"), dank_5_container = new MenuType<>(DockMenu::t5));
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_5"), portable_dank_5_container = new MenuType<>(DankMenu::t5));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_5"), dank_5_container = new MenuType<>(DockMenu::t5, FeatureFlagSet.of(FeatureFlags.VANILLA)));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_5"), portable_dank_5_container = new MenuType<>(DankMenu::t5, FeatureFlagSet.of(FeatureFlags.VANILLA)));
 
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_6"), dank_6_container = new MenuType<>(DockMenu::t6));
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_6"), portable_dank_6_container = new MenuType<>(DankMenu::t6));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_6"), dank_6_container = new MenuType<>(DockMenu::t6, FeatureFlagSet.of(FeatureFlags.VANILLA)));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_6"), portable_dank_6_container = new MenuType<>(DankMenu::t6, FeatureFlagSet.of(FeatureFlags.VANILLA)));
 
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_7"), dank_7_container = new MenuType<>(DockMenu::t7));
-        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_7"), portable_dank_7_container = new MenuType<>(DankMenu::t7));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "dank_7"), dank_7_container = new MenuType<>(DockMenu::t7, FeatureFlagSet.of(FeatureFlags.VANILLA)));
+        Registry.register(BuiltInRegistries.MENU, new ResourceLocation(MODID, "portable_dank_7"), portable_dank_7_container = new MenuType<>(DankMenu::t7, FeatureFlagSet.of(FeatureFlags.VANILLA)));
 
 
         DankPacketHandler.registerMessages();

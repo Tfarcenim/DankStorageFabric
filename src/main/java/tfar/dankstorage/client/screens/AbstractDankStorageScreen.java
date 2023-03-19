@@ -66,8 +66,6 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         this.frequency.setValue("");
         this.frequency.setTextColor(0xff00ff00);
         this.addWidget(this.frequency);
-        this.setInitialFocus(this.frequency);
-        frequency.setFocus(false);
 
         Tooltip freqTooltip = new DualTooltip(
                 Component.translatable("text.dankstorage.unlock_button"),
@@ -156,7 +154,7 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         int i = pSlot.x;
         int j = pSlot.y;
         if (pSlot.index < menu.dankInventory.getContainerSize() && !pSlot.hasItem() && menu.dankInventory.hasGhostItem(pSlot.index)) {
-            itemRenderer.renderAndDecorateFakeItem(menu.dankInventory.getGhostItem(pSlot.index), i, j);
+            itemRenderer.renderAndDecorateFakeItem(pPoseStack,menu.dankInventory.getGhostItem(pSlot.index), i, j);
             RenderSystem.depthFunc(516);
             GuiComponent.fill(pPoseStack, i, j, i + 16, j + 16, 0x40ffffff);
             RenderSystem.depthFunc(515);

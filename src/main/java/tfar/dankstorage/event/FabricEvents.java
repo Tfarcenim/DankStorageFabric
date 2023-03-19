@@ -61,11 +61,11 @@ public class FabricEvents {
             poses.translate((float) (-(x + 8)), (float) (-(y + 12)), 0.0F);
         }
 
-        mc.getItemRenderer().renderAndDecorateItem(player, stack, x, y,0);
+        mc.getItemRenderer().renderAndDecorateItem(poses,player, stack, x, y,0);
         if (f > 0.0F) {
             poses.popPose();
         }
-        mc.getItemRenderer().renderGuiItemDecorations(mc.font, stack, x, y);
+        mc.getItemRenderer().renderGuiItemDecorations(poses,mc.font, stack, x, y);
     }
 
 }

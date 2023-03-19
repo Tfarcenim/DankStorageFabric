@@ -20,7 +20,7 @@ public class SmallButton extends Button {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    @Override
+    /*@Override
     public void renderButton(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
         RenderSystem.setShaderTexture(0,WIDGETS_LOCATION);
 
@@ -46,7 +46,7 @@ public class SmallButton extends Button {
         blit(matrices, getX() + halfwidth1, getY() + halfheight1,
                 200 - halfwidth2, 46 + c * 20 + 20 - halfheight2, halfwidth2, halfheight2);
         if (shouldDrawText()) drawText(matrices, halfwidth2);
-    }
+    }*/
 
     public void drawText(PoseStack stack, int halfwidth2) {
         int textColor = 0xe0e0e0;

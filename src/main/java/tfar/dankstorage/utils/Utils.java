@@ -225,6 +225,7 @@ public class Utils {
         if (selectedSlot != INVALID) {
             setSelectedSlot(bag, selectedSlot);
             DankPacketHandler.sendSelectedItem(player,selected);
+            player.displayClientMessage(selected.getHoverName(),true);
         }
     }
 
@@ -353,13 +354,13 @@ public class Utils {
 
         for (CraftingRecipe recipe : REVERSIBLE3x3) {
             if (recipe.getIngredients().get(0).test(stack)) {
-                return Pair.of(recipe.getResultItem(),9);
+                return Pair.of(recipe.getResultItem(level.registryAccess()),9);
             }
         }
 
         for (CraftingRecipe recipe : REVERSIBLE2x2) {
             if (recipe.getIngredients().get(0).test(stack)) {
-                return Pair.of(recipe.getResultItem(),4);
+                return Pair.of(recipe.getResultItem(level.registryAccess()),4);
             }
         }
 
@@ -409,11 +410,11 @@ public class Utils {
                                 break;
                             }
                         }
-                        if (same && shapedRecipe.getResultItem().getCount() == 1) {
-                            DUMMY.setItem(0,shapedRecipe.getResultItem());
+                        if (same && shapedRecipe.getResultItem(level.registryAccess()).getCount() == 1) {
+                            DUMMY.setItem(0,shapedRecipe.getResultItem(level.registryAccess()));
 
                             level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, DUMMY, level).ifPresent(rrecipe -> {
-                                if (rrecipe.getResultItem().getCount() == size * size) {
+                                if (rrecipe.getResultItem(level.registryAccess()).getCount() == size * size) {
                                     compactingRecipes.add(shapedRecipe);
                                 }
                             });

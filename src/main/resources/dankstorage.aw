@@ -2,9 +2,6 @@ accessWidener v1 named
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 
 accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
-
-accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;)V
-
 accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftStatus I
 accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftType I
 accessible field net/minecraft/world/inventory/AbstractContainerMenu quickcraftSlots Ljava/util/Set;
