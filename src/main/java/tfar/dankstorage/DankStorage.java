@@ -97,6 +97,7 @@ public class DankStorage implements ModInitializer, ClientModInitializer,
             DankItem dankItem = new DankItem(properties, DankStats.values()[i]);
             DispenserBlock.registerBehavior(dankItem, new DankDispenserBehavior());
             Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MODID, "dank_" + i), dankItem);
+            ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(entries -> entries.accept(dankItem));
         });
         IntStream.range(1, 7).forEach(i -> Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MODID, i + "_to_" + (i + 1)), new UpgradeItem(properties, new UpgradeInfo(i, i + 1))));
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, new ResourceLocation(MODID, "upgrade"), upgrade = new Serializer2());
