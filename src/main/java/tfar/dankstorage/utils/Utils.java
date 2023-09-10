@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -123,7 +124,7 @@ public class Utils {
         if (ordinal > PickupMode.PICKUP_MODES.length - 1) ordinal = 0;
         getOrCreateSettings(bag).putInt("mode", ordinal);
         player.displayClientMessage(
-            Component.translatable("dankstorage.mode." + PickupMode.PICKUP_MODES[ordinal].name()), true);
+            Component.translatable("dankstorage.mode." + PickupMode.PICKUP_MODES[ordinal].name().toLowerCase(Locale.ROOT)), true);
     }
 
     public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag) {
