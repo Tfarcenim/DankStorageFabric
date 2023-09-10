@@ -1,5 +1,7 @@
 package tfar.dankstorage.client;
 
+import java.text.DecimalFormat;
+
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -21,6 +23,7 @@ import tfar.dankstorage.network.server.C2SMessageToggleUseType;
 public class Client {
 
     public static final Minecraft mc = Minecraft.getInstance();
+    private static final DecimalFormat decimalFormat = new DecimalFormat("0.#");
     public static KeyMapping CONSTRUCTION;
     public static KeyMapping LOCK_SLOT;
     public static KeyMapping PICKUP_MODE;
@@ -70,6 +73,15 @@ public class Client {
             return new ClientDankTooltip(dankTooltip);
         }
         return null;
+    }
+
+    public static String getStringFromInt(int number) {
+
+        if (number >= 1000000000) return decimalFormat.format(number / 1000000000f) + "b";
+        if (number >= 1000000) return decimalFormat.format(number / 1000000f) + "m";
+        if (number >= 1000) return decimalFormat.format(number / 1000f) + "k";
+
+        return Float.toString(number).replaceAll("\\.?0*$", "");
     }
 
 

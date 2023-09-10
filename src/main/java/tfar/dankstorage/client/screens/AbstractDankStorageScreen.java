@@ -1,17 +1,21 @@
 package tfar.dankstorage.client.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
@@ -142,15 +146,62 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     @Override
-    public void renderSlot(GuiGraphics guiGraphics, Slot pSlot) {
-        super.renderSlot(guiGraphics, pSlot);
-        int i = pSlot.x;
-        int j = pSlot.y;
-        if (pSlot.index < menu.dankInventory.getContainerSize() && !pSlot.hasItem() && menu.dankInventory.hasGhostItem(pSlot.index)) {
-            guiGraphics.renderFakeItem(menu.dankInventory.getGhostItem(pSlot.index), i, j);
-            RenderSystem.depthFunc(516);
-            guiGraphics.fill(i, j, i + 16, j + 16, 0x40ffffff);
-            RenderSystem.depthFunc(515);
+    public void renderSlot(GuiGraphics guiGraphics, Slot slot) {
+        if (!(slot instanceof DankSlot)) {
+            super.renderSlot(guiGraphics, slot);
+        } else {
+            Pair<ResourceLocation, ResourceLocation> pair;
+            int i = slot.x;
+            int j = slot.y;
+            ItemStack itemStack = slot.getItem();
+            boolean bl = false;
+            boolean bl2 = slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
+            ItemStack itemStack2 = ((AbstractContainerMenu)this.menu).getCarried();
+            String string = null;
+            if (slot == this.clickedSlot && !this.draggingItem.isEmpty() && this.isSplittingStack && !itemStack.isEmpty()) {
+                itemStack = itemStack.copyWithCount(itemStack.getCount() / 2);
+            } else if (this.isQuickCrafting && this.quickCraftSlots.contains(slot) && !itemStack2.isEmpty()) {
+                if (this.quickCraftSlots.size() == 1) {
+                    return;
+                }
+                if (AbstractContainerMenu.canItemQuickReplace(slot, itemStack2, true) && ((AbstractContainerMenu)this.menu).canDragTo(slot)) {
+                    bl = true;
+                    int k = Math.min(itemStack2.getMaxStackSize(), slot.getMaxStackSize(itemStack2));
+                    int l = slot.getItem().isEmpty() ? 0 : slot.getItem().getCount();
+                    int m = AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots, this.quickCraftingType, itemStack2) + l;
+                    if (m > k) {
+                        m = k;
+                        string = ChatFormatting.YELLOW.toString() + k;
+                    }
+                    itemStack = itemStack2.copyWithCount(m);
+                } else {
+                    this.quickCraftSlots.remove(slot);
+                    this.recalculateQuickCraftRemaining();
+                }
+            }
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(0.0f, 0.0f, 100.0f);
+            if (itemStack.isEmpty() && slot.isActive() && (pair = slot.getNoItemIcon()) != null) {
+                TextureAtlasSprite textureAtlasSprite = this.minecraft.getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
+                guiGraphics.blit(i, j, 0, 16, 16, textureAtlasSprite);
+                bl2 = true;
+            }
+            if (!bl2) {
+                if (bl) {
+                    guiGraphics.fill(i, j, i + 16, j + 16, -2130706433);
+                }
+                guiGraphics.renderItem(itemStack, i, j, slot.x + slot.y * this.imageWidth);
+                guiGraphics.renderItemDecorations(this.font, itemStack, i, j, Client.getStringFromInt(itemStack.getCount()));
+            }
+            guiGraphics.pose().popPose();
+
+            if (slot.index < menu.dankInventory.getContainerSize() && !slot.hasItem() &&
+                menu.dankInventory.hasGhostItem(slot.index)) {
+                guiGraphics.renderFakeItem(menu.dankInventory.getGhostItem(slot.index), i, j);
+                RenderSystem.depthFunc(516);
+                guiGraphics.fill(i, j, i + 16, j + 16, 0x40ffffff);
+                RenderSystem.depthFunc(515);
+            }
         }
     }
 
