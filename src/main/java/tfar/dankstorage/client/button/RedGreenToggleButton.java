@@ -1,6 +1,8 @@
 package tfar.dankstorage.client.button;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
 public class RedGreenToggleButton extends SmallButton {
@@ -17,8 +19,8 @@ public class RedGreenToggleButton extends SmallButton {
     }
 
     @Override
-    public void tint() {
-        if (toggled) RenderSystem.setShaderColor(0, 1, 0,1);
-        else RenderSystem.setShaderColor(1, 0, 0,1);
+    public void tint(GuiGraphics guiGraphics) {
+        if (toggled) guiGraphics.setColor(0, 1, 0,1);
+        else guiGraphics.setColor(1, 0, 0,1);
     }
 }

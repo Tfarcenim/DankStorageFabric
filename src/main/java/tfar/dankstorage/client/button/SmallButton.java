@@ -1,10 +1,12 @@
 package tfar.dankstorage.client.button;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import tfar.dankstorage.client.Client;
+import net.minecraft.util.Mth;
 
 public class SmallButton extends Button {
 
@@ -16,8 +18,30 @@ public class SmallButton extends Button {
         return !getMessage().getString().isEmpty();
     }
 
-    public void tint() {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    public void tint(GuiGraphics guiGraphics) {
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    @Override
+    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        Minecraft minecraft = Minecraft.getInstance();
+        tint(guiGraphics);
+        RenderSystem.enableBlend();
+        RenderSystem.enableDepthTest();
+        guiGraphics.blitNineSliced(WIDGETS_LOCATION, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 20, 4, 200, 20, 0, this.getTextureY());
+        guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        int k = this.active ? 0xFFFFFF : 0xA0A0A0;
+        this.renderString(guiGraphics, minecraft.font, k | Mth.ceil(this.alpha * 255.0f) << 24);
+    }
+
+    private int getTextureY() {
+        int i = 1;
+        if (!this.active) {
+            i = 0;
+        } else if (this.isHoveredOrFocused()) {
+            i = 2;
+        }
+        return 46 + i * 20;
     }
 
     /*@Override
