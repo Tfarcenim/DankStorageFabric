@@ -1,12 +1,9 @@
 package tfar.dankstorage.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -37,7 +34,7 @@ public class ClientDankTooltip implements ClientTooltipComponent {
     }
 
     @Override
-    public void renderImage(Font font, int i, int j, PoseStack poseStack, ItemRenderer itemRenderer) {
+    public void renderImage(Font font, int i, int j, GuiGraphics guiGraphics) {
         int gridSizeX = this.gridSizeX();
         int gridSizeY = this.gridSizeY();
         int slot = 0;
@@ -45,29 +42,27 @@ public class ClientDankTooltip implements ClientTooltipComponent {
             for (int x1 = 0; x1 < gridSizeX; ++x1) {
                 int q = i + x1 * 18;
                 int r = j + y1 * 18;
-                this.renderSlot(q, r, slot++, font, poseStack, itemRenderer);
+                this.renderSlot(q, r, slot++, font, guiGraphics);
             }
         }
     }
 
-    private void renderSlot(int i, int j, int slot, Font font, PoseStack poseStack, ItemRenderer itemRenderer) {
+    private void renderSlot(int i, int j, int slot, Font font, GuiGraphics guiGraphics) {
         if (slot >= this.items.size()) {
-            this.blit(poseStack, i, j, 0, Texture.BLOCKED_SLOT);
+            this.blit(guiGraphics, i, j, 0, Texture.BLOCKED_SLOT);
             return;
         }
         ItemStack itemStack = this.items.get(slot);
-        this.blit(poseStack, i, j, 0, Texture.SLOT);
-        itemRenderer.renderAndDecorateItem(poseStack,itemStack, i + 1, j + 1, slot);
-        itemRenderer.renderGuiItemDecorations(poseStack,font, itemStack, i + 1, j + 1);
+        this.blit(guiGraphics, i, j, 0, Texture.SLOT);
+        guiGraphics.renderItem(itemStack, i + 1, j + 1, slot);
+        guiGraphics.renderItemDecorations(font, itemStack, i + 1, j + 1);
         if (slot == selected) {
-            AbstractContainerScreen.renderSlotHighlight(poseStack, i + 1, j + 1, 0);
+            AbstractContainerScreen.renderSlotHighlight(guiGraphics, i + 1, j + 1, 0);
         }
     }
 
-    private void blit(PoseStack poseStack, int i, int j, int k, Texture texture) {
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, TEXTURE_LOCATION);
-        GuiComponent.blit(poseStack, i, j, k, texture.x, texture.y, texture.w, texture.h, 128, 128);
+    private void blit(GuiGraphics guiGraphics, int i, int j, int k, Texture texture) {
+        guiGraphics.blit(TEXTURE_LOCATION, i, j, k, texture.x, texture.y, texture.w, texture.h, 128, 128);
     }
 
     private int gridSizeX() {

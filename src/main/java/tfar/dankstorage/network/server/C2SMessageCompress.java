@@ -24,7 +24,7 @@ public class C2SMessageCompress implements ServerPlayNetworking.PlayChannelHandl
         AbstractContainerMenu container = player.containerMenu;
         if (container instanceof AbstractDankMenu dankMenu) {
             DankInventory inventory = dankMenu.dankInventory;
-            inventory.compress(player.getLevel());
+            inventory.compress(player.serverLevel());
         }
     }
 
@@ -33,4 +33,3 @@ public class C2SMessageCompress implements ServerPlayNetworking.PlayChannelHandl
         server.execute(() -> handle(player));
     }
 }
-

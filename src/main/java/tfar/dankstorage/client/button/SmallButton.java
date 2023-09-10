@@ -48,7 +48,7 @@ public class SmallButton extends Button {
         if (shouldDrawText()) drawText(matrices, halfwidth2);
     }*/
 
-    public void drawText(PoseStack stack, int halfwidth2) {
+    /*public void drawText(PoseStack stack, int halfwidth2) {
         int textColor = 0xe0e0e0;
 
         if (1 != 0) {
@@ -59,5 +59,5 @@ public class SmallButton extends Button {
             textColor = 0xffffa0;
         }
         drawCenteredString(stack, Client.mc.font, getMessage(), getX() + halfwidth2, getY() + (this.height - 8) / 2, textColor);
-    }
+    }*/
 }

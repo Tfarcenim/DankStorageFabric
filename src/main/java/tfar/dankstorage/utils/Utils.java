@@ -1,8 +1,28 @@
 package tfar.dankstorage.utils;
 
-import com.mojang.datafixers.util.Pair;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
 import io.netty.buffer.Unpooled;
+import tfar.dankstorage.DankStorage;
+import tfar.dankstorage.item.DankItem;
+import tfar.dankstorage.network.DankPacketHandler;
+import tfar.dankstorage.network.server.C2SMessageToggleUseType;
+import tfar.dankstorage.world.ClientData;
+import tfar.dankstorage.world.DankInventory;
+
 import net.fabricmc.loader.api.FabricLoader;
+
+import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -13,33 +33,27 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
-import tfar.dankstorage.DankStorage;
-import tfar.dankstorage.item.DankItem;
-import tfar.dankstorage.mixin.CraftingContainerAccess;
-import tfar.dankstorage.network.DankPacketHandler;
-import tfar.dankstorage.network.server.C2SMessageToggleUseType;
-import tfar.dankstorage.world.ClientData;
-import tfar.dankstorage.world.DankInventory;
-
-import javax.annotation.Nullable;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static tfar.dankstorage.network.server.C2SMessageToggleUseType.useTypes;
 
 public class Utils {
 
-    public static final TagKey<Item> BLACKLISTED_STORAGE = bind(new ResourceLocation(DankStorage.MODID, "blacklisted_storage"));
-    public static final TagKey<Item> BLACKLISTED_USAGE = bind(new ResourceLocation(DankStorage.MODID, "blacklisted_usage"));
+    public static final TagKey<Item> BLACKLISTED_STORAGE =
+        bind(new ResourceLocation(DankStorage.MODID, "blacklisted_storage"));
+    public static final TagKey<Item> BLACKLISTED_USAGE =
+        bind(new ResourceLocation(DankStorage.MODID, "blacklisted_usage"));
 
     public static final TagKey<Item> WRENCHES = bind(new ResourceLocation("forge", "wrenches"));
 
@@ -78,7 +92,8 @@ public class Utils {
 
     public static boolean isConstruction(ItemStack bag) {
         CompoundTag settings = Utils.getSettings(bag);
-        return settings != null && settings.getInt("construction") == C2SMessageToggleUseType.UseType.construction.ordinal();
+        return settings != null &&
+            settings.getInt("construction") == C2SMessageToggleUseType.UseType.construction.ordinal();
     }
 
     public static DankStats getStatsfromRows(int rows) {
@@ -108,7 +123,7 @@ public class Utils {
         if (ordinal > PickupMode.PICKUP_MODES.length - 1) ordinal = 0;
         getOrCreateSettings(bag).putInt("mode", ordinal);
         player.displayClientMessage(
-                Component.translatable("dankstorage.mode." + PickupMode.PICKUP_MODES[ordinal].name()), true);
+            Component.translatable("dankstorage.mode." + PickupMode.PICKUP_MODES[ordinal].name()), true);
     }
 
     public static C2SMessageToggleUseType.UseType getUseType(ItemStack bag) {
@@ -124,7 +139,7 @@ public class Utils {
         if (ordinal >= useTypes.length) ordinal = 0;
         tag.putInt("construction", ordinal);
         player.displayClientMessage(
-                Component.translatable("dankstorage.usetype." + useTypes[ordinal].name()), true);
+            Component.translatable("dankstorage.usetype." + useTypes[ordinal].name()), true);
     }
 
     //this can be 0 - 80
@@ -134,12 +149,12 @@ public class Utils {
     }
 
     public static void setSelectedSlot(ItemStack bag, int slot) {
-        getOrCreateSettings(bag).putInt("selectedSlot",slot);
+        getOrCreateSettings(bag).putInt("selectedSlot", slot);
     }
 
-    public static void setPickSlot(Level level,ItemStack bag, ItemStack stack) {
+    public static void setPickSlot(Level level, ItemStack bag, ItemStack stack) {
 
-        DankInventory dankInventory = getInventory(bag,level);
+        DankInventory dankInventory = getInventory(bag, level);
 
         if (dankInventory != null) {
             int slot = findSlotMatchingItem(dankInventory, stack);
@@ -147,16 +162,16 @@ public class Utils {
         }
     }
 
-    public static int findSlotMatchingItem(DankInventory dankInventory,ItemStack itemStack) {
+    public static int findSlotMatchingItem(DankInventory dankInventory, ItemStack itemStack) {
         for (int i = 0; i < dankInventory.getContainerSize(); ++i) {
             ItemStack stack = dankInventory.getItem(i);
-            if (stack.isEmpty() || !ItemStack.isSameItemSameTags(itemStack,stack)) continue;
+            if (stack.isEmpty() || !ItemStack.isSameItemSameTags(itemStack, stack)) continue;
             return i;
         }
         return INVALID;
     }
 
-    public static ItemStack getSelectedItem(ItemStack bag,Level level) {
+    public static ItemStack getSelectedItem(ItemStack bag, Level level) {
         if (bag.hasTag()) {
             int selected = getSelectedSlot(bag);
             if (!level.isClientSide) {
@@ -164,7 +179,7 @@ public class Utils {
                 if (dankInventory != null) {
                     return dankInventory.getItem(selected);
                 } else {
-                //    System.out.println("Attempted to access a selected item from a null inventory");
+                    //    System.out.println("Attempted to access a selected item from a null inventory");
                 }
             } else {
                 return ClientData.selectedItem;
@@ -197,7 +212,7 @@ public class Utils {
     }
 
     public static void changeSelectedSlot(ItemStack bag, boolean right, ServerPlayer player) {
-        DankInventory handler = getInventory(bag,player.getLevel());
+        DankInventory handler = getInventory(bag, player.level());
         //don't change slot if empty
         if (handler == null || handler.noValidSlots()) return;
         int selectedSlot = getSelectedSlot(bag);
@@ -224,8 +239,8 @@ public class Utils {
         }
         if (selectedSlot != INVALID) {
             setSelectedSlot(bag, selectedSlot);
-            DankPacketHandler.sendSelectedItem(player,selected);
-            player.displayClientMessage(selected.getHoverName(),true);
+            DankPacketHandler.sendSelectedItem(player, selected);
+            player.displayClientMessage(selected.getHoverName(), true);
         }
     }
 
@@ -238,8 +253,8 @@ public class Utils {
         return INVALID;
     }
 
-    public static void setFrequency(ItemStack bag,int frequency) {
-        getOrCreateSettings(bag).putInt(ID,frequency);
+    public static void setFrequency(ItemStack bag, int frequency) {
+        getOrCreateSettings(bag).putInt(ID, frequency);
     }
 
     private static boolean hasSettings(ItemStack bag) {
@@ -253,7 +268,7 @@ public class Utils {
     public static DankInventory getOrCreateInventory(ItemStack bag, Level level) {
         if (!level.isClientSide) {
             int id = getFrequency(bag);
-            return DankStorage.instance.data.getOrCreateInventory(id,getStats(bag));
+            return DankStorage.instance.data.getOrCreateInventory(id, getStats(bag));
         }
         throw new RuntimeException("Attempted to get inventory on client");
     }
@@ -281,8 +296,8 @@ public class Utils {
         return buffer.writerIndex();
     }
 
-    public static ItemStack getItemStackInSelectedSlot(ItemStack bag,ServerLevel level) {
-        DankInventory inv = getInventory(bag,level);
+    public static ItemStack getItemStackInSelectedSlot(ItemStack bag, ServerLevel level) {
+        DankInventory inv = getInventory(bag, level);
         if (inv == null) return ItemStack.EMPTY;
         ItemStack stack = inv.getItem(Utils.getSelectedSlot(bag));
         return stack.is(BLACKLISTED_USAGE) ? ItemStack.EMPTY : stack;
@@ -327,12 +342,13 @@ public class Utils {
         } else if (first.getCount() > inventory.getMaxStackSize()) {
             return false;
         } else {
-            return ItemStack.tagMatches(first, second);
+            return ItemStack.isSameItemSameTags(first, second);
         }
     }
 
     public static void warn(Player player, DankStats item, DankStats inventory) {
-        player.sendSystemMessage(Component.literal("Dank Item Level "+item.ordinal() +" cannot open Dank Inventory Level "+inventory.ordinal()));
+        player.sendSystemMessage(Component.literal(
+            "Dank Item Level " + item.ordinal() + " cannot open Dank Inventory Level " + inventory.ordinal()));
     }
 
     @Nullable
@@ -350,27 +366,27 @@ public class Utils {
         cached = false;
     }
 
-    public static Pair<ItemStack,Integer> compress(ServerLevel level, ItemStack stack) {
+    public static Pair<ItemStack, Integer> compress(ServerLevel level, ItemStack stack) {
 
         for (CraftingRecipe recipe : REVERSIBLE3x3) {
             if (recipe.getIngredients().get(0).test(stack)) {
-                return Pair.of(recipe.getResultItem(level.registryAccess()),9);
+                return Pair.of(recipe.getResultItem(level.registryAccess()), 9);
             }
         }
 
         for (CraftingRecipe recipe : REVERSIBLE2x2) {
             if (recipe.getIngredients().get(0).test(stack)) {
-                return Pair.of(recipe.getResultItem(level.registryAccess()),4);
+                return Pair.of(recipe.getResultItem(level.registryAccess()), 4);
             }
         }
 
-        return Pair.of(ItemStack.EMPTY,0);
+        return Pair.of(ItemStack.EMPTY, 0);
     }
 
     public static boolean canCompress(ServerLevel level, ItemStack stack) {
         if (!cached) {
-            REVERSIBLE3x3 = findReversibles(level,3);
-            REVERSIBLE2x2 = findReversibles(level,2);
+            REVERSIBLE3x3 = findReversibles(level, 3);
+            REVERSIBLE2x2 = findReversibles(level, 2);
             cached = true;
         }
 
@@ -388,7 +404,8 @@ public class Utils {
 
         return false;
     }
-    public static List<CraftingRecipe> findReversibles(ServerLevel level,int size) {
+
+    public static List<CraftingRecipe> findReversibles(ServerLevel level, int size) {
         List<CraftingRecipe> compactingRecipes = new ArrayList<>();
         List<CraftingRecipe> recipes = level.getRecipeManager().getAllRecipesFor(RecipeType.CRAFTING);
 
@@ -403,7 +420,7 @@ public class Utils {
                     Ingredient first = inputs.get(0);
                     if (first != Ingredient.EMPTY) {
                         boolean same = true;
-                        for (int i = 1; i < x * y;i++) {
+                        for (int i = 1; i < x * y; i++) {
                             Ingredient next = inputs.get(i);
                             if (next != first) {
                                 same = false;
@@ -411,13 +428,14 @@ public class Utils {
                             }
                         }
                         if (same && shapedRecipe.getResultItem(level.registryAccess()).getCount() == 1) {
-                            DUMMY.setItem(0,shapedRecipe.getResultItem(level.registryAccess()));
+                            DUMMY.setItem(0, shapedRecipe.getResultItem(level.registryAccess()));
 
-                            level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, DUMMY, level).ifPresent(rrecipe -> {
-                                if (rrecipe.getResultItem(level.registryAccess()).getCount() == size * size) {
-                                    compactingRecipes.add(shapedRecipe);
-                                }
-                            });
+                            level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, DUMMY, level)
+                                .ifPresent(rrecipe -> {
+                                    if (rrecipe.getResultItem(level.registryAccess()).getCount() == size * size) {
+                                        compactingRecipes.add(shapedRecipe);
+                                    }
+                                });
                         }
                     }
                 }
@@ -427,15 +445,76 @@ public class Utils {
     }
 
 
-    private static final CraftingContainer DUMMY = new CraftingContainer(null,1,1) {
+    private static final CraftingContainer DUMMY = new CraftingContainer() {
+        ItemStack item = ItemStack.EMPTY;
+
         @Override
-        public void setItem(int i, ItemStack itemStack) {
-            ((CraftingContainerAccess)this).getItems().set(i, itemStack);
+        public int getWidth() {
+            return 1;
         }
 
         @Override
-        public ItemStack removeItem(int i, int j) {
-            return ContainerHelper.removeItem(((CraftingContainerAccess)this).getItems(), i, j);
+        public int getHeight() {
+            return 1;
+        }
+
+        @Override
+        public @NotNull List<ItemStack> getItems() {
+            return List.of(item);
+        }
+
+        @Override
+        public int getContainerSize() {
+            return 1;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return item.isEmpty();
+        }
+
+        @Override
+        public @NotNull ItemStack getItem(int i) {
+            return i == 0 ? item : ItemStack.EMPTY;
+        }
+
+        @Override
+        public @NotNull ItemStack removeItem(int i, int j) {
+            if (i != 0) return ItemStack.EMPTY;
+            if (item.isEmpty()) return ItemStack.EMPTY;
+            return item.split(j);
+        }
+
+        @Override
+        public @NotNull ItemStack removeItemNoUpdate(int i) {
+            if (i != 0) return ItemStack.EMPTY;
+            ItemStack old = item;
+            item = ItemStack.EMPTY;
+            return old;
+        }
+
+        @Override
+        public void setItem(int i, @NotNull ItemStack itemStack) {
+            if (i == 0) item = itemStack;
+        }
+
+        @Override
+        public void setChanged() {
+        }
+
+        @Override
+        public boolean stillValid(@NotNull Player player) {
+            return true;
+        }
+
+        @Override
+        public void clearContent() {
+            item = ItemStack.EMPTY;
+        }
+
+        @Override
+        public void fillStackedContents(@NotNull StackedContents stackedContents) {
+            stackedContents.accountSimpleStack(item);
         }
     };
 

@@ -34,7 +34,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
         if (slot != null) {
             ItemStack slotStack = slot.getItem();
 
-            if (!flag && stack.sameItem(slotStack) && ItemStack.tagMatches(slotStack, stack)) {
+            if (!flag && ItemStack.isSameItemSameTags(slotStack, stack)) {
                 return slotStack.getCount() + (stackSizeMatters ? 0 : stack.getCount()) <= slot.getMaxStackSize(slotStack);
             }
         }
@@ -134,20 +134,14 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                     ItemStack itemstack3 = this.getCarried().copy();
                     int j1 = this.getCarried().getCount();
 
-                    for(Slot slot1 : this.quickcraftSlots) {
-                        ItemStack itemstack1 = this.getCarried();
-                        if (slot1 != null && canItemQuickReplace(slot1, itemstack1, true) && slot1.mayPlace(itemstack1) && (this.quickcraftType == 2 || itemstack1.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(slot1)) {
-                            ItemStack itemstack2 = itemstack3.copy();
-                            int j = slot1.hasItem() ? slot1.getItem().getCount() : 0;
-                            getQuickCraftSlotCount(this.quickcraftSlots, this.quickcraftType, itemstack2, j);
-                            int k = Math.min(itemstack2.getMaxStackSize(), slot1.getMaxStackSize(itemstack2));
-                            if (itemstack2.getCount() > k) {
-                                itemstack2.setCount(k);
-                            }
-
-                            j1 -= itemstack2.getCount() - j;
-                            slot1.set(itemstack2);
-                        }
+                    for (Slot slot2 : this.quickcraftSlots) {
+                        ItemStack itemStack32 = this.getCarried();
+                        if (slot2 == null || !AbstractContainerMenu.canItemQuickReplace(slot2, itemStack32, true) || !slot2.mayPlace(itemStack32) || this.quickcraftType != 2 && itemStack32.getCount() < this.quickcraftSlots.size() || !this.canDragTo(slot2)) continue;
+                        int n = slot2.hasItem() ? slot2.getItem().getCount() : 0;
+                        int o = Math.min(itemstack3.getMaxStackSize(), slot2.getMaxStackSize(itemstack3));
+                        int p = Math.min(AbstractContainerMenu.getQuickCraftPlaceCount(this.quickcraftSlots, this.quickcraftType, itemstack3) + n, o);
+                        j1 -= p - n;
+                        slot2.setByPlayer(itemstack3.copyWithCount(p));
                     }
 
                     itemstack3.setCount(j1);
@@ -181,7 +175,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
                     return;
                 }
 
-                for(ItemStack itemstack9 = this.quickMoveStack(player, slotId); !itemstack9.isEmpty() && ItemStack.isSame(slot6.getItem(), itemstack9); itemstack9 = this.quickMoveStack(player, slotId)) {
+                for(ItemStack itemstack9 = this.quickMoveStack(player, slotId); !itemstack9.isEmpty() && ItemStack.isSameItemSameTags(slot6.getItem(), itemstack9); itemstack9 = this.quickMoveStack(player, slotId)) {
                 }
             } else {
                 if (slotId < 0) {
@@ -341,7 +335,7 @@ public abstract class AbstractDankMenu extends AbstractContainerMenu {
             Slot slot = this.slots.get(i);
             ItemStack slotStack = slot.getItem();
 
-            if (!slotStack.isEmpty() && slotStack.getItem() == stack.getItem() && ItemStack.tagMatches(stack, slotStack)) {
+            if (!slotStack.isEmpty() && ItemStack.isSameItemSameTags(slotStack, stack)) {
                 int combinedCount = slotStack.getCount() + stack.getCount();
                 int maxSize = slot.getMaxStackSize(slotStack);
 

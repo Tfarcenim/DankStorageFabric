@@ -1,11 +1,9 @@
 package tfar.dankstorage.client.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -17,7 +15,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
-import tfar.dankstorage.client.BigItemRenderer;
 import tfar.dankstorage.client.Client;
 import tfar.dankstorage.client.DualTooltip;
 import tfar.dankstorage.client.NumberEditBox;
@@ -28,7 +25,6 @@ import tfar.dankstorage.network.server.*;
 import tfar.dankstorage.utils.Utils;
 import tfar.dankstorage.world.DankInventory;
 
-import javax.tools.Tool;
 import java.util.List;
 
 public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> extends AbstractContainerScreen<T> {
@@ -145,18 +141,15 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
         }
     }
 
-    public void renderSlot(PoseStack pPoseStack, Slot pSlot) {
-        if (pSlot instanceof DankSlot) {
-            itemRenderer = BigItemRenderer.INSTANCE;
-        }
-        super.renderSlot(pPoseStack, pSlot);
-        itemRenderer = minecraft.getItemRenderer();
+    @Override
+    public void renderSlot(GuiGraphics guiGraphics, Slot pSlot) {
+        super.renderSlot(guiGraphics, pSlot);
         int i = pSlot.x;
         int j = pSlot.y;
         if (pSlot.index < menu.dankInventory.getContainerSize() && !pSlot.hasItem() && menu.dankInventory.hasGhostItem(pSlot.index)) {
-            itemRenderer.renderAndDecorateFakeItem(pPoseStack,menu.dankInventory.getGhostItem(pSlot.index), i, j);
+            guiGraphics.renderFakeItem(menu.dankInventory.getGhostItem(pSlot.index), i, j);
             RenderSystem.depthFunc(516);
-            GuiComponent.fill(pPoseStack, i, j, i + 16, j + 16, 0x40ffffff);
+            guiGraphics.fill(i, j, i + 16, j + 16, 0x40ffffff);
             RenderSystem.depthFunc(515);
         }
     }
@@ -183,13 +176,12 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     @Override
-    protected void renderBg(PoseStack stack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 
-        RenderSystem.setShaderTexture(0, background);
         if (is7)
-            blit(stack, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 512);
+            guiGraphics.blit(background, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 512);
         else
-            blit(stack, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+            guiGraphics.blit(background, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
 
         for (int i = 0; i < (menu.rows * 9); i++) {
@@ -198,27 +190,27 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
             int offsetx = 8;
             int offsety = 18;
             if (this.menu.dankInventory.hasGhostItem(i)) {
-                fill(stack, leftPos + j * 18 + offsetx, topPos + k * 18 + offsety,
+                guiGraphics.fill(leftPos + j * 18 + offsetx, topPos + k * 18 + offsety,
                         leftPos + j * 18 + offsetx + 16, topPos + k * 18 + offsety + 16, 0xFFFF0000);
             }
         }
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(stack);
-        super.render(stack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
         RenderSystem.disableBlend();
 
         int color = menu.dankInventory.getTextColor();
         this.frequency.setTextColor(color);
-        this.frequency.render(stack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(stack, mouseX, mouseY);
+        this.frequency.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override
-    public List<Component> getTooltipFromItem(ItemStack itemStack) {
-        List<Component> tooltipFromItem = super.getTooltipFromItem(itemStack);
+    public List<Component> getTooltipFromContainerItem(ItemStack itemStack) {
+        List<Component> tooltipFromItem = super.getTooltipFromContainerItem(itemStack);
         appendDankInfo(tooltipFromItem, itemStack);
         return tooltipFromItem;
     }
@@ -246,10 +238,10 @@ public abstract class AbstractDankStorageScreen<T extends AbstractDankMenu> exte
     }
 
     @Override
-    protected void renderLabels(PoseStack poseStack, int i, int j) {
-        super.renderLabels(poseStack, i, j);
+    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+        super.renderLabels(guiGraphics, i, j);
         int id = menu.dankInventory.getFrequency();//menu.dankInventory.get(menu.rows * 9);
         int color = 0x008000;
-        this.font.draw(poseStack, "ID: " + id, 62, inventoryLabelY, color);
+        guiGraphics.drawString(this.font, "ID: " + id, 62, inventoryLabelY, color);
     }
 }

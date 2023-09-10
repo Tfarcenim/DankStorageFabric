@@ -1,9 +1,8 @@
 package tfar.dankstorage.event;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
@@ -15,7 +14,7 @@ public class FabricEvents {
 
     static Minecraft mc = Minecraft.getInstance();
 
-    public static void renderStack(PoseStack matrixStack, float v) {
+    public static void renderStack(GuiGraphics guiGraphics, float v) {
         Player player = mc.player;
         if (player == null)
             return;
@@ -41,17 +40,17 @@ public class FabricEvents {
 
             final int itemX = xStart - 150;
             final int itemY = yStart - 25;
-            renderHotbarItem(matrixStack,itemX, itemY, 0, player, toPlace);
+            renderHotbarItem(guiGraphics,itemX, itemY, 0, player, toPlace);
         }
         final int stringX = xStart - 155;
         final int stringY = yStart - 10;
         String mode = Utils.getUseType(bag).name();
-        mc.font.drawShadow(matrixStack, mode, stringX, stringY, 0xffffff);
-        RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
+        guiGraphics.drawString(mc.font, mode, stringX, stringY, 0xffffff, true);
 
         }
 
-    private static void renderHotbarItem(PoseStack poses,int x, int y, float partialTicks, Player player, ItemStack stack) {
+    private static void renderHotbarItem(GuiGraphics guiGraphics, int x, int y, float partialTicks, Player player, ItemStack stack) {
+        PoseStack poses = guiGraphics.pose();
         float f = (float) stack.getPopTime() - partialTicks;
         if (f > 0.0F) {
             poses.pushPose();
@@ -61,11 +60,11 @@ public class FabricEvents {
             poses.translate((float) (-(x + 8)), (float) (-(y + 12)), 0.0F);
         }
 
-        mc.getItemRenderer().renderAndDecorateItem(poses,player, stack, x, y,0);
+        guiGraphics.renderItem(stack, x, y, 0);
         if (f > 0.0F) {
             poses.popPose();
         }
-        mc.getItemRenderer().renderGuiItemDecorations(poses,mc.font, stack, x, y);
+        guiGraphics.renderItemDecorations(mc.font, stack, x, y);
     }
 
 }
