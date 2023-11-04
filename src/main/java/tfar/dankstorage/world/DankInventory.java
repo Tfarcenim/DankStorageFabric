@@ -284,10 +284,6 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         }
     }
 
-    public int getFrequencySlot() {
-        return getContainerSize();
-    }
-
     public int getTextColor() {
         return get(1);
     }
@@ -452,12 +448,13 @@ public class DankInventory extends SimpleContainer implements ContainerData {
         for (int i = 0; i < wrappers.size(); i++) {
             ItemStack stack = wrappers.get(i).stack;
             int count = stack.getCount();
-            if (count > dankStats.stacklimit) {
-                int fullStacks = count / dankStats.stacklimit;
-                int partialStack = count - fullStacks * dankStats.stacklimit;
+            int stackSizeSensitive = getMaxStackSizeSensitive(stack);
+            if (count > stackSizeSensitive) {
+                int fullStacks = count / stackSizeSensitive;
+                int partialStack = count - fullStacks * stackSizeSensitive;
 
                 for (int j = 0; j < fullStacks; j++) {
-                    setItem(slotId, ItemHandlerHelper.copyStackWithSize(stack, dankStats.stacklimit));
+                    setItem(slotId, ItemHandlerHelper.copyStackWithSize(stack, stackSizeSensitive));
                     slotId++;
                 }
                 if (partialStack > 0) {
@@ -507,6 +504,6 @@ public class DankInventory extends SimpleContainer implements ContainerData {
 
     @Override
     public int getCount() {
-        return getContainerSize() + 3;
+        return 3;
     }
 }
