@@ -115,6 +115,7 @@ public class DankInventory extends SimpleContainer implements ContainerData {
                 && checkGhostItem;
     }
 
+
     //paranoia
     /*
     @Override
@@ -267,6 +268,11 @@ public class DankInventory extends SimpleContainer implements ContainerData {
 
         f /= this.getContainerSize();
         return Mth.floor(f * 14F) + (numStacks > 0 ? 1 : 0);
+    }
+
+
+    public int getMaxStackSizeSensitive(ItemStack stack) {
+        return stack.is(Utils.UNSTACKABLE) ? 1 : getMaxStackSize();
     }
 
 

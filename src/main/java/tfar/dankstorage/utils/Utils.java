@@ -38,6 +38,8 @@ public class Utils {
 
     public static final TagKey<Item> BLACKLISTED_STORAGE = bind(new ResourceLocation(DankStorage.MODID, "blacklisted_storage"));
     public static final TagKey<Item> BLACKLISTED_USAGE = bind(new ResourceLocation(DankStorage.MODID, "blacklisted_usage"));
+    public static final TagKey<Item> UNSTACKABLE = bind(new ResourceLocation(DankStorage.MODID, "unstackable"));
+
 
     public static final TagKey<Item> WRENCHES = bind(new ResourceLocation("forge", "wrenches"));
 
